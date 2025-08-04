@@ -1,0 +1,11 @@
+services:
+  cfn:
+    image: cfn:latest
+    ports:
+      - 127.0.0.1:2836:2836
+    environment:
+      CleanupForNotion__StateFilePath: /app/cfnstate.json
+      ASPNETCORE_URLS: "http://0.0.0.0:2836"
+    volumes:
+      - ./appsettings.json:/app/appsettings.json
+      - ./cfnstate.json:/app/cfnstate.json
