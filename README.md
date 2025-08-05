@@ -208,7 +208,6 @@ The easiest way to run the application in this model is with Docker and Docker C
 ```console
 # mkdir /srv/CleanupForNotion
 # cp docker-compose.yml /srv/CleanupForNotion
-# cd /srv/CleanupForNotion
 # vim /srv/CleanupForNotion/appsettings.json
 # touch /srv/CleanupForNotion/cfnstate.json
 # docker compose -f /srv/CleanupForNotion/docker-compose.yml up -d
