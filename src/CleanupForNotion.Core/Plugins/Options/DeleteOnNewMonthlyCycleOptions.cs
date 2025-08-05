@@ -6,4 +6,4 @@ public record DeleteOnNewMonthlyCycleOptions(
   int CycleResetDay,
   bool MonthOverflowResetsOnFirstDayOfNextMonth = true,
   string? TimeZoneName = null,
-  TimeSpan? GracePeriod = null) : IDeletePluginOptions;
+  TimeSpan? GracePeriod = null) : IBasicPluginOptions;

@@ -38,7 +38,7 @@ public class RawPluginOptions(Dictionary<string, object> options) {
     };
   }
 
-  private bool? StringToBoolean(string key, string stringValue) {
+  private static bool? StringToBoolean(string key, string stringValue) {
     if (stringValue.Equals("true", StringComparison.OrdinalIgnoreCase)) return true;
     if (stringValue.Equals("false", StringComparison.OrdinalIgnoreCase)) return false;
 

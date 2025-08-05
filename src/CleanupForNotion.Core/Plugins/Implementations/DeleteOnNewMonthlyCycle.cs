@@ -1,7 +1,7 @@
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.NotionIntegration;
 using CleanupForNotion.Core.Infrastructure.State;
-using CleanupForNotion.Core.Infrastructure.TimeZones;
+using CleanupForNotion.Core.Infrastructure.Time;
 using CleanupForNotion.Core.Plugins.Options;
 using Microsoft.Extensions.Logging;
 using Notion.Client;

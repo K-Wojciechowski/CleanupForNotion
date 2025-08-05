@@ -10,7 +10,7 @@ public class DeleteOnNewMonthlyCycleProvider(
     ILoggerFactory loggerFactory,
     IPluginStateProvider pluginStateProvider,
     TimeProvider timeProvider)
-    : DeletePluginProviderBase<DeleteOnNewMonthlyCycle, DeleteOnNewMonthlyCycleOptions>(
+    : BasicPluginProviderBase<DeleteOnNewMonthlyCycle, DeleteOnNewMonthlyCycleOptions>(
         loggerFactory,
         pluginStateProvider,
         timeProvider) {
@@ -19,10 +19,11 @@ public class DeleteOnNewMonthlyCycleProvider(
   protected override DeleteOnNewMonthlyCycleOptions GetOptions(
       RawPluginOptions options,
       string databaseId,
+      string propertyName,
       TimeSpan? gracePeriod) {
     return new DeleteOnNewMonthlyCycleOptions(
         DatabaseId: databaseId,
-        PropertyName: options.GetString("PropertyName"),
+        PropertyName: propertyName,
         CycleResetDay: options.GetInteger("CycleResetDay"),
         MonthOverflowResetsOnFirstDayOfNextMonth: options.GetOptionalBoolean("MonthOverflowResetsOnFirstDayOfNextMonth") ?? true,
         TimeZoneName: options.GetOptionalString("TimeZoneName"),

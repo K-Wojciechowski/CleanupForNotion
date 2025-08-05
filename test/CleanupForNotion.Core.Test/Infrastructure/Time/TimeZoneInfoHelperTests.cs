@@ -1,7 +1,7 @@
-using CleanupForNotion.Core.Infrastructure.TimeZones;
+﻿using CleanupForNotion.Core.Infrastructure.Time;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.TimeZones;
+namespace CleanupForNotion.Test.Infrastructure.Time;
 
 [TestClass]
 public class TimeZoneInfoHelperTests {

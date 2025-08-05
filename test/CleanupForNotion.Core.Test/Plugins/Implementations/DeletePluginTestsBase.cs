@@ -1,4 +1,4 @@
-using CleanupForNotion.Core.Infrastructure.NotionIntegration;
+﻿using CleanupForNotion.Core.Infrastructure.NotionIntegration;
 using Microsoft.Extensions.Logging.Testing;
 using Notion.Client;
 using NSubstitute;
@@ -34,7 +34,7 @@ public abstract class DeletePluginTestsBase {
   ) {
     // Assert
     var logRecords = logger.Collector.GetSnapshot();
-    logRecords.ShouldContain(r => r.Message.StartsWith("Searching for pages to delete with filters: {\""));
+    logRecords.ShouldContain(r => r.Message.StartsWith("Searching for pages to change with filters: {\""));
     logRecords.ShouldContain(r => r.Message == "Pages to delete: 3");
 
     await client.ReceivedWithAnyArgs()

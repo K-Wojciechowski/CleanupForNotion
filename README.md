@@ -22,7 +22,9 @@ While it is quite trivial to right-click and click Delete, this allows keeping t
 
 This plugin deletes items from databases that belong to previous monthly cycles.
 
-The database I use this with tracks purchases made with my secondary bank’s debit card, and to ensure I reach the magic number required to waive the fees at that bank. The cycle resets every month, and I only need the current month’s data in the database.
+The database I use this with tracks purchases made with my secondary bank’s debit card. I use it to ensure I reach the magic number required to waive the fees at that bank.
+
+I need to reach the threshold every month, and I only need the current month’s data in the database. So this plugin deletes pages after the month ends. (And the cycle doesn’t have to start on the first day of the month.)
 
 #### Plugin-specific configuration for DeleteOnNewMonthlyCycle
 
@@ -43,6 +45,25 @@ This plugin implements a simple “debt settlement” mechanism for items. It lo
 Note that the algorithm is a bit simplistic, and it won’t consider (2, 2, -4) to be removable.
 
 This plugin has no special configuration options.
+
+### EnsureStaticRelatedPage
+
+This plugin ensures that all pages in a database have a relation field set to a single, specified page.
+
+This is another part of the “secondary bank’s credit card” database (as described alongside [DeleteOnNewMonthlyCycle](#deleteonnewmonthlycycle)).
+
+I actually have two databases: one with the purchases, and another that shows the remaining amount until the target by using this terrible formula:
+
+```javascript
+if(prop("Total")>=TARGET, "✅",
+let(x, add(subtract(TARGET, prop("Total")), 0.000001),	style("PLN " + replace(format(x), "(\d+\.\d\d)(.+)", "$1"), "b", "red_background")))
+```
+
+For this to work, all purchases must have a relationship to the single row in the summary database. I use a Button to do it, but I occassionally forget and insert data directly into the transactions database. This plugin fixes that.
+
+#### Plugin-specific configuration for EnsureStaticRelatedPage
+
+* **RelatedPageId** (string, mandatory) — The Notion ID of the page that all pages in the database must be related to.
 
 ## Setup in Notion
 
@@ -73,6 +94,15 @@ https://www.notion.so/workspace-name/11111111111111111111111111111111?v=22222222
                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ```
 
+### Get page IDs
+
+Open the target page in full view and look at the URL:
+
+```text
+https://www.notion.so/workspace-name/Page-Name-22222222222222222222222222222222
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+
 ## Configuration
 
 ### General options
@@ -80,7 +110,7 @@ https://www.notion.so/workspace-name/11111111111111111111111111111111?v=22222222
 * **AuthToken** (string, mandatory) — the Notion authentication token. See the [Setup in Notion](#setup-in-notion) section for details.
 * **StateFilePath** (string, optional) — the path to a file in which some plugins may persist state between runs. If not defined, some plugins may not work correctly.
 * **RunFrequency** (string, `"HH:MM:SS"`, optional) — the frequency of automated cleanups. Behavior depends on the deployment model.
-* **DryRun** (boolean, defaults to `false`) — if true, no actual changes will be made to the Notion databases (but checks will still be done and items that would have been deleted will be logged).
+* **DryRun** (boolean, defaults to `false`) — if true, no actual changes will be made to the Notion databases (but checks will still be done and items that would have been changed will be logged).
 
 ### Defining and configuring plugins
 
@@ -90,7 +120,7 @@ Plugins are configured in a **Plugins** array. Every plugin instance has its own
 * **PluginDescription** (string, mandatory) — the description of the plugin instance. Should be unique and human-readable.
 * **DatabaseId** (string, mandatory) — ID of the database to work on. See [Setup in Notion](#setup-in-notion) for retrieval instructions.
 * **PropertyName** (string, mandatory) — name of the property to base deletion checks on. This is the human-readable name visible in the database.
-* **GracePeriod** (string, `"HH:MM:SS"`, optional) — defines the time after the last edit for which the page will not be deleted. Defaults to 1 hour.
+* **GracePeriod** (string, `"HH:MM:SS"`, optional) — defines the time after the last edit for which the page will not be modified. Defaults to 1 hour.
 
 ### Putting it all together
 
@@ -128,6 +158,14 @@ Here is the an example CleanupForNotion configuration:
       "PluginDescription": "Delete zero sum entries from Settlement Sheet",
       "DatabaseId": "33333333333333333333333333333333",
       "PropertyName": "Amount"
+    },
+    {
+      "PluginName": "EnsureStaticRelatedPage",
+      "PluginDescription": "Ensure all entries in Secondary Bank Card Fee point to target row",
+      "DatabaseId": "44444444444444444444444444444444",
+      "PropertyName": "SummaryRef",
+      "RelatedPageId": "45454545454545454545454545454545",
+      "GracePeriod": "00:01:00"
     }
   ]
 }

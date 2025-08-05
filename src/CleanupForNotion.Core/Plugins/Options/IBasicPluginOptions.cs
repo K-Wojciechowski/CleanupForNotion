@@ -1,6 +1,6 @@
 namespace CleanupForNotion.Core.Plugins.Options;
 
-public interface IDeletePluginOptions {
+public interface IBasicPluginOptions {
   string DatabaseId { get; }
 
   string PropertyName { get; }

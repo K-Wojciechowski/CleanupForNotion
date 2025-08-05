@@ -4,4 +4,4 @@ public record DeleteByCheckboxOptions(
   string DatabaseId,
   string PropertyName,
   bool DeleteIfChecked = true,
-  TimeSpan? GracePeriod = null) : IDeletePluginOptions;
+  TimeSpan? GracePeriod = null) : IBasicPluginOptions;

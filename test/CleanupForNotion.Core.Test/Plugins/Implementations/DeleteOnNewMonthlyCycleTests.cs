@@ -2,7 +2,7 @@ using System.Globalization;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.NotionIntegration;
 using CleanupForNotion.Core.Infrastructure.State;
-using CleanupForNotion.Core.Infrastructure.TimeZones;
+using CleanupForNotion.Core.Infrastructure.Time;
 using CleanupForNotion.Core.Plugins.Implementations;
 using CleanupForNotion.Core.Plugins.Options;
 using Microsoft.Extensions.Logging.Testing;
@@ -137,12 +137,9 @@ public class DeleteOnNewMonthlyCycleTests : DeletePluginTestsBase {
     var client = CreateMockNotionClient();
 
     var currentCycleStartGenericDateTime = currentCycleStartDate.ToDateTime(TimeOnly.MinValue);
-    var lastEditedBefore = timeProvider.GetUtcNow() - ((IDeletePluginOptions)options).GracePeriodWithFallback;
 
-    var expectedCompoundFilter = new CompoundFilter(and: [
-        new TimestampLastEditedTimeFilter(onOrBefore: lastEditedBefore.DateTime),
-        new DateFilter(options.PropertyName, before: currentCycleStartGenericDateTime)
-    ]);
+    var dateFilter = new DateFilter(options.PropertyName, before: currentCycleStartGenericDateTime);
+    var expectedCompoundFilter = LastEditedFilterHelper.GetCompoundFilterWithLastEdited(timeProvider, options, [dateFilter]);
 
     var nowLocal = options.TimeZoneName != null
         ? TimeZoneInfo.ConvertTime(now, TimeZoneInfoHelper.GetTimeZone(options.TimeZoneName))

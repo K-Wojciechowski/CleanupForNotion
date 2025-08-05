@@ -2,15 +2,16 @@ using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.NotionIntegration;
 using CleanupForNotion.Core.Infrastructure.Plugins;
 using CleanupForNotion.Core.Infrastructure.State;
+using CleanupForNotion.Core.Infrastructure.Time;
+using CleanupForNotion.Core.Infrastructure.Traceability;
 using CleanupForNotion.Core.Plugins.Options;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Notion.Client;
 
 namespace CleanupForNotion.Core.Plugins;
 
 public abstract class DeletePluginBase<TOptions> : IPlugin
-    where TOptions : IDeletePluginOptions {
+    where TOptions : IBasicPluginOptions {
   public abstract string Name { get; }
   public string Description { get; }
 
@@ -39,13 +40,9 @@ public abstract class DeletePluginBase<TOptions> : IPlugin
       GlobalOptions globalOptions,
       List<Filter> filters,
       CancellationToken cancellationToken) {
-    var lastEditedBefore = TimeProvider.GetUtcNow() - Options.GracePeriodWithFallback;
-    var filter = new CompoundFilter(and: [
-        new TimestampLastEditedTimeFilter(onOrBefore: lastEditedBefore.DateTime),
-        .. filters
-    ]);
-    // Not a fan of Newtonsoft.Json, but Notion.Client is using that, so we must use it too to get correct output
-    Logger.LogInformation("Searching for pages to delete with filters: {Filters}", JsonConvert.SerializeObject(filter));
+    var filter = LastEditedFilterHelper.GetCompoundFilterWithLastEdited(TimeProvider, Options, filters);
+
+    Logger.LogFilters(filter);
     var pageIds = await client.QueryDatabaseIdsAsync(Options.DatabaseId, filter, cancellationToken).ConfigureAwait(false);
 
     await DoDelete(client, globalOptions, pageIds, cancellationToken).ConfigureAwait(false);

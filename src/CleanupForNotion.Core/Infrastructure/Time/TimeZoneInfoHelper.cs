@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace CleanupForNotion.Core.Infrastructure.TimeZones;
+namespace CleanupForNotion.Core.Infrastructure.Time;
 
 public static class TimeZoneInfoHelper {
   [ExcludeFromCodeCoverage(Justification = "Method is tested, but computing its coverage requires merging two runs on two operating systems")]

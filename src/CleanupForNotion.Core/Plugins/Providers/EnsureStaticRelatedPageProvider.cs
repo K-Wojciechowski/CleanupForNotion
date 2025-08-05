@@ -1,4 +1,4 @@
-using CleanupForNotion.Core.Infrastructure.ConfigModels;
+﻿using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.State;
 using CleanupForNotion.Core.Plugins.Implementations;
 using CleanupForNotion.Core.Plugins.Options;
@@ -6,33 +6,34 @@ using Microsoft.Extensions.Logging;
 
 namespace CleanupForNotion.Core.Plugins.Providers;
 
-public class DeleteWithoutRelationshipsProvider(
+public class EnsureStaticRelatedPageProvider(
     ILoggerFactory loggerFactory,
     IPluginStateProvider pluginStateProvider,
     TimeProvider timeProvider)
-    : BasicPluginProviderBase<DeleteWithoutRelationships, DeleteWithoutRelationshipsOptions>(
+    : BasicPluginProviderBase<EnsureStaticRelatedPage, EnsureStaticRelatedPageOptions>(
         loggerFactory,
         pluginStateProvider,
         timeProvider) {
-  public override string Name => "DeleteWithoutRelationships";
+  public override string Name => "EnsureStaticRelatedPage";
 
-  protected override DeleteWithoutRelationshipsOptions GetOptions(
+  protected override EnsureStaticRelatedPageOptions GetOptions(
       RawPluginOptions options,
       string databaseId,
       string propertyName,
       TimeSpan? gracePeriod) {
-    return new DeleteWithoutRelationshipsOptions(
+    return new EnsureStaticRelatedPageOptions(
         databaseId,
         propertyName,
+        options.GetString("RelatedPageId"),
         gracePeriod);
   }
 
-  protected override DeleteWithoutRelationships CreatePlugin(
-      ILogger<DeleteWithoutRelationships> logger,
+  protected override EnsureStaticRelatedPage CreatePlugin(
+      ILogger<EnsureStaticRelatedPage> logger,
       IPluginStateProvider pluginStateProvider,
       TimeProvider timeProvider,
-      DeleteWithoutRelationshipsOptions options,
+      EnsureStaticRelatedPageOptions options,
       string pluginDescription) {
-    return new DeleteWithoutRelationships(logger, pluginStateProvider, timeProvider, options, pluginDescription);
+    return new EnsureStaticRelatedPage(logger, timeProvider, options, pluginDescription);
   }
 }

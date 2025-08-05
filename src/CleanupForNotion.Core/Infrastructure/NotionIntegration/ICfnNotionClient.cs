@@ -8,5 +8,7 @@ public interface ICfnNotionClient {
       DatabasesQueryParameters queryParameters,
       CancellationToken cancellationToken);
 
+  Task UpdatePageAsync(string pageId, PagesUpdateParameters pagesUpdateParameters, CancellationToken cancellationToken);
+
   Task DeletePageAsync(string pageId, CancellationToken cancellationToken);
 }

@@ -1,4 +1,5 @@
-using CleanupForNotion.Core.Infrastructure.ConfigModels;
+﻿using CleanupForNotion.Core.Infrastructure.ConfigModels;
+using CleanupForNotion.Core.Infrastructure.Time;
 using CleanupForNotion.Core.Plugins;
 using CleanupForNotion.Core.Plugins.Options;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,7 @@ namespace CleanupForNotion.Test.Plugins.Implementations;
 
 public abstract class BasicDeletePluginTestsBase<TPlugin, TOptions> : DeletePluginTestsBase
     where TPlugin : DeletePluginBase<TOptions>
-    where TOptions : IDeletePluginOptions {
+    where TOptions : IBasicPluginOptions {
   protected const string DatabaseId = "databaseId";
 
   protected async Task TestRun(
@@ -23,11 +24,7 @@ public abstract class BasicDeletePluginTestsBase<TPlugin, TOptions> : DeletePlug
     var logger = new FakeLogger<TPlugin>();
     var timeProvider = new FakeTimeProvider();
     var plugin = pluginCreator(logger, timeProvider);
-    var lastEditedBefore = timeProvider.GetUtcNow() - options.GracePeriodWithFallback;
-    var expectedCompoundFilter = new CompoundFilter(and: [
-        new TimestampLastEditedTimeFilter(onOrBefore: lastEditedBefore.DateTime),
-        .. filters
-    ]);
+    var expectedCompoundFilter = LastEditedFilterHelper.GetCompoundFilterWithLastEdited(timeProvider, options, filters);
 
     var client = CreateMockNotionClient();
 

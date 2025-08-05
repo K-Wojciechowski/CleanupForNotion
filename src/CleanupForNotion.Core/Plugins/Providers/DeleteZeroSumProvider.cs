@@ -10,7 +10,7 @@ public class DeleteZeroSumProvider(
     ILoggerFactory loggerFactory,
     IPluginStateProvider pluginStateProvider,
     TimeProvider timeProvider)
-    : DeletePluginProviderBase<DeleteZeroSum, DeleteZeroSumOptions>(
+    : BasicPluginProviderBase<DeleteZeroSum, DeleteZeroSumOptions>(
         loggerFactory,
         pluginStateProvider,
         timeProvider) {
@@ -19,10 +19,11 @@ public class DeleteZeroSumProvider(
   protected override DeleteZeroSumOptions GetOptions(
       RawPluginOptions options,
       string databaseId,
+      string propertyName,
       TimeSpan? gracePeriod) {
     return new DeleteZeroSumOptions(
         databaseId,
-        options.GetString("PropertyName"),
+        propertyName,
         gracePeriod);
   }
 

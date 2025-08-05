@@ -1,6 +1,7 @@
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.NotionIntegration;
 using CleanupForNotion.Core.Infrastructure.State;
+using CleanupForNotion.Core.Infrastructure.Time;
 using CleanupForNotion.Core.Plugins.Options;
 using Microsoft.Extensions.Logging;
 using Notion.Client;
@@ -18,8 +19,7 @@ public class DeleteZeroSum(
 
   public override async Task Run(ICfnNotionClient client, GlobalOptions globalOptions,
       CancellationToken cancellationToken) {
-    var lastEditedBefore = TimeProvider.GetUtcNow() - ((IDeletePluginOptions)Options).GracePeriodWithFallback;
-    var filter = new TimestampLastEditedTimeFilter(onOrBefore: lastEditedBefore.DateTime);
+    var filter = LastEditedFilterHelper.GetLastEditedFilter(TimeProvider, Options);
 
     var pages = await client.QueryDatabaseAsync(Options.DatabaseId, filter, cancellationToken).ConfigureAwait(false);
     var buckets = new Buckets();

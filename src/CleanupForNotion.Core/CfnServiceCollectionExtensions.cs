@@ -23,6 +23,7 @@ public static class CfnServiceCollectionExtensions {
       .AddSingleton<IPluginProvider, DeleteOnNewMonthlyCycleProvider>()
       .AddSingleton<IPluginProvider, DeleteWithoutRelationshipsProvider>()
       .AddSingleton<IPluginProvider, DeleteZeroSumProvider>()
+      .AddSingleton<IPluginProvider, EnsureStaticRelatedPageProvider>()
       .AddSingleton<IRunnerSemaphore, RunnerSemaphore>();
   }
 }
