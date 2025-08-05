@@ -203,10 +203,9 @@ The HTTP API is extremely simple: a `POST /` call will trigger a cleanup. With t
 
 The API should not be exposed on the public Internet.
 
-The easiest way to run the application in this model is with Docker and Docker Compose:
+The easiest way to run the application in this model is with Docker and Docker Compose. The Docker image is hosted on [GitHub Container Registry](https://github.com/K-Wojciechowski/CleanupForNotion/pkgs/container/cleanupfornotion), with the latest release available as `docker pull ghcr.io/k-wojciechowski/cleanupfornotion:latest`.
 
 ```console
-# ./build-docker.sh
 # mkdir /srv/CleanupForNotion
 # cp docker-compose.yml /srv/CleanupForNotion
 # cd /srv/CleanupForNotion

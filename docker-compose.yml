@@ -1,6 +1,6 @@
 services:
   cfn:
-    image: cfn:latest
+    image: ghcr.io/k-wojciechowski/cleanupfornotion:latest
     ports:
       - 127.0.0.1:2836:2836
     environment:

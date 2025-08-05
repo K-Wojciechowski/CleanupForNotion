@@ -15,7 +15,41 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build:
+  test:
+    name: Build and Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        dotnet-version: [9.0.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory "TestResults"
+    - name: Generate coverage report
+      continue-on-error: true
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.4.11
+      with:
+       reports: TestResults/*/coverage.cobertura.xml
+       targetdir: coveragereport
+       reporttypes: TextSummary
+    - name: Display coverage report
+      continue-on-error: true
+      run: cat coveragereport/Summary.txt
+
+  docker:
+    name: Build and Publish Docker Image
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -25,27 +59,6 @@ jobs:
       id-token: write
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory "TestResults"
-    - name: Generate coverage report
-      uses: danielpalme/ReportGenerator-GitHub-Action@5.4.11
-      with:
-       reports: TestResults/*/coverage.cobertura.xml
-       targetdir: coveragereport
-       reporttypes: TextSummary
-    - name: Display coverage report
-      run: cat coveragereport/Summary.txt
-
-      
     # Install the cosign tool except on PR
     # https://github.com/sigstore/cosign-installer
     - name: Install cosign
@@ -106,4 +119,4 @@ jobs:
       # against the sigstore community Fulcio instance.
       run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
-      
+
