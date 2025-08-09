@@ -1,4 +1,4 @@
-﻿using CleanupForNotion.Core.Infrastructure.Time;
+using CleanupForNotion.Core.Infrastructure.Time;
 using Shouldly;
 
 namespace CleanupForNotion.Test.Infrastructure.Time;

@@ -1,4 +1,4 @@
-﻿using CleanupForNotion.Core.Infrastructure.Traceability;
+using CleanupForNotion.Core.Infrastructure.Traceability;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 using Notion.Client;

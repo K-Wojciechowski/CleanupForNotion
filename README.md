@@ -118,7 +118,7 @@ Plugins are configured in a **Plugins** array. Every plugin instance has its own
 
 * **PluginName** (string, mandatory) — the name of the plugin. Valid values: `DeleteByCheckbox`, `DeleteOnNewMonthlyCycle`, `DeleteWithoutRelationships`, `DeleteZeroSum`. One plugin may be used multiple times in the configuration.
 * **PluginDescription** (string, mandatory) — the description of the plugin instance. Should be unique and human-readable.
-* **DatabaseId** (string, mandatory) — ID of the database to work on. See [Setup in Notion](#setup-in-notion) for retrieval instructions.
+* **DatabaseId** (string, mandatory) — ID of the database to work on. See [Setup in Notion](#setup-in-notion) for retrieval instructions.
 * **PropertyName** (string, mandatory) — name of the property to base deletion checks on. This is the human-readable name visible in the database.
 * **GracePeriod** (string, `"HH:MM:SS"`, optional) — defines the time after the last edit for which the page will not be modified. Defaults to 1 hour.
 
