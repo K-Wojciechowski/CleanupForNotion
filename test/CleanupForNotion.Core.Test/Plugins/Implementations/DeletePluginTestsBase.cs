@@ -1,4 +1,4 @@
-﻿using CleanupForNotion.Core.Infrastructure.NotionIntegration;
+using CleanupForNotion.Core.Infrastructure.NotionIntegration;
 using Microsoft.Extensions.Logging.Testing;
 using Notion.Client;
 using NSubstitute;

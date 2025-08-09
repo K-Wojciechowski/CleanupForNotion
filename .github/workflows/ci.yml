@@ -35,7 +35,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory "TestResults"
+      run: dotnet test --no-build --verbosity normal -l "console;verbosity=normal" --collect:"XPlat Code Coverage" --results-directory "TestResults"
     - name: Generate coverage report
       continue-on-error: true
       uses: danielpalme/ReportGenerator-GitHub-Action@5.4.11

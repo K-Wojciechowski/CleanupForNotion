@@ -1,4 +1,4 @@
-﻿namespace CleanupForNotion.Core.Plugins.Options;
+namespace CleanupForNotion.Core.Plugins.Options;
 
 public record EnsureStaticRelatedPageOptions(
   string DatabaseId,

@@ -9,9 +9,10 @@ using Microsoft.Extensions.Options;
 namespace CleanupForNotion.Core.Infrastructure.State;
 
 public class JsonFilePluginStateProvider : IPluginStateProvider, INotificationListener, IDisposable {
-  private readonly SemaphoreSlim _semaphore = new(1, 1);
   private readonly ILogger<JsonFilePluginStateProvider> _logger;
   private readonly INotificationSender _notificationSender;
+
+  private readonly SemaphoreSlim _semaphore = new(1, 1);
   private readonly string? _filePath;
   private Dictionary<string, string> _data;
   private bool _initialized;
@@ -57,8 +58,8 @@ public class JsonFilePluginStateProvider : IPluginStateProvider, INotificationLi
 
   public void Dispose() {
     Save();
-    _semaphore.Dispose();
     _notificationSender.Unregister(this);
+    _semaphore.Dispose();
     GC.SuppressFinalize(this);
   }
 

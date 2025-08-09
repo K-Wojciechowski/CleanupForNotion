@@ -1,4 +1,4 @@
-﻿using CleanupForNotion.Core.Plugins.Options;
+using CleanupForNotion.Core.Plugins.Options;
 using Notion.Client;
 
 namespace CleanupForNotion.Core.Infrastructure.Time;
