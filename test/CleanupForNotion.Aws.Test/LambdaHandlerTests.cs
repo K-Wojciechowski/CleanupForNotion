@@ -37,9 +37,14 @@ public class LambdaHandlerTests {
     var testContext = new TestLambdaContext();
 
     // Act
-    using var _1 = new TempEnvironmentVariable("AWS_ACCESS_KEY_ID", "X");
-    using var _2 = new TempEnvironmentVariable("AWS_SECRET_ACCESS_KEY", "X");
-    using var _3 = new TempEnvironmentVariable("AWS_SESSION_TOKEN", "X");
+    using var _1 = new TempEnvironmentVariable("CFN_S3_BUCKET", s3BucketName);
+    using var _2 = new TempEnvironmentVariable("CFN_S3_KEY", s3Key);
+    using var _3 = new TempEnvironmentVariable("CFN_DYNAMODB_TABLE_NAME", dynamoDbTableName);
+    using var _4 = new TempEnvironmentVariable("AWS_ACCESS_KEY_ID", "X");
+    using var _5 = new TempEnvironmentVariable("AWS_SECRET_ACCESS_KEY", "X");
+    using var _6 = new TempEnvironmentVariable("AWS_SESSION_TOKEN", "X");
+    using var _7 = new TempEnvironmentVariable("AWS_REGION", "eu-west-1");
+    using var _8 = new TempEnvironmentVariable("AWS_DEFAULT_REGION", "eu-west-1");
     var host = LambdaHandler.BuildHost(testContext, s3Client);
 
     // Assert
