@@ -7,7 +7,6 @@ using CleanupForNotion.Aws.Test.Utils;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.State;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -17,7 +16,7 @@ namespace CleanupForNotion.Aws.Test;
 
 [TestClass]
 [DoNotParallelize] // Tests change environment variables, which may break other tests
-public class LambdaHandlerTests {
+public class LambdaHostBuilderTests {
   [TestMethod]
   public void BuildHost_EnvironmentVariablesSet_BuildsHostWithServicesOptionsAndRedirectedLogging() {
     // Arrange
@@ -45,13 +44,13 @@ public class LambdaHandlerTests {
     using var _6 = new TempEnvironmentVariable("AWS_SESSION_TOKEN", "X");
     using var _7 = new TempEnvironmentVariable("AWS_REGION", "eu-west-1");
     using var _8 = new TempEnvironmentVariable("AWS_DEFAULT_REGION", "eu-west-1");
-    var host = LambdaHandler.BuildHost(testContext, s3Client);
+    var host = LambdaHostBuilder.BuildHost(testContext, s3Client);
 
     // Assert
     host.Services.GetServices<IPluginStateProvider>().ShouldHaveSingleItem()
         .ShouldBeOfType<DynamoDbPluginStateProvider>();
     host.Services.GetService<IPluginStateProvider>().ShouldNotBeNull().ShouldBeOfType<DynamoDbPluginStateProvider>();
-    host.Services.GetService<IHostedService>().ShouldNotBeNull().ShouldBeOfType<LambdaHostedServiceWrapper>();
+    host.Services.GetService<OneShotRunner>().ShouldNotBeNull();
     host.Services.GetService<IOptions<CfnOptions>>().ShouldNotBeNull().Value.AuthToken
         .ShouldBe(S3TestBase.ExpectedOptions["CleanupForNotion:AuthToken"]);
     host.Services.GetService<IOptions<DynamoDbOptions>>().ShouldNotBeNull().Value.TableName.ShouldBe(dynamoDbTableName);
@@ -71,25 +70,10 @@ public class LambdaHandlerTests {
     using var _2 = new TempEnvironmentVariable("CFN_S3_KEY", null);
     using var _3 = new TempEnvironmentVariable("CFN_DYNAMODB_TABLE_NAME", null);
 
-    Action act = () => LambdaHandler.BuildHost(testContext, s3Client);
+    Action act = () => LambdaHostBuilder.BuildHost(testContext, s3Client);
 
     // Assert
     act.ShouldThrow<InvalidConfigurationException>().Message.ShouldBe(expectedMessage);
     testContext.Logger.ShouldBeOfType<TestLambdaLogger>().Buffer.ToString().ShouldContain(expectedMessage);
   }
-
-  /*
-  // for manual testing
-  [TestMethod]
-  public async Task RunLambdaHandler() {
-    var testContext = new TestLambdaContext();
-
-    Environment.SetEnvironmentVariable("CFN_S3_BUCKET", "cfn-test");
-    Environment.SetEnvironmentVariable("CFN_S3_KEY", "cfn-appsettings.json");
-    Environment.SetEnvironmentVariable("CFN_DYNAMODB_TABLE_NAME", "CfnTest");
-
-    var handler = new LambdaHandler();
-    await handler.Handle(testContext).ConfigureAwait(false);
-  }
-  */
 }
