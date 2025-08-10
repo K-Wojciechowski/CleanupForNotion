@@ -66,6 +66,10 @@ jobs:
     name: Build and Publish Docker Image
     needs: test
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
     permissions:
       contents: read
       packages: write
@@ -137,3 +141,34 @@ jobs:
       run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
 
+  lambda:
+    name: Build and Publish Lambda Package
+    needs: test
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Build Lambda
+      run: ./aws-terraform/build-lambda.sh
+    - name: Upload Lambda package to pipeline artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: lambda-package
+        path: ./aws-terraform/lambda.zip
+        retention-days: 30
+    - name: Upload binaries to release
+      if: ${{ github.event_name == 'release' || github.event_name == 'tag' }}
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./aws-terraform/lambda.zip
+        asset_name: lambda.zip
+        tag: ${{ github.ref }}
+        overwrite: true
