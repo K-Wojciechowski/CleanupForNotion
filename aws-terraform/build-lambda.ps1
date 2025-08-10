@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 try {
-  dotnet publish -c Release -r linux-x64 -p:PublishReadyToRun=true -o $PSScriptRoot/publish $PSScriptRoot/../src/CleanupForNotion.Aws/CleanupForNotion.Aws.Csproj
+  dotnet publish -c Release -r linux-x64 -p:PublishReadyToRun=true -o $PSScriptRoot/publish $PSScriptRoot/../src/CleanupForNotion.Aws/CleanupForNotion.Aws.csproj
   if ($LASTEXITCODE -ne 0) {
     Write-Error "dotnet publish failed with exit code $LASTEXITCODE"
     Exit $LASTEXITCODE
