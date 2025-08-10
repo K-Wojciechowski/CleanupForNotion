@@ -54,15 +54,15 @@ jobs:
         $fullMethodCoverage = $coverage.summary.fullmethodcoverage
         $okay = $true
         if ($lineCoverage -ne 100) {
-          Write-Host "Line coverage is $lineCoverage%, expected 100%"
+          Write-Output "Line coverage is $lineCoverage%, expected 100%"
           $okay = $false
         }
         if ($branchCoverage -ne 100) {
-          Write-Host "Branch coverage is $branchCoverage%, expected 100%"
+          Write-Output "Branch coverage is $branchCoverage%, expected 100%"
           $okay = $false
         }
         if ($fullMethodCoverage -ne 100) {
-          Write-Host "Full method coverage is $fullMethodCoverage%, expected 100%"
+          Write-Output "Full method coverage is $fullMethodCoverage%, expected 100%"
           $okay = $false
         }
         if (-not $okay) {
