@@ -38,15 +38,36 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal -l "console;verbosity=normal" --collect:"XPlat Code Coverage" --results-directory "TestResults"
     - name: Generate coverage report
-      continue-on-error: true
       uses: danielpalme/ReportGenerator-GitHub-Action@5.4.11
       with:
        reports: TestResults/*/coverage.cobertura.xml
        targetdir: coveragereport
-       reporttypes: TextSummary
+       reporttypes: TextSummary,JsonSummary
     - name: Display coverage report
-      continue-on-error: true
       run: cat coveragereport/Summary.txt
+    - name: Ensure 100% code coverage
+      shell: pwsh
+      run: |
+        $coverage = ConvertFrom-Json (Get-Content -Raw coveragereport/Summary.json)
+        $lineCoverage = $coverage.summary.linecoverage
+        $branchCoverage = $coverage.summary.branchcoverage
+        $fullMethodCoverage = $coverage.summary.fullmethodcoverage
+        $okay = $true
+        if ($lineCoverage -ne 100) {
+          Write-Host "Line coverage is $lineCoverage%, expected 100%"
+          $okay = $false
+        }
+        if ($branchCoverage -ne 100) {
+          Write-Host "Branch coverage is $branchCoverage%, expected 100%"
+          $okay = $false
+        }
+        if ($fullMethodCoverage -ne 100) {
+          Write-Host "Full method coverage is $fullMethodCoverage%, expected 100%"
+          $okay = $false
+        }
+        if (-not $okay) {
+          Exit 1
+        }
 
   docker:
     name: Build and Publish Docker Image
