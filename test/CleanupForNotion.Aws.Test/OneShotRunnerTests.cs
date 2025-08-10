@@ -2,24 +2,21 @@ using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Execution;
 using CleanupForNotion.Core.Infrastructure.PluginManagement;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Testing;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using Shouldly;
 
 namespace CleanupForNotion.Aws.Test;
 
 [TestClass]
-public class LambdaHostedServiceWrapperTests {
+public class OneShotRunnerTests {
   [TestMethod]
   public async Task ExecuteAsync_Called_RunsOneCleanupAndStopsApplication() {
     // Arrange
     var globalOptionsProvider = Substitute.For<IGlobalOptionsProvider>();
     globalOptionsProvider.GlobalOptions.Returns(new GlobalOptions(RunFrequency: TimeSpan.FromMilliseconds(100)));
-    var hostApplicationLifetime = Substitute.For<IHostApplicationLifetime>();
-    var logger = NullLogger<LambdaHostedServiceWrapper>.Instance;
+    var logger = NullLogger<OneShotRunner>.Instance;
     var runner = Substitute.For<IRunner>();
 
     runner.RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>())
@@ -29,21 +26,19 @@ public class LambdaHostedServiceWrapperTests {
         .AddScoped<IRunner>(_ => runner)
         .BuildServiceProvider();
 
-    var lambdaHostedServiceWrapper = new LambdaHostedServiceWrapper(
+    var lambdaRunner = new OneShotRunner(
         globalOptionsProvider,
-        hostApplicationLifetime,
         logger,
         services.GetRequiredService<IServiceScopeFactory>());
 
     // Act
     using var cancellationTokenSource = new CancellationTokenSource();
-    await lambdaHostedServiceWrapper.StartAsync(cancellationTokenSource.Token).ConfigureAwait(false);
-    await Task.Delay(TimeSpan.FromSeconds(2), CancellationToken.None).ConfigureAwait(false);
+    await lambdaRunner.Run(cancellationTokenSource.Token).ConfigureAwait(false);
     await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
 
     // Assert
-    await runner.ReceivedWithAnyArgs(1).RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>()).ConfigureAwait(false);
-    hostApplicationLifetime.Received().StopApplication();
+    await runner.ReceivedWithAnyArgs(1).RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>())
+        .ConfigureAwait(false);
   }
 
   [TestMethod]
@@ -51,32 +46,35 @@ public class LambdaHostedServiceWrapperTests {
     // Arrange
     var globalOptionsProvider = Substitute.For<IGlobalOptionsProvider>();
     globalOptionsProvider.GlobalOptions.Returns(new GlobalOptions(RunFrequency: TimeSpan.FromMilliseconds(100)));
-    var hostApplicationLifetime = Substitute.For<IHostApplicationLifetime>();
-    var logger = new FakeLogger<LambdaHostedServiceWrapper>();
+    var logger = new FakeLogger<OneShotRunner>();
     var runner = Substitute.For<IRunner>();
 
     runner.RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>())
-        .Throws(new Exception("kaboom"));
+        .Returns(async _ => {
+          await Task.Delay(100).ConfigureAwait(false);
+          throw new Exception("kaboom");
+        });
 
     var services = new ServiceCollection()
         .AddScoped(_ => runner)
         .BuildServiceProvider();
 
-    var lambdaHostedServiceWrapper = new LambdaHostedServiceWrapper(
+    var lambdaHostedServiceWrapper = new OneShotRunner(
         globalOptionsProvider,
-        hostApplicationLifetime,
         logger,
         services.GetRequiredService<IServiceScopeFactory>());
 
     // Act
     using var cancellationTokenSource = new CancellationTokenSource();
-    await lambdaHostedServiceWrapper.StartAsync(cancellationTokenSource.Token).ConfigureAwait(false);
+    var runTask = lambdaHostedServiceWrapper.Run(cancellationTokenSource.Token);
     await Task.Delay(TimeSpan.FromSeconds(2), CancellationToken.None).ConfigureAwait(false);
     await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
+    Func<Task> act = async () => await runTask.ConfigureAwait(false);
 
     // Assert
-    await runner.ReceivedWithAnyArgs(1).RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>()).ConfigureAwait(false);
+    (await act.ShouldThrowAsync<Exception>().ConfigureAwait(false)).Message.ShouldBe("kaboom");
+    await runner.ReceivedWithAnyArgs(1).RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>())
+        .ConfigureAwait(false);
     logger.LatestRecord.Message.ShouldContain("kaboom");
-    hostApplicationLifetime.Received().StopApplication();
   }
 }

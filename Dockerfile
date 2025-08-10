@@ -3,7 +3,7 @@ WORKDIR /src
 COPY src ./
 WORKDIR /src/CleanupForNotion.Web
 RUN dotnet restore
-RUN dotnet publish -o out
+RUN dotnet publish -c Release -o out -p:PublishReadyToRun=true
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
