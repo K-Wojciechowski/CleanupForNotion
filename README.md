@@ -8,6 +8,23 @@ Can be deployed to AWS (for approximately $0/month), your own server, or possibl
 
 Fully tested: 100% code coverage for the core library and AWS deployment model.
 
+## Table of Contents
+
+* [Plugins](#plugins)
+  * [DeleteByCheckbox](#deletebycheckbox)
+  * [DeleteOnNewMonthlyCycle](#deleteonnewmonthlycycle)
+  * [DeleteWithoutRelationships](#deletewithoutrelationships)
+  * [DeleteZeroSum](#deletezerosum)
+  * [EnsureStaticRelatedPage](#ensurestaticrelatedpage)
+* [Setup in Notion](#setup-in-notion)
+* [Configuration](#configuration)
+* [Deployment](#deployment)
+  * [Web application (in Docker)](#web-application-in-docker)
+  * [AWS](#aws)
+  * [Console](#console)
+* [Roadmap](#roadmap)
+* [Legal](#legal)
+
 ## Plugins
 
 ### DeleteByCheckbox
