@@ -4,7 +4,9 @@ An app (in a few deployment flavors) to periodically clean up Notion databases.
 
 Fully configurable, with plugins for all the use cases I need.
 
-Fully tested: 100% code coverage for the core library.
+Can be deployed to AWS (for approximately $0/month), your own server, or possibly even a PC.
+
+Fully tested: 100% code coverage for the core library and AWS deployment model.
 
 ## Plugins
 
@@ -191,7 +193,7 @@ For the Web and Console apps, an `appsettings.json` file is required in the same
 
 ## Deployment
 
-There are currently two supported deployment methods.
+There are currently three supported deployment methods.
 
 ### Web application (in Docker)
 
@@ -215,6 +217,31 @@ The easiest way to run the application in this model is with Docker and Docker C
 
 The Docker Compose file is configured to expose the API on port 2836 on localhost (it won’t be accessible from other machines).
 
+### AWS
+
+In this model, CleanupForNotion uses various services offered by [AWS](https://aws.amazon.com/):
+
+* Configuration (`appsettings.json`) is stored in **S3**
+* Plugin state is stored in **DynamoDB**
+* Code runs in **Lambda**
+* Logs are stored in **CloudWatch**
+* Periodic execution is handled by **EventBridge Scheduler**
+
+All of the above services have very generous free tiers. As long as you keep the execution frequency reasonable (15 minutes should be fine), the AWS costs related to using this should be $0/month (or close enough that AWS won’t charge your card).
+
+To deploy this, all you need is [Terraform](https://developer.hashicorp.com/terraform). Here are the deployment steps:
+
+1. Clone the repository and go into the `aws-terraform` directory
+2. To get a pre-built package, run the `download-lambda.sh` / `download-lambda.ps1` script (Bash version requires `curl` and `jq`).
+   If you prefer to build the code yourself and have the .NET 8 SDK, run the `build-lambda.sh` / `build-lambda.ps1` script (Bash version requires `zip`).
+3. Place your appsettings.json in the `aws-terraform` directory (note that `StateFilePath` and `RunFrequency` are ignored)
+4. Make sure you are happy with the configuration in `variables.tf`
+5. Ensure you have AWS access keys configured in a way Terraform understands (e.g. `~/.aws/credentials`).
+6. Run `terraform init`
+7. Run `terraform apply`
+
+After the deployment completes, `invoke.sh` and `invoke.cmd` scripts will be generated to run your new lambda using the AWS CLI.
+
 ### Console
 
 In this model, CleanupForNotion runs as a console application. It can be run in the usual .NET way (`dotnet run`).
@@ -223,7 +250,7 @@ If `RunFrequency` is configured, the application will run forever, and cleanup w
 
 ## Roadmap
 
-This is more-or-less feature-complete, at least for my requirements. (Although I reserve the right to come up with some other way to abuse Notion that will require automated cleanup.)
+This is more-or-less feature-complete, at least for my requirements. (Although I reserve the right to come up with some other ways to abuse Notion that will require automated cleanup.)
 
 Some planned features may be found in the [GitHub Issues][] for the project.
 
