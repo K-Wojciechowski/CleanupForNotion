@@ -27,3 +27,11 @@ variable "schedule_expression" {
   default     = "rate(30 minutes)"
   type        = string
 }
+
+variable "tags" {
+  description = "A map of tags to assign to AWS resources"
+  type        = map(string)
+  default = {
+    Project = "CleanupForNotion"
+  }
+}

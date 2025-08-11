@@ -1,5 +1,9 @@
 provider "aws" {
   region = var.aws_region
+
+  default_tags {
+    tags = var.tags
+  }
 }
 
 module "cloudwatch" {
@@ -47,5 +51,6 @@ module "scheduler" {
 module "scripts" {
   source = "./scripts"
 
+  aws_region  = var.aws_region
   lambda_name = module.lambda.name
 }
