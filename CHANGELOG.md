@@ -1,5 +1,9 @@
 # CleanupForNotion Changelog
 
+## 1.3.0
+
+* AWS deployment model (fix #2)
+
 ## 1.2.0
 
 * Set up CI using GitHub Actions to run tests; build and publish Docker image (fix #1)

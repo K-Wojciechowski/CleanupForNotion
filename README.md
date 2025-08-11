@@ -75,7 +75,7 @@ I actually have two databases: one with the purchases, and another that shows th
 
 ```javascript
 if(prop("Total")>=TARGET, "✅",
-let(x, add(subtract(TARGET, prop("Total")), 0.000001),	style("PLN " + replace(format(x), "(\d+\.\d\d)(.+)", "$1"), "b", "red_background")))
+let(x, add(subtract(TARGET, prop("Total")), 0.000001), style("PLN " + replace(format(x), "(\d+\.\d\d)(.+)", "$1"), "b", "red_background")))
 ```
 
 For this to work, all purchases must have a relationship to the single row in the summary database. I use a Button to do it, but I occassionally forget and insert data directly into the transactions database. This plugin fixes that.
