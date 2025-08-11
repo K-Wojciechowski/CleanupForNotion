@@ -1,3 +1,4 @@
+#!/usr/bin/env pwsh
 $ErrorActionPreference = "Stop"
 try {
   dotnet publish -c Release -r linux-x64 -p:PublishReadyToRun=true -o $PSScriptRoot/publish $PSScriptRoot/../src/CleanupForNotion.Aws/CleanupForNotion.Aws.csproj
