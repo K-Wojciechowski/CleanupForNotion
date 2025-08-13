@@ -1,5 +1,6 @@
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Execution;
+using CleanupForNotion.Core.Infrastructure.Loop;
 using CleanupForNotion.Core.Infrastructure.PluginManagement;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -7,16 +8,16 @@ using Microsoft.Extensions.Logging.Testing;
 using NSubstitute;
 using Shouldly;
 
-namespace CleanupForNotion.Aws.Test;
+namespace CleanupForNotion.Test.Infrastructure.Loop;
 
 [TestClass]
-public class OneShotRunnerTests {
+public class OneShotLoopTests {
   [TestMethod]
   public async Task ExecuteAsync_Called_RunsOneCleanupAndStopsApplication() {
     // Arrange
     var globalOptionsProvider = Substitute.For<IGlobalOptionsProvider>();
     globalOptionsProvider.GlobalOptions.Returns(new GlobalOptions(RunFrequency: TimeSpan.FromMilliseconds(100)));
-    var logger = NullLogger<OneShotRunner>.Instance;
+    var logger = NullLogger<OneShotLoop>.Instance;
     var runner = Substitute.For<IRunner>();
 
     runner.RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>())
@@ -26,14 +27,14 @@ public class OneShotRunnerTests {
         .AddScoped<IRunner>(_ => runner)
         .BuildServiceProvider();
 
-    var lambdaRunner = new OneShotRunner(
+    var loop = new OneShotLoop(
         globalOptionsProvider,
         logger,
         services.GetRequiredService<IServiceScopeFactory>());
 
     // Act
     using var cancellationTokenSource = new CancellationTokenSource();
-    await lambdaRunner.Run(cancellationTokenSource.Token).ConfigureAwait(false);
+    await loop.ExecuteAsync(cancellationTokenSource.Token).ConfigureAwait(false);
     await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
 
     // Assert
@@ -46,7 +47,7 @@ public class OneShotRunnerTests {
     // Arrange
     var globalOptionsProvider = Substitute.For<IGlobalOptionsProvider>();
     globalOptionsProvider.GlobalOptions.Returns(new GlobalOptions(RunFrequency: TimeSpan.FromMilliseconds(100)));
-    var logger = new FakeLogger<OneShotRunner>();
+    var logger = new FakeLogger<OneShotLoop>();
     var runner = Substitute.For<IRunner>();
 
     runner.RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>())
@@ -59,14 +60,14 @@ public class OneShotRunnerTests {
         .AddScoped(_ => runner)
         .BuildServiceProvider();
 
-    var lambdaHostedServiceWrapper = new OneShotRunner(
+    var lambdaHostedServiceWrapper = new OneShotLoop(
         globalOptionsProvider,
         logger,
         services.GetRequiredService<IServiceScopeFactory>());
 
     // Act
     using var cancellationTokenSource = new CancellationTokenSource();
-    var runTask = lambdaHostedServiceWrapper.Run(cancellationTokenSource.Token);
+    var runTask = lambdaHostedServiceWrapper.ExecuteAsync(cancellationTokenSource.Token);
     await Task.Delay(TimeSpan.FromSeconds(2), CancellationToken.None).ConfigureAwait(false);
     await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
     Func<Task> act = async () => await runTask.ConfigureAwait(false);

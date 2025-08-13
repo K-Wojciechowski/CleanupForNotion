@@ -3,13 +3,13 @@ using CleanupForNotion.Core.Infrastructure.PluginManagement;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace CleanupForNotion.Aws;
+namespace CleanupForNotion.Core.Infrastructure.Loop;
 
-public class OneShotRunner(
+public class OneShotLoop(
     IGlobalOptionsProvider globalOptionsProvider,
-    ILogger<OneShotRunner> logger,
+    ILogger<OneShotLoop> logger,
     IServiceScopeFactory serviceScopeFactory) {
-  public async Task Run(CancellationToken stoppingToken) {
+  public async Task ExecuteAsync(CancellationToken stoppingToken) {
     await Task.Yield();
 
     using var serviceScope = serviceScopeFactory.CreateScope();

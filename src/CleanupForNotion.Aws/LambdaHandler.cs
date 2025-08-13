@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Amazon.Lambda.Core;
 using Amazon.S3;
+using CleanupForNotion.Core.Infrastructure.Loop;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CleanupForNotion.Aws;
@@ -15,7 +16,7 @@ public class LambdaHandler {
     cancellationTokenSource.CancelAfter(context.RemainingTime);
     using var amazonS3Client = new AmazonS3Client();
     var host = LambdaHostBuilder.BuildHost(context, amazonS3Client);
-    await host.Services.GetRequiredService<OneShotRunner>().Run(cancellationTokenSource.Token).ConfigureAwait(false);
+    await host.Services.GetRequiredService<OneShotLoop>().ExecuteAsync(cancellationTokenSource.Token).ConfigureAwait(false);
   }
 #pragma warning restore CA1822
 }

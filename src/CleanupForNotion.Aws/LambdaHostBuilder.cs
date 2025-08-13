@@ -6,6 +6,7 @@ using CleanupForNotion.Aws.DynamoDb;
 using CleanupForNotion.Aws.S3;
 using CleanupForNotion.Core;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
+using CleanupForNotion.Core.Infrastructure.Loop;
 using CleanupForNotion.Core.Infrastructure.State;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,7 +40,7 @@ internal static class LambdaHostBuilder {
         .AddLogging(options => options.ClearProviders().AddLambdaLogger(loggerOptions))
         .AddDefaultAWSOptions(new AWSOptions())
         .AddAWSService<IAmazonDynamoDB>()
-        .AddSingleton<OneShotRunner>()
+        .AddSingleton<OneShotLoop>()
         .Configure<CfnOptions>(builder.Configuration.GetSection("CleanupForNotion"))
         .Configure<DynamoDbOptions>(o => o.TableName = dynamoDbTableName);
 

@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="CleanupForNotion.Web.Test" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CleanupForNotion.Core\CleanupForNotion.Core.csproj" />
   </ItemGroup>
 

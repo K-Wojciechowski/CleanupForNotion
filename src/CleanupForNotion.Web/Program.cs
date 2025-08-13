@@ -1,32 +1,38 @@
 using System.Threading.Channels;
 using CleanupForNotion.Core;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
-using CleanupForNotion.Web;
+using CleanupForNotion.Core.Infrastructure.Loop;
 
-var builder = WebApplication.CreateBuilder(args);
+namespace CleanupForNotion.Web;
 
-builder.Services
-    .AddCfnServices()
-    .AddSingleton(TimeProvider.System)
-    .AddHostedService<TimerBackgroundService>()
-    .AddHostedService<WebRunnerBackgroundService>()
-    .AddLogging(loggingBuilder => loggingBuilder.AddSimpleConsole(options => {
-      options.IncludeScopes = true;
-      options.SingleLine = true;
-      options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
-    }))
-    .Configure<CfnOptions>(builder.Configuration.GetSection("CleanupForNotion"))
-    .AddSingleton<Channel<DateTimeOffset>>(_ =>
-        Channel.CreateUnbounded<DateTimeOffset>(
-            new UnboundedChannelOptions {
-                SingleWriter = false, SingleReader = true, AllowSynchronousContinuations = false
-            }));
+public class Program {
+  public static void Main(string[] args) {
+    var builder = WebApplication.CreateBuilder(args);
 
-var app = builder.Build();
+    builder.Services
+        .AddCfnServices()
+        .AddSingleton(TimeProvider.System)
+        .AddHostedService<ChannelTimerBackgroundService>()
+        .AddHostedService<ChannelBasedLoop>()
+        .AddLogging(loggingBuilder => loggingBuilder.AddSimpleConsole(options => {
+          options.IncludeScopes = true;
+          options.SingleLine = true;
+          options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
+        }))
+        .Configure<CfnOptions>(builder.Configuration.GetSection("CleanupForNotion"))
+        .AddSingleton<Channel<DateTimeOffset>>(_ =>
+            Channel.CreateUnbounded<DateTimeOffset>(
+                new UnboundedChannelOptions {
+                    SingleWriter = false, SingleReader = true, AllowSynchronousContinuations = false
+                }));
 
-app.MapPost("/", async (Channel<DateTimeOffset> channel, TimeProvider timeProvider) => {
-  await channel.Writer.WriteAsync(timeProvider.GetUtcNow()).ConfigureAwait(false);
-  return "Triggered";
-});
+    var app = builder.Build();
 
-app.Run();
+    app.MapPost("/", async (Channel<DateTimeOffset> channel, TimeProvider timeProvider) => {
+      await channel.Writer.WriteAsync(timeProvider.GetUtcNow()).ConfigureAwait(false);
+      return "Triggered";
+    });
+
+    app.Run();
+  }
+}

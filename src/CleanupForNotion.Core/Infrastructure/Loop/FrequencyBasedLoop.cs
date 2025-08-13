@@ -4,14 +4,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace CleanupForNotion.Console;
+namespace CleanupForNotion.Core.Infrastructure.Loop;
 
-public class ConsoleHostedServiceWrapper(
-  IGlobalOptionsProvider globalOptionsProvider,
-  IHostApplicationLifetime hostApplicationLifetime,
-  ILogger<ConsoleHostedServiceWrapper> logger,
-  IServiceScopeFactory serviceScopeFactory)
-  : BackgroundService {
+public class FrequencyBasedLoop(
+    IGlobalOptionsProvider globalOptionsProvider,
+    IHostApplicationLifetime hostApplicationLifetime,
+    ILogger<FrequencyBasedLoop> logger,
+    IServiceScopeFactory serviceScopeFactory)
+    : BackgroundService {
   protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
     await Task.Yield();
 
@@ -22,6 +22,10 @@ public class ConsoleHostedServiceWrapper(
           await runner.RunCleanup(globalOptionsProvider.GlobalOptions, stoppingToken).ConfigureAwait(false);
         } catch (Exception exc) {
           logger.LogError(exc, "Runner failed with exception: {Error}", exc.Message);
+          if (!globalOptionsProvider.GlobalOptions.RunFrequency.HasValue) {
+            hostApplicationLifetime.StopApplication();
+            throw;
+          }
         }
       }
 

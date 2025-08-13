@@ -5,6 +5,7 @@ using Amazon.S3.Model;
 using CleanupForNotion.Aws.DynamoDb;
 using CleanupForNotion.Aws.Test.Utils;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
+using CleanupForNotion.Core.Infrastructure.Loop;
 using CleanupForNotion.Core.Infrastructure.State;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -50,7 +51,7 @@ public class LambdaHostBuilderTests {
     host.Services.GetServices<IPluginStateProvider>().ShouldHaveSingleItem()
         .ShouldBeOfType<DynamoDbPluginStateProvider>();
     host.Services.GetService<IPluginStateProvider>().ShouldNotBeNull().ShouldBeOfType<DynamoDbPluginStateProvider>();
-    host.Services.GetService<OneShotRunner>().ShouldNotBeNull();
+    host.Services.GetService<OneShotLoop>().ShouldNotBeNull();
     host.Services.GetService<IOptions<CfnOptions>>().ShouldNotBeNull().Value.AuthToken
         .ShouldBe(S3TestBase.ExpectedOptions["CleanupForNotion:AuthToken"]);
     host.Services.GetService<IOptions<DynamoDbOptions>>().ShouldNotBeNull().Value.TableName.ShouldBe(dynamoDbTableName);
