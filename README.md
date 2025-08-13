@@ -6,7 +6,9 @@ Fully configurable, with plugins for all the use cases I need.
 
 Can be deployed to AWS (for approximately $0/month), your own server, or possibly even a PC.
 
-Fully tested: 100% code coverage for the core library and AWS deployment model.
+Fully tested: 100% code coverage, enforced by the CI pipeline.
+
+[![CleanupForNotion CI](https://github.com/K-Wojciechowski/CleanupForNotion/actions/workflows/ci.yml/badge.svg)](https://github.com/K-Wojciechowski/CleanupForNotion/actions/workflows/ci.yml)
 
 ## Table of Contents
 
