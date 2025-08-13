@@ -1,9 +1,8 @@
-using CleanupForNotion.Core;
 using CleanupForNotion.Core.Infrastructure.PluginManagement;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
-namespace CleanupForNotion.Test;
+namespace CleanupForNotion.Core.Test;
 
 [TestClass]
 public class CfnServiceCollectionExtensionsTests {

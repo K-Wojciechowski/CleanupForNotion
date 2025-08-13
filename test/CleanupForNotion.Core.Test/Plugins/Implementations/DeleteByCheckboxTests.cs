@@ -5,7 +5,7 @@ using Notion.Client;
 using NSubstitute;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Plugins.Implementations;
+namespace CleanupForNotion.Core.Test.Plugins.Implementations;
 
 [TestClass]
 public class DeleteByCheckboxTests : BasicDeletePluginTestsBase<DeleteByCheckbox, DeleteByCheckboxOptions> {

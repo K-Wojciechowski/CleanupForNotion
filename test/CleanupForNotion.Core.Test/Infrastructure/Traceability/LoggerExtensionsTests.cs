@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging.Testing;
 using Notion.Client;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.Traceability;
+namespace CleanupForNotion.Core.Test.Infrastructure.Traceability;
 
 [TestClass]
 public class LoggerExtensionsTests {

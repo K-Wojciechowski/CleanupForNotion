@@ -1,11 +1,10 @@
-using CleanupForNotion.Core;
 using CleanupForNotion.Core.Infrastructure.Time;
 using CleanupForNotion.Core.Plugins.Options;
 using Microsoft.Extensions.Time.Testing;
 using Notion.Client;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.Time;
+namespace CleanupForNotion.Core.Test.Infrastructure.Time;
 
 [TestClass]
 public class LastEditedFilterHelperTests {

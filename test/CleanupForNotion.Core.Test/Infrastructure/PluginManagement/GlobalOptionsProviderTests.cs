@@ -3,7 +3,7 @@ using CleanupForNotion.Core.Infrastructure.PluginManagement;
 using Microsoft.Extensions.Options;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.PluginManagement;
+namespace CleanupForNotion.Core.Test.Infrastructure.PluginManagement;
 
 [TestClass]
 public class GlobalOptionsProviderTests {

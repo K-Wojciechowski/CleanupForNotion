@@ -4,7 +4,7 @@ using CleanupForNotion.Core.Infrastructure.Plugins;
 using NSubstitute;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.PluginManagement;
+namespace CleanupForNotion.Core.Test.Infrastructure.PluginManagement;
 
 [TestClass]
 public class PluginActivatorTests {

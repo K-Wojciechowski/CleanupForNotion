@@ -1,7 +1,7 @@
 using CleanupForNotion.Core.Infrastructure.Notifications;
 using NSubstitute;
 
-namespace CleanupForNotion.Test.Infrastructure.Notifications;
+namespace CleanupForNotion.Core.Test.Infrastructure.Notifications;
 
 [TestClass]
 public class NotificationSenderTests {

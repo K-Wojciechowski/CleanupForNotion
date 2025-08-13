@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Plugins.Providers;
+namespace CleanupForNotion.Core.Test.Plugins.Providers;
 
 [TestClass]
 public class DeleteByCheckboxProviderTests {

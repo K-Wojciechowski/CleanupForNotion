@@ -1,4 +1,4 @@
-﻿using System.Threading.Channels;
+using System.Threading.Channels;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Loop;
 using CleanupForNotion.Core.Infrastructure.PluginManagement;
@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging.Testing;
 using NSubstitute;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.Loop;
+namespace CleanupForNotion.Core.Test.Infrastructure.Loop;
 
 [TestClass]
 public class ChannelTimerBackgroundServiceTests {

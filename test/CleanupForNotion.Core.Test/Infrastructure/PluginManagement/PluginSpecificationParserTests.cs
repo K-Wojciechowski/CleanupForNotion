@@ -2,7 +2,7 @@ using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.PluginManagement;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.PluginManagement;
+namespace CleanupForNotion.Core.Test.Infrastructure.PluginManagement;
 
 [TestClass]
 public class PluginSpecificationParserTests {

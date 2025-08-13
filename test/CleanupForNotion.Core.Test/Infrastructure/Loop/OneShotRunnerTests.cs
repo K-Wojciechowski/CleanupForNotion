@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging.Testing;
 using NSubstitute;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.Loop;
+namespace CleanupForNotion.Core.Test.Infrastructure.Loop;
 
 [TestClass]
 public class OneShotLoopTests {

@@ -2,7 +2,7 @@ using CleanupForNotion.Core.Infrastructure.State;
 using NSubstitute;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.State;
+namespace CleanupForNotion.Core.Test.Infrastructure.State;
 
 [TestClass]
 public class PluginStateProviderExtensionsTests {

@@ -1,7 +1,7 @@
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using Microsoft.Extensions.Options;
 
-namespace CleanupForNotion.Test;
+namespace CleanupForNotion.Core.Test;
 
 public static class TestHelpers {
   public static IOptions<CfnOptions> GetCfnOptions() => GetCfnOptions([]);

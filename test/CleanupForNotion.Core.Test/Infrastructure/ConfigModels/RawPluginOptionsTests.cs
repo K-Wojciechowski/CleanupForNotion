@@ -1,7 +1,7 @@
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.ConfigModels;
+namespace CleanupForNotion.Core.Test.Infrastructure.ConfigModels;
 
 [TestClass]
 public sealed class RawPluginOptionsTests {

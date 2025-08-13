@@ -1,7 +1,7 @@
 using CleanupForNotion.Core.Infrastructure.Semaphores;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.Semaphores;
+namespace CleanupForNotion.Core.Test.Infrastructure.Semaphores;
 
 [TestClass]
 public class SemaphoreSlimExtensionsTests

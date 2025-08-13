@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging.Testing;
 using Notion.Client;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.NotionIntegration;
+namespace CleanupForNotion.Core.Test.Infrastructure.NotionIntegration;
 
 [TestClass]
 public class RateLimitHelperTests {

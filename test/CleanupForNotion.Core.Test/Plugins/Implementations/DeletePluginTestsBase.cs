@@ -4,7 +4,7 @@ using Notion.Client;
 using NSubstitute;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Plugins.Implementations;
+namespace CleanupForNotion.Core.Test.Plugins.Implementations;
 
 public abstract class DeletePluginTestsBase {
   private const string DatabaseId = "databaseId";

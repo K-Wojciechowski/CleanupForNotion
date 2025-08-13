@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Time.Testing;
 using Notion.Client;
 
-namespace CleanupForNotion.Test.Plugins.Implementations;
+namespace CleanupForNotion.Core.Test.Plugins.Implementations;
 
 public abstract class BasicDeletePluginTestsBase<TPlugin, TOptions> : DeletePluginTestsBase
     where TPlugin : DeletePluginBase<TOptions>

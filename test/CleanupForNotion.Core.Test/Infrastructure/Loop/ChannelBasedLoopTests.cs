@@ -1,4 +1,4 @@
-﻿using System.Threading.Channels;
+using System.Threading.Channels;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Execution;
 using CleanupForNotion.Core.Infrastructure.Loop;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.Time.Testing;
 using NSubstitute;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.Loop;
+namespace CleanupForNotion.Core.Test.Infrastructure.Loop;
 
 [TestClass]
 public class ChannelBasedLoopTests {

@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using Shouldly;
 
-namespace CleanupForNotion.Test.Infrastructure.Execution;
+namespace CleanupForNotion.Core.Test.Infrastructure.Execution;
 
 [TestClass]
 public sealed class RunnerTests {
