@@ -1,5 +1,9 @@
 # CleanupForNotion Changelog
 
+## 1.4.1
+
+* Improve logging configuration
+
 ## 1.4.0
 
 * 100% code coverage for Web app, 100% tests for Console app components (fix #4)

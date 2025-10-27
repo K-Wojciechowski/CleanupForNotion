@@ -16,7 +16,6 @@ public class Program {
         .AddHostedService<ChannelBasedLoop>()
         .AddLogging(loggingBuilder => loggingBuilder.AddSimpleConsole(options => {
           options.IncludeScopes = true;
-          options.SingleLine = true;
           options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
         }))
         .Configure<CfnOptions>(builder.Configuration.GetSection("CleanupForNotion"))
