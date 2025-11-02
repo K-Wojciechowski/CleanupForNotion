@@ -175,3 +175,20 @@ jobs:
         asset_name: lambda.zip
         tag: ${{ github.ref }}
         overwrite: true
+
+  deploy:
+    name: Deploy
+    needs: [docker, lambda]
+    runs-on: ubuntu-latest
+    #if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Trigger deployment
+        run: |
+          code=$(curl -w"%{http_code}" -H "Authorization: Bearer $DEPLOYTRIGGER_TOKEN" "$DEPLOYTRIGGER_URL" 2> /dev/null)
+          echo "Status code: $code"
+          if [[ "x$code" != "x200" ]]; then
+            exit 1
+          fi
+        env:
+          DEPLOYTRIGGER_TOKEN: ${{ secrets.DEPLOYTRIGGER_TOKEN }}
+          DEPLOYTRIGGER_URL: ${{ secrets.DEPLOYTRIGGER_URL }}
