@@ -180,7 +180,7 @@ jobs:
     name: Deploy
     needs: [docker, lambda]
     runs-on: ubuntu-latest
-    #if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Trigger deployment
         run: |
