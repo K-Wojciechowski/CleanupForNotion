@@ -1,5 +1,9 @@
 # CleanupForNotion Changelog
 
+## 1.5.0
+
+* Upgrade to .NET 10
+
 ## 1.4.1
 
 * Improve logging configuration

@@ -6,6 +6,7 @@ services:
     environment:
       CleanupForNotion__StateFilePath: /app/cfnstate.json
       ASPNETCORE_URLS: "http://0.0.0.0:2836"
+    user: "33:33" # www-data on Debian-like systems
     volumes:
       - ./appsettings.json:/app/appsettings.json
       - ./cfnstate.json:/app/cfnstate.json
