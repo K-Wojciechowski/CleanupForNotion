@@ -1,5 +1,9 @@
 # CleanupForNotion Changelog
 
+## 2.0.1
+
+* Upgrade Lambda to .NET 10
+
 ## 2.0.0
 
 * Upgrade to Notion.Net 5.0.0, which removes the deprecated database query API.

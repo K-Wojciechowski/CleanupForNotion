@@ -4,7 +4,7 @@ resource "aws_lambda_function" "lambda" {
   function_name    = var.lambda_name
   role             = aws_iam_role.lambda_role.arn
   handler          = "CleanupForNotion.Aws::CleanupForNotion.Aws.LambdaHandler::Handle"
-  runtime          = "dotnet8"
+  runtime          = "dotnet10"
   timeout          = 300
 
   logging_config {
