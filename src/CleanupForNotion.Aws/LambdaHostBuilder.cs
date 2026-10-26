@@ -45,10 +45,8 @@ internal static class LambdaHostBuilder {
         .Configure<DynamoDbOptions>(o => o.TableName = dynamoDbTableName);
 
 
-    var existingPluginStateProvider = builder.Services.FirstOrDefault(s => s.ServiceType == typeof(IPluginStateProvider));
-    if (existingPluginStateProvider != null) {
-      builder.Services.Remove(existingPluginStateProvider);
-    }
+    var existingPluginStateProvider = builder.Services.First(s => s.ServiceType == typeof(IPluginStateProvider));
+    builder.Services.Remove(existingPluginStateProvider);
 
     builder.Services.AddSingleton<IPluginStateProvider, DynamoDbPluginStateProvider>();
 
