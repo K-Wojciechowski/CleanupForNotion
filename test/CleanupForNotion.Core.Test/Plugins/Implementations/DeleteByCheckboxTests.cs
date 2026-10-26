@@ -28,7 +28,7 @@ public class DeleteByCheckboxTests : BasicDeletePluginTestsBase<DeleteByCheckbox
   public async Task Run_Called_DeletesByCheckbox(bool dryRun, bool deleteIfChecked) {
     const string propertyName = "propertyName";
     var options = new DeleteByCheckboxOptions(
-        DatabaseId: DatabaseId,
+        DataSourceId: DataSourceId,
         PropertyName: propertyName,
         DeleteIfChecked: deleteIfChecked,
         GracePeriod: null);

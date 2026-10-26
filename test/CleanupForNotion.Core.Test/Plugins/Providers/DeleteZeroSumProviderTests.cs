@@ -26,7 +26,7 @@ public class DeleteZeroSumProviderTests {
   public void GetPlugin_ValidOptions_ReturnsPlugin() {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" }, { "PropertyName", "property name" },
+        { "DataSourceId", "data source id" }, { "PropertyName", "property name" },
     };
 
     var pluginSpecification = new PluginSpecification(
@@ -48,7 +48,7 @@ public class DeleteZeroSumProviderTests {
     // Arrange
     const string description = "Plugin Description";
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" },
+        { "DataSourceId", "data source id" },
         { "GracePeriod", "00:00:01" }
     };
 

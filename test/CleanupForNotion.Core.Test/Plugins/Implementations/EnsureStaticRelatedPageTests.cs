@@ -13,7 +13,7 @@ namespace CleanupForNotion.Core.Test.Plugins.Implementations;
 
 [TestClass]
 public class EnsureStaticRelatedPageTests {
-  private const string DatabaseId = "databaseId";
+  private const string DataSourceId = "dataSourceId";
   private const string PropertyName = "propertyName";
   private const string PluginDescription = "pluginDescription";
   private const string RelatedPageId = "relatedPageId";
@@ -26,7 +26,7 @@ public class EnsureStaticRelatedPageTests {
     var logger = new FakeLogger<EnsureStaticRelatedPage>();
     var timeProvider = new FakeTimeProvider();
     var options = new EnsureStaticRelatedPageOptions(
-        DatabaseId: DatabaseId,
+        DataSourceId: DataSourceId,
         PropertyName: PropertyName,
         RelatedPageId: RelatedPageId
     );
@@ -55,8 +55,8 @@ public class EnsureStaticRelatedPageTests {
     };
 
     var client = Substitute.For<ICfnNotionClient>();
-    client.QueryDatabaseRawAsync(DatabaseId, Arg.Any<DatabasesQueryParameters>(), CancellationToken.None)
-        .Returns(new DatabaseQueryResponse { Results = pages.Cast<IWikiDatabase>().ToList(), HasMore = false });
+    client.QueryDataSourceRawAsync(Arg.Any<QueryDataSourceRequest>(), CancellationToken.None)
+        .Returns(new QueryDataSourceResponse { Results = pages.Cast<IQueryDataSourceResponseObject>().ToList(), HasMore = false });
 
     var relationFilter = new RelationFilter(options.PropertyName, doesNotContain: options.RelatedPageId);
     var expectedFilter = LastEditedFilterHelper.GetCompoundFilterWithLastEdited(
@@ -68,12 +68,14 @@ public class EnsureStaticRelatedPageTests {
     await plugin.Run(client, new GlobalOptions { DryRun = dryRun }, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
-    var queryCall = client.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "QueryDatabaseRawAsync");
+    var queryCall = client.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "QueryDataSourceRawAsync");
     var queryCallArguments = queryCall.GetArguments();
-    queryCallArguments[0].ShouldBe(DatabaseId);
-    queryCallArguments[1].ShouldBeOfType<DatabasesQueryParameters>().Filter
-        .ShouldBeEquivalentTo(expectedFilter);
-    queryCallArguments[2].ShouldBe(CancellationToken.None);
+
+    var request = queryCallArguments[0].ShouldBeOfType<QueryDataSourceRequest>();
+    request.DataSourceId.ShouldBe(DataSourceId);
+    request.Filter.ShouldBeEquivalentTo(expectedFilter);
+
+    queryCallArguments[1].ShouldBe(CancellationToken.None);
 
     await client.DidNotReceiveWithAnyArgs().DeletePageAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
         .ConfigureAwait(false);
@@ -117,15 +119,15 @@ public class EnsureStaticRelatedPageTests {
     var logger = new FakeLogger<EnsureStaticRelatedPage>();
     var timeProvider = new FakeTimeProvider();
     var options = new EnsureStaticRelatedPageOptions(
-        DatabaseId: DatabaseId,
+        DataSourceId: DataSourceId,
         PropertyName: PropertyName,
         RelatedPageId: RelatedPageId
     );
     var plugin = new EnsureStaticRelatedPage(logger, timeProvider, options, PluginDescription);
 
     var client = Substitute.For<ICfnNotionClient>();
-    client.QueryDatabaseRawAsync(DatabaseId, Arg.Any<DatabasesQueryParameters>(), CancellationToken.None)
-        .Returns(new DatabaseQueryResponse { Results = [], HasMore = false });
+    client.QueryDataSourceRawAsync(Arg.Any<QueryDataSourceRequest>(), CancellationToken.None)
+        .Returns(new QueryDataSourceResponse { Results = [], HasMore = false });
 
     var relationFilter = new RelationFilter(options.PropertyName, doesNotContain: options.RelatedPageId);
     var expectedFilter = LastEditedFilterHelper.GetCompoundFilterWithLastEdited(
@@ -135,12 +137,14 @@ public class EnsureStaticRelatedPageTests {
     await plugin.Run(client, new GlobalOptions { DryRun = dryRun }, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
-    var queryCall = client.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "QueryDatabaseRawAsync");
+    var queryCall = client.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "QueryDataSourceRawAsync");
     var queryCallArguments = queryCall.GetArguments();
-    queryCallArguments[0].ShouldBe(DatabaseId);
-    queryCallArguments[1].ShouldBeOfType<DatabasesQueryParameters>().Filter
-        .ShouldBeEquivalentTo(expectedFilter);
-    queryCallArguments[2].ShouldBe(CancellationToken.None);
+
+    var request = queryCallArguments[0].ShouldBeOfType<QueryDataSourceRequest>();
+    request.DataSourceId.ShouldBe(DataSourceId);
+    request.Filter.ShouldBeEquivalentTo(expectedFilter);
+
+    queryCallArguments[1].ShouldBe(CancellationToken.None);
 
     await client.DidNotReceiveWithAnyArgs().UpdatePageAsync(Arg.Any<string>(), Arg.Any<PagesUpdateParameters>(),
             Arg.Any<CancellationToken>())
@@ -158,7 +162,7 @@ public class EnsureStaticRelatedPageTests {
     var logger = new FakeLogger<EnsureStaticRelatedPage>();
     var timeProvider = new FakeTimeProvider();
     var options = new EnsureStaticRelatedPageOptions(
-        DatabaseId: DatabaseId,
+        DataSourceId: DataSourceId,
         PropertyName: PropertyName,
         RelatedPageId: "?"
     );
@@ -199,8 +203,8 @@ public class EnsureStaticRelatedPageTests {
     };
 
     var client = Substitute.For<ICfnNotionClient>();
-    client.QueryDatabaseRawAsync(DatabaseId, Arg.Any<DatabasesQueryParameters>(), CancellationToken.None)
-        .Returns(new DatabaseQueryResponse { Results = pages.Cast<IWikiDatabase>().ToList(), HasMore = false });
+    client.QueryDataSourceRawAsync(Arg.Any<QueryDataSourceRequest>(), CancellationToken.None)
+        .Returns(new QueryDataSourceResponse { Results = pages.Cast<IQueryDataSourceResponseObject>().ToList(), HasMore = false });
 
     var expectedFilter = LastEditedFilterHelper.GetLastEditedFilter(timeProvider, TimeSpan.Zero);
     var expectedLogMessages = new[] {
@@ -214,12 +218,14 @@ public class EnsureStaticRelatedPageTests {
     await plugin.Run(client, new GlobalOptions { DryRun = false }, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
-    var queryCall = client.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "QueryDatabaseRawAsync");
+    var queryCall = client.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "QueryDataSourceRawAsync");
     var queryCallArguments = queryCall.GetArguments();
-    queryCallArguments[0].ShouldBe(DatabaseId);
-    queryCallArguments[1].ShouldBeOfType<DatabasesQueryParameters>().Filter
-        .ShouldBeEquivalentTo(expectedFilter);
-    queryCallArguments[2].ShouldBe(CancellationToken.None);
+
+    var request = queryCallArguments[0].ShouldBeOfType<QueryDataSourceRequest>();
+    request.DataSourceId.ShouldBe(DataSourceId);
+    request.Filter.ShouldBeEquivalentTo(expectedFilter);
+
+    queryCallArguments[1].ShouldBe(CancellationToken.None);
 
     await client.DidNotReceiveWithAnyArgs().UpdatePageAsync(Arg.Any<string>(), Arg.Any<PagesUpdateParameters>(),
             Arg.Any<CancellationToken>())

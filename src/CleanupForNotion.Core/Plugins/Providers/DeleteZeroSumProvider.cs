@@ -18,11 +18,11 @@ public class DeleteZeroSumProvider(
 
   protected override DeleteZeroSumOptions GetOptions(
       RawPluginOptions options,
-      string databaseId,
+      string dataSourceId,
       string propertyName,
       TimeSpan? gracePeriod) {
     return new DeleteZeroSumOptions(
-        databaseId,
+        dataSourceId,
         propertyName,
         gracePeriod);
   }

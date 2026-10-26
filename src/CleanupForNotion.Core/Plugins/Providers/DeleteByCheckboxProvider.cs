@@ -18,11 +18,11 @@ public class DeleteByCheckboxProvider(
 
   protected override DeleteByCheckboxOptions GetOptions(
       RawPluginOptions options,
-      string databaseId,
+      string dataSourceId,
       string propertyName,
       TimeSpan? gracePeriod) {
     return new DeleteByCheckboxOptions(
-        databaseId,
+        dataSourceId,
         propertyName,
         options.GetOptionalBoolean("DeleteIfChecked") ?? true,
         gracePeriod);

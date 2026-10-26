@@ -21,7 +21,7 @@ public class DeleteZeroSum(
       CancellationToken cancellationToken) {
     var filter = LastEditedFilterHelper.GetLastEditedFilter(TimeProvider, Options);
 
-    var pages = await client.QueryDatabaseAsync(Options.DatabaseId, filter, cancellationToken).ConfigureAwait(false);
+    var pages = await client.QueryDataSourceAsync(Options.DataSourceId, filter, cancellationToken).ConfigureAwait(false);
     var buckets = new Buckets();
 
     foreach (var page in pages) {

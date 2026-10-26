@@ -18,11 +18,11 @@ public class DeleteOnNewMonthlyCycleProvider(
 
   protected override DeleteOnNewMonthlyCycleOptions GetOptions(
       RawPluginOptions options,
-      string databaseId,
+      string dataSourceId,
       string propertyName,
       TimeSpan? gracePeriod) {
     return new DeleteOnNewMonthlyCycleOptions(
-        DatabaseId: databaseId,
+        DataSourceId: dataSourceId,
         PropertyName: propertyName,
         CycleResetDay: options.GetInteger("CycleResetDay"),
         MonthOverflowResetsOnFirstDayOfNextMonth: options.GetOptionalBoolean("MonthOverflowResetsOnFirstDayOfNextMonth") ?? true,

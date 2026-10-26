@@ -11,13 +11,12 @@ public class CfnNotionClient(ILogger<CfnNotionClient> logger, IOptions<CfnOption
   private readonly NotionClient _notionClient =
       NotionClientFactory.Create(new ClientOptions { AuthToken = options.Value.AuthToken });
 
-  public async Task<DatabaseQueryResponse> QueryDatabaseRawAsync(
-      string databaseId,
-      DatabasesQueryParameters queryParameters,
+  public async Task<QueryDataSourceResponse> QueryDataSourceRawAsync(
+      QueryDataSourceRequest request,
       CancellationToken cancellationToken)
     => await RateLimitHelper.CallWithRetryAsync(async () =>
-            await _notionClient.Databases
-                .QueryAsync(databaseId, queryParameters, cancellationToken)
+            await _notionClient.DataSources
+                .QueryAsync(request, cancellationToken)
                 .ConfigureAwait(false),
         logger,
         cancellationToken).ConfigureAwait(false);

@@ -35,7 +35,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   public void GetPlugin_ValidOptions_ReturnsPlugin(string? gracePeriod, object? cycleResetDay, bool? monthOverflowResets, string? timeZoneName) {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" },
+        { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "CycleResetDay", cycleResetDay ?? 1 }
     };
@@ -61,7 +61,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   public void GetPlugin_MissingPropertyName_ThrowsException() {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" },
+        { "DataSourceId", "data source id" },
         { "CycleResetDay", 1 }
     };
 
@@ -82,7 +82,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   public void GetPlugin_MissingCycleResetDay_ThrowsException() {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" },
+        { "DataSourceId", "data source id" },
         { "PropertyName", "property name" }
     };
 
@@ -103,7 +103,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   public void GetPlugin_InvalidGracePeriod_ThrowsException() {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" },
+        { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "CycleResetDay", 1 },
         { "GracePeriod", "invalid" }
@@ -126,7 +126,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   public void GetPlugin_InvalidCycleResetDay_ThrowsException() {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" },
+        { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "CycleResetDay", "one" },
     };
@@ -148,7 +148,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   public void GetPlugin_InvalidMonthOverflowResetsOnFirstDayOfNextMonth_ThrowsException() {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" },
+        { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "CycleResetDay", 1 },
         { "MonthOverflowResetsOnFirstDayOfNextMonth", "invalid" }

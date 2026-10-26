@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CleanupForNotion.Aws/CleanupForNotion.Aws.csproj" />
+    <Project Path="src/CleanupForNotion.Console/CleanupForNotion.Console.csproj" />
+    <Project Path="src/CleanupForNotion.Core/CleanupForNotion.Core.csproj" />
+    <Project Path="src/CleanupForNotion.Web/CleanupForNotion.Web.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/CleanupForNotion.Aws.Test/CleanupForNotion.Aws.Test.csproj" />
+    <Project Path="test/CleanupForNotion.Core.Test/CleanupForNotion.Core.Test.csproj" />
+    <Project Path="test/CleanupForNotion.Web.Test/CleanupForNotion.Web.Test.csproj" />
+  </Folder>
+</Solution>

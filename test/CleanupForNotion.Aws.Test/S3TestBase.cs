@@ -16,7 +16,7 @@ public static class S3TestBase {
             {
               "PluginName": "DeleteOnNewMonthlyCycle",
               "PluginDescription": "Secondary Bank Card Fee cycle enforcement",
-              "DatabaseId": "00000000000000000000000000000000",
+              "DataSourceId": "00000000000000000000000000000000",
               "PropertyName": "Date",
               "TimeZoneName": "Europe/Warsaw",
               "CycleResetDay": 10
@@ -24,7 +24,7 @@ public static class S3TestBase {
             {
               "PluginName": "DeleteByCheckbox",
               "PluginDescription": "Delete checked items",
-              "DatabaseId": "11111111111111111111111111111111",
+              "DataSourceId": "11111111111111111111111111111111",
               "PropertyName": "Delete"
             }
           ]
@@ -37,13 +37,13 @@ public static class S3TestBase {
       { "CleanupForNotion:DryRun", "True" },
       { "CleanupForNotion:Plugins:0:PluginName", "DeleteOnNewMonthlyCycle" },
       { "CleanupForNotion:Plugins:0:PluginDescription", "Secondary Bank Card Fee cycle enforcement" },
-      { "CleanupForNotion:Plugins:0:DatabaseId", "00000000000000000000000000000000" },
+      { "CleanupForNotion:Plugins:0:DataSourceId", "00000000000000000000000000000000" },
       { "CleanupForNotion:Plugins:0:PropertyName", "Date" },
       { "CleanupForNotion:Plugins:0:TimeZoneName", "Europe/Warsaw" },
       { "CleanupForNotion:Plugins:0:CycleResetDay", "10" },
       { "CleanupForNotion:Plugins:1:PluginName", "DeleteByCheckbox" },
       { "CleanupForNotion:Plugins:1:PluginDescription", "Delete checked items" },
-      { "CleanupForNotion:Plugins:1:DatabaseId", "11111111111111111111111111111111" },
+      { "CleanupForNotion:Plugins:1:DataSourceId", "11111111111111111111111111111111" },
       { "CleanupForNotion:Plugins:1:PropertyName", "Delete" }
   };
 

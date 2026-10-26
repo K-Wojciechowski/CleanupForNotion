@@ -26,7 +26,7 @@ public class DeleteWithoutRelationshipsTests : BasicDeletePluginTestsBase<Delete
   public async Task Run_Called_DeletesWithoutRelationships(bool dryRun) {
     const string propertyName = "propertyName";
     var options = new DeleteWithoutRelationshipsOptions(
-        DatabaseId: DatabaseId,
+        DataSourceId: DataSourceId,
         PropertyName: propertyName,
         GracePeriod: TimeSpan.FromMinutes(1));
 

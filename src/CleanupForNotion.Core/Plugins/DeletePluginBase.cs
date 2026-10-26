@@ -43,7 +43,7 @@ public abstract class DeletePluginBase<TOptions> : IPlugin
     var filter = LastEditedFilterHelper.GetCompoundFilterWithLastEdited(TimeProvider, Options, filters);
 
     Logger.LogFilters(filter);
-    var pageIds = await client.QueryDatabaseIdsAsync(Options.DatabaseId, filter, cancellationToken).ConfigureAwait(false);
+    var pageIds = await client.QueryDataSourceIdsAsync(Options.DataSourceId, filter, cancellationToken).ConfigureAwait(false);
 
     await DoDelete(client, globalOptions, pageIds, cancellationToken).ConfigureAwait(false);
   }

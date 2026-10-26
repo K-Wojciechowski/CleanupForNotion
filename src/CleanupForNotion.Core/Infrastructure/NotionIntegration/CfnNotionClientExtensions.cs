@@ -3,19 +3,19 @@ using Notion.Client;
 namespace CleanupForNotion.Core.Infrastructure.NotionIntegration;
 
 public static class CfnNotionClientExtensions {
-  public static async Task<List<Page>> QueryDatabaseAsync(
+  public static async Task<List<Page>> QueryDataSourceAsync(
       this ICfnNotionClient cfnNotionClient,
-      string databaseId,
+      string dataSourceId,
       Filter filter,
       CancellationToken cancellationToken) {
-    var queryParameters = new DatabasesQueryParameters { Filter = filter };
-    var queryResults = await cfnNotionClient.QueryDatabaseRawAsync(databaseId, queryParameters, cancellationToken)
+    var request = new QueryDataSourceRequest { DataSourceId = dataSourceId, Filter = filter };
+    var queryResults = await cfnNotionClient.QueryDataSourceRawAsync(request, cancellationToken)
         .ConfigureAwait(false);
-    var pages = new List<IWikiDatabase>(queryResults.Results);
+    var pages = new List<IQueryDataSourceResponseObject>(queryResults.Results);
 
     while (queryResults.HasMore) {
-      var nextQueryParameters = new DatabasesQueryParameters { Filter = filter, StartCursor = queryResults.NextCursor };
-      queryResults = await cfnNotionClient.QueryDatabaseRawAsync(databaseId, nextQueryParameters, cancellationToken)
+      var nextRequest = new QueryDataSourceRequest { DataSourceId = dataSourceId, Filter = filter, StartCursor = queryResults.NextCursor };
+      queryResults = await cfnNotionClient.QueryDataSourceRawAsync(nextRequest, cancellationToken)
           .ConfigureAwait(false);
       pages.AddRange(queryResults.Results);
     }
@@ -23,12 +23,12 @@ public static class CfnNotionClientExtensions {
     return pages.Cast<Page>().ToList();
   }
 
-  public static async Task<List<string>> QueryDatabaseIdsAsync(
+  public static async Task<List<string>> QueryDataSourceIdsAsync(
       this ICfnNotionClient cfnNotionClient,
-      string databaseId,
+      string dataSourceId,
       Filter filter,
       CancellationToken cancellationToken) =>
-      (await QueryDatabaseAsync(cfnNotionClient, databaseId, filter, cancellationToken).ConfigureAwait(false))
+      (await cfnNotionClient.QueryDataSourceAsync(dataSourceId, filter, cancellationToken).ConfigureAwait(false))
       .Select(p => p.Id)
       .ToList();
 }

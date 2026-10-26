@@ -14,7 +14,7 @@ namespace CleanupForNotion.Core.Test.Plugins.Implementations;
 
 [TestClass]
 public class DeleteZeroSumTests {
-  private const string DatabaseId = "DatabaseId";
+  private const string DataSourceId = "DataSourceId";
   private const string PropertyName = "PropertyName";
   private const string PluginDescription = "PluginDescription";
 
@@ -67,10 +67,10 @@ public class DeleteZeroSumTests {
     ];
 
     var client = Substitute.For<ICfnNotionClient>();
-    client.QueryDatabaseRawAsync(DatabaseId,
-            Arg.Is((DatabasesQueryParameters d) => d.Filter.GetType() == typeof(TimestampLastEditedTimeFilter)),
+    client.QueryDataSourceRawAsync(
+            Arg.Is((QueryDataSourceRequest d) => d.Filter.GetType() == typeof(TimestampLastEditedTimeFilter)),
             CancellationToken.None)
-        .Returns(new DatabaseQueryResponse { Results = pages.Cast<IWikiDatabase>().ToList() });
+        .Returns(new QueryDataSourceResponse { Results = pages.Cast<IQueryDataSourceResponseObject>().ToList() });
     client.DeletePageAsync(Arg.Is((string s) => s.StartsWith('d')), CancellationToken.None)
         .Returns(Task.CompletedTask);
     client.DeletePageAsync(Arg.Is((string s) => !s.StartsWith('d')), CancellationToken.None)
@@ -78,7 +78,7 @@ public class DeleteZeroSumTests {
 
     var logger = new FakeLogger<DeleteZeroSum>();
     var timeProvider = new FakeTimeProvider();
-    var options = new DeleteZeroSumOptions(DatabaseId: DatabaseId, PropertyName: PropertyName);
+    var options = new DeleteZeroSumOptions(DataSourceId: DataSourceId, PropertyName: PropertyName);
 
     var plugin = new DeleteZeroSum(logger, Substitute.For<IPluginStateProvider>(), timeProvider, options,
         PluginDescription);

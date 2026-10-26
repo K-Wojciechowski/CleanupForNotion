@@ -3,9 +3,8 @@ using Notion.Client;
 namespace CleanupForNotion.Core.Infrastructure.NotionIntegration;
 
 public interface ICfnNotionClient {
-  Task<DatabaseQueryResponse> QueryDatabaseRawAsync(
-      string databaseId,
-      DatabasesQueryParameters queryParameters,
+  Task<QueryDataSourceResponse> QueryDataSourceRawAsync(
+      QueryDataSourceRequest request,
       CancellationToken cancellationToken);
 
   Task UpdatePageAsync(string pageId, PagesUpdateParameters pagesUpdateParameters, CancellationToken cancellationToken);

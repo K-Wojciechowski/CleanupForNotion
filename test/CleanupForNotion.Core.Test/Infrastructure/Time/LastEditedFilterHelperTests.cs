@@ -13,7 +13,7 @@ public class LastEditedFilterHelperTests {
   [DataRow(false)]
   public void GetLastEditedFilter_WithOptions_ReturnsCorrectFilter(bool gracePeriodPresent) {
     var gracePeriod = gracePeriodPresent ? TimeSpan.FromMinutes(10) : Constants.DefaultGracePeriod;
-    var options = new DeleteZeroSumOptions(DatabaseId: "", PropertyName: "", GracePeriod: gracePeriodPresent ? gracePeriod : null);
+    var options = new DeleteZeroSumOptions(DataSourceId: "", PropertyName: "", GracePeriod: gracePeriodPresent ? gracePeriod : null);
     TestGetLastEditedFilter(timeProvider => LastEditedFilterHelper.GetLastEditedFilter(timeProvider, options), gracePeriod);
   }
 
@@ -28,7 +28,7 @@ public class LastEditedFilterHelperTests {
   [DataRow(false)]
   public void GetCompoundFilterWithLastEdited_WithOptions_ReturnsCorrectFilter(bool gracePeriodPresent) {
     var gracePeriod = gracePeriodPresent ? TimeSpan.FromMinutes(20) : Constants.DefaultGracePeriod;
-    var options = new DeleteZeroSumOptions(DatabaseId: "", PropertyName: "", GracePeriod: gracePeriodPresent ? gracePeriod : null);
+    var options = new DeleteZeroSumOptions(DataSourceId: "", PropertyName: "", GracePeriod: gracePeriodPresent ? gracePeriod : null);
     TestGetCompoundFilterWithLastEdited((timeProvider, filters) => LastEditedFilterHelper.GetCompoundFilterWithLastEdited(timeProvider, options, filters), gracePeriod);
   }
 

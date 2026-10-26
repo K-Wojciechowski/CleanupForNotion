@@ -7,18 +7,17 @@ using Shouldly;
 namespace CleanupForNotion.Core.Test.Plugins.Implementations;
 
 public abstract class DeletePluginTestsBase {
-  private const string DatabaseId = "databaseId";
+  private const string DataSourceId = "dataSourceId";
   private static readonly string[] _pageIdsToDelete = ["a", "b", "c"];
 
   protected static ICfnNotionClient CreateMockNotionClient()
   {
     var client = Substitute.For<ICfnNotionClient>();
 
-    client.QueryDatabaseRawAsync(
-        DatabaseId,
-        Arg.Any<DatabasesQueryParameters>(), CancellationToken.None).Returns(
-        new DatabaseQueryResponse {
-            Results = _pageIdsToDelete.Select(id => new Page { Id = id }).Cast<IWikiDatabase>().ToList()
+    client.QueryDataSourceRawAsync(
+        Arg.Any<QueryDataSourceRequest>(), CancellationToken.None).Returns(
+        new QueryDataSourceResponse {
+            Results = _pageIdsToDelete.Select(id => new Page { Id = id }).Cast<IQueryDataSourceResponseObject>().ToList()
         });
 
     client.DeletePageAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).ReturnsForAnyArgs(Task.CompletedTask);
@@ -38,15 +37,17 @@ public abstract class DeletePluginTestsBase {
     logRecords.ShouldContain(r => r.Message == "Pages to delete: 3");
 
     await client.ReceivedWithAnyArgs()
-        .QueryDatabaseRawAsync(Arg.Any<string>(), Arg.Any<DatabasesQueryParameters>(), CancellationToken.None)
+        .QueryDataSourceRawAsync(Arg.Any<QueryDataSourceRequest>(), CancellationToken.None)
         .ConfigureAwait(false);
 
-    var queryCall = client.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "QueryDatabaseRawAsync");
+    var queryCall = client.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "QueryDataSourceRawAsync");
     var queryCallArguments = queryCall.GetArguments();
-    queryCallArguments[0].ShouldBe(DatabaseId);
-    queryCallArguments[1].ShouldBeOfType<DatabasesQueryParameters>().Filter
-        .ShouldBeEquivalentTo(expectedCompoundFilter);
-    queryCallArguments[2].ShouldBe(CancellationToken.None);
+
+    var request = queryCallArguments[0].ShouldBeOfType<QueryDataSourceRequest>();
+    request.DataSourceId.ShouldBe(DataSourceId);
+    request.Filter.ShouldBeEquivalentTo(expectedCompoundFilter);
+
+    queryCallArguments[1].ShouldBe(CancellationToken.None);
 
     if (dryRun) {
       await client.DidNotReceiveWithAnyArgs().DeletePageAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())

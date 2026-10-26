@@ -18,11 +18,11 @@ public class EnsureStaticRelatedPageProvider(
 
   protected override EnsureStaticRelatedPageOptions GetOptions(
       RawPluginOptions options,
-      string databaseId,
+      string dataSourceId,
       string propertyName,
       TimeSpan? gracePeriod) {
     return new EnsureStaticRelatedPageOptions(
-        databaseId,
+        dataSourceId,
         propertyName,
         options.GetString("RelatedPageId"),
         gracePeriod);

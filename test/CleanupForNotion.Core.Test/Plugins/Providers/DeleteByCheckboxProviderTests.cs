@@ -32,7 +32,7 @@ public class DeleteByCheckboxProviderTests {
   public void GetPlugin_ValidOptions_ReturnsPlugin(string? gracePeriod, string? deleteIfChecked) {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" }, { "PropertyName", "property name" },
+        { "DataSourceId", "data source id" }, { "PropertyName", "property name" },
     };
     if (gracePeriod != null) options["GracePeriod"] = gracePeriod;
     if (deleteIfChecked != null) options["DeleteIfChecked"] = deleteIfChecked;
@@ -55,7 +55,7 @@ public class DeleteByCheckboxProviderTests {
   public void GetPlugin_InvalidGracePeriod_ThrowsException() {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" },
+        { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "DeleteIfChecked", "true" },
         { "GracePeriod", "invalid" }
@@ -79,7 +79,7 @@ public class DeleteByCheckboxProviderTests {
   public void GetPlugin_InvalidDeleteIfChecked_ThrowsException() {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" },
+        { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "GracePeriod", "00:00:01" },
         { "DeleteIfChecked", "invalid" }

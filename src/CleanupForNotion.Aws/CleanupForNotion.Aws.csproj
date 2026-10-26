@@ -12,21 +12,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CleanupForNotion.Core\CleanupForNotion.Core.csproj"/>
+    <ProjectReference Include="..\CleanupForNotion.Core\CleanupForNotion.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Amazon.Lambda.Core" Version="2.7.0"/>
-    <PackageReference Include="Amazon.Lambda.Logging.AspNetCore" Version="4.1.0"/>
-    <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.4.4"/>
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="4.0.3.4"/>
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.2.1"/>
-    <PackageReference Include="AWSSDK.S3" Version="4.0.6.4"/>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8"/>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8"/>
-    <PackageReference Include="Polly" Version="8.6.2"/>
+    <PackageReference Include="Amazon.Lambda.Core" Version="3.4.0" />
+    <PackageReference Include="Amazon.Lambda.Logging.AspNetCore" Version="5.1.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="3.0.1" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="4.0.109.1" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.102.6" />
+    <PackageReference Include="AWSSDK.S3" Version="4.0.104.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.14" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.14" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.14" />
+    <PackageReference Include="Polly" Version="8.8.0" />
   </ItemGroup>
 
 </Project>

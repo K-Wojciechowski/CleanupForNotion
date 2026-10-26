@@ -1,5 +1,11 @@
 # CleanupForNotion Changelog
 
+## 2.0.0
+
+* Upgrade to Notion.Net 5.0.0, which removes the deprecated database query API.
+  Existing configurations must be manually migrated to use `DataSourceId`s.
+  Data source IDs can be retrieved from Notion's UI.
+
 ## 1.5.0
 
 * Upgrade to .NET 10

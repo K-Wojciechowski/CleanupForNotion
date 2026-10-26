@@ -15,7 +15,7 @@ namespace CleanupForNotion.Core.Test.Plugins.Implementations;
 
 [TestClass]
 public class DeleteOnNewMonthlyCycleTests : DeletePluginTestsBase {
-  private const string DatabaseId = "databaseId";
+  private const string DataSourceId = "dataSourceId";
   private const string PropertyName = "propertyName";
   private const int CycleResetDay = 10;
   private const string PluginName = "DeleteOnNewMonthlyCycle";
@@ -23,7 +23,7 @@ public class DeleteOnNewMonthlyCycleTests : DeletePluginTestsBase {
   private const string LastRunSettingsKey = "LastRun";
 
   private readonly DeleteOnNewMonthlyCycleOptions _standardOptions = new(
-      DatabaseId: DatabaseId,
+      DataSourceId: DataSourceId,
       PropertyName: PropertyName,
       CycleResetDay: CycleResetDay,
       MonthOverflowResetsOnFirstDayOfNextMonth: false,

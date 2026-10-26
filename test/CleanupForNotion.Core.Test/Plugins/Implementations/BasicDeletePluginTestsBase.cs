@@ -12,7 +12,7 @@ namespace CleanupForNotion.Core.Test.Plugins.Implementations;
 public abstract class BasicDeletePluginTestsBase<TPlugin, TOptions> : DeletePluginTestsBase
     where TPlugin : DeletePluginBase<TOptions>
     where TOptions : IBasicPluginOptions {
-  protected const string DatabaseId = "databaseId";
+  protected const string DataSourceId = "dataSourceId";
 
   protected async Task TestRun(
       Func<ILogger<TPlugin>, TimeProvider, TPlugin> pluginCreator,

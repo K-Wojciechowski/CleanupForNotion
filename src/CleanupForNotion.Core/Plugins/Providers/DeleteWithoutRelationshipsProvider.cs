@@ -18,11 +18,11 @@ public class DeleteWithoutRelationshipsProvider(
 
   protected override DeleteWithoutRelationshipsOptions GetOptions(
       RawPluginOptions options,
-      string databaseId,
+      string dataSourceId,
       string propertyName,
       TimeSpan? gracePeriod) {
     return new DeleteWithoutRelationshipsOptions(
-        databaseId,
+        dataSourceId,
         propertyName,
         gracePeriod);
   }

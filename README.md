@@ -104,16 +104,14 @@ Navigate to the integration settings on the [Integrations](https://www.notion.so
 
 Open the target page or database for CleanupForNotion. Click the three dot menu in the top right corner, then choose Connections, and add the integration.
 
-### Get database IDs
+### Get data source IDs
 
-Open the target database in full view. For embedded databases, click the expand icon to open the database itself.
+1. Click on the settings button for the database
+2. Choose "Manage data sources"
+3. Click the ellipsis icon next to your data source
+4. Click "Copy data source ID"
 
-Extract the database ID from the URL of the full view:
-
-```text
-https://www.notion.so/workspace-name/11111111111111111111111111111111?v=22222222222222222222222222222222
-                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-```
+Note that those data source IDs are distinct from previously used database IDs.
 
 ### Get page IDs
 
@@ -139,7 +137,7 @@ Plugins are configured in a **Plugins** array. Every plugin instance has its own
 
 * **PluginName** (string, mandatory) — the name of the plugin. Valid values: `DeleteByCheckbox`, `DeleteOnNewMonthlyCycle`, `DeleteWithoutRelationships`, `DeleteZeroSum`. One plugin may be used multiple times in the configuration.
 * **PluginDescription** (string, mandatory) — the description of the plugin instance. Should be unique and human-readable.
-* **DatabaseId** (string, mandatory) — ID of the database to work on. See [Setup in Notion](#setup-in-notion) for retrieval instructions.
+* **DataSourceId** (string, mandatory) — ID of the data source to work on. See [Setup in Notion](#setup-in-notion) for retrieval instructions.
 * **PropertyName** (string, mandatory) — name of the property to base deletion checks on. This is the human-readable name visible in the database.
 * **GracePeriod** (string, `"HH:MM:SS"`, optional) — defines the time after the last edit for which the page will not be modified. Defaults to 1 hour.
 
@@ -156,7 +154,7 @@ Here is the an example CleanupForNotion configuration:
     {
       "PluginName": "DeleteOnNewMonthlyCycle",
       "PluginDescription": "Secondary Bank Card Fee cycle enforcement",
-      "DatabaseId": "00000000000000000000000000000000",
+      "DataSourceId": "00000000000000000000000000000000",
       "PropertyName": "Date",
       "TimeZoneName": "Europe/Warsaw",
       "CycleResetDay": 10
@@ -164,26 +162,26 @@ Here is the an example CleanupForNotion configuration:
     {
       "PluginName": "DeleteByCheckbox",
       "PluginDescription": "Delete checked items",
-      "DatabaseId": "11111111111111111111111111111111",
+      "DataSourceId": "11111111111111111111111111111111",
       "PropertyName": "Delete"
     },
     {
       "PluginName": "DeleteWithoutRelationships",
       "PluginDescription": "Delete log rows with no items",
-      "DatabaseId": "22222222222222222222222222222222",
+      "DataSourceId": "22222222222222222222222222222222",
       "PropertyName": "Items",
       "GracePeriod": "00:10:00"
     },
     {
       "PluginName": "DeleteZeroSum",
       "PluginDescription": "Delete zero sum entries from Settlement Sheet",
-      "DatabaseId": "33333333333333333333333333333333",
+      "DataSourceId": "33333333333333333333333333333333",
       "PropertyName": "Amount"
     },
     {
       "PluginName": "EnsureStaticRelatedPage",
       "PluginDescription": "Ensure all entries in Secondary Bank Card Fee point to target row",
-      "DatabaseId": "44444444444444444444444444444444",
+      "DataSourceId": "44444444444444444444444444444444",
       "PropertyName": "SummaryRef",
       "RelatedPageId": "45454545454545454545454545454545",
       "GracePeriod": "00:01:00"

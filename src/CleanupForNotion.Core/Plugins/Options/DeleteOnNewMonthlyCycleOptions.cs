@@ -1,7 +1,7 @@
 namespace CleanupForNotion.Core.Plugins.Options;
 
 public record DeleteOnNewMonthlyCycleOptions(
-  string DatabaseId,
+  string DataSourceId,
   string PropertyName,
   int CycleResetDay,
   bool MonthOverflowResetsOnFirstDayOfNextMonth = true,

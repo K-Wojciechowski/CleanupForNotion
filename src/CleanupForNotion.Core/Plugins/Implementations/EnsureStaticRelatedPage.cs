@@ -28,7 +28,7 @@ public class EnsureStaticRelatedPage(
     logger.LogFilters(filter);
 
     var pagesToUpdate = await client
-        .QueryDatabaseAsync(options.DatabaseId, filter, cancellationToken)
+        .QueryDataSourceAsync(options.DataSourceId, filter, cancellationToken)
         .ConfigureAwait(false);
 
     if (pagesToUpdate.Count == 0) {
@@ -57,7 +57,7 @@ public class EnsureStaticRelatedPage(
 
     var allPagesFilter = LastEditedFilterHelper.GetLastEditedFilter(timeProvider, TimeSpan.Zero);
     var allPages = await client
-        .QueryDatabaseAsync(options.DatabaseId, allPagesFilter, cancellationToken)
+        .QueryDataSourceAsync(options.DataSourceId, allPagesFilter, cancellationToken)
         .ConfigureAwait(false);
 
     foreach (var page in allPages) {

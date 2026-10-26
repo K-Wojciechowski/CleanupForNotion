@@ -28,7 +28,7 @@ public class EnsureStaticRelatedPageProviderTests {
   public void GetPlugin_ValidOptions_ReturnsPlugin(string? gracePeriod) {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" },
+        { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "RelatedPageId", "related page id" },
     };
@@ -52,7 +52,7 @@ public class EnsureStaticRelatedPageProviderTests {
   public void GetPlugin_MissingRelatedPageId_ThrowsException() {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" },
+        { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
     };
 
@@ -74,7 +74,7 @@ public class EnsureStaticRelatedPageProviderTests {
   public void GetPlugin_InvalidRelatedPageIdType_ThrowsException() {
     // Arrange
     var options = new Dictionary<string, object> {
-        { "DatabaseId", "database id" },
+        { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "GracePeriod", "00:00:01" },
         { "RelatedPageId", Guid.NewGuid() }
