@@ -21,7 +21,8 @@ public class CfnNotionClient(ILogger<CfnNotionClient> logger, IOptions<CfnOption
         logger,
         cancellationToken).ConfigureAwait(false);
 
-  public async Task UpdatePageAsync(string pageId, PagesUpdateParameters pagesUpdateParameters, CancellationToken cancellationToken)
+  public async Task UpdatePageAsync(string pageId, PagesUpdateParameters pagesUpdateParameters,
+      CancellationToken cancellationToken)
     => await RateLimitHelper.CallWithRetryAsync(async () =>
             await _notionClient.Pages
                 .UpdateAsync(pageId, pagesUpdateParameters, cancellationToken)
@@ -30,5 +31,6 @@ public class CfnNotionClient(ILogger<CfnNotionClient> logger, IOptions<CfnOption
         cancellationToken).ConfigureAwait(false);
 
   public async Task DeletePageAsync(string pageId, CancellationToken cancellationToken)
-    => await UpdatePageAsync(pageId, new PagesUpdateParameters { InTrash = true }, cancellationToken).ConfigureAwait(false);
+    => await UpdatePageAsync(pageId, new PagesUpdateParameters { InTrash = true }, cancellationToken)
+        .ConfigureAwait(false);
 }

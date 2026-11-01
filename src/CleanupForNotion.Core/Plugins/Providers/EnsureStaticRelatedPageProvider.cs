@@ -16,11 +16,11 @@ public class EnsureStaticRelatedPageProvider(
         timeProvider) {
   public override string Name => "EnsureStaticRelatedPage";
 
-  protected override EnsureStaticRelatedPageOptions GetOptions(
-      RawPluginOptions options,
+  protected override EnsureStaticRelatedPageOptions GetOptions(RawPluginOptions options,
       string dataSourceId,
       string propertyName,
-      TimeSpan? gracePeriod) {
+      TimeSpan? gracePeriod,
+      int pluginIndex) {
     return new EnsureStaticRelatedPageOptions(
         dataSourceId,
         propertyName,

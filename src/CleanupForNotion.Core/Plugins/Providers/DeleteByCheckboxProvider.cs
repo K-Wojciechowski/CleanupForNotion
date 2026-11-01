@@ -16,11 +16,11 @@ public class DeleteByCheckboxProvider(
         timeProvider) {
   public override string Name => "DeleteByCheckbox";
 
-  protected override DeleteByCheckboxOptions GetOptions(
-      RawPluginOptions options,
+  protected override DeleteByCheckboxOptions GetOptions(RawPluginOptions options,
       string dataSourceId,
       string propertyName,
-      TimeSpan? gracePeriod) {
+      TimeSpan? gracePeriod,
+      int pluginIndex) {
     return new DeleteByCheckboxOptions(
         dataSourceId,
         propertyName,

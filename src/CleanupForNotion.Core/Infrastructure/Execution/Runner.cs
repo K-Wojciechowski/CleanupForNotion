@@ -40,7 +40,6 @@ public class Runner(
 
     using var _ = semaphore;
 
-
     var plugins = rawPlugins
       .Select(pluginSpecificationParser.ParseSpecification)
       .Select(pluginActivator.ActivatePlugin)
