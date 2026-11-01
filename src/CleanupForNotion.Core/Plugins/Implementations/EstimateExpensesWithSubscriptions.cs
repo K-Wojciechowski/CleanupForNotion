@@ -1,4 +1,5 @@
-﻿using CleanupForNotion.Core.Infrastructure.ConfigModels;
+using System.Diagnostics.CodeAnalysis;
+using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.NotionIntegration;
 using CleanupForNotion.Core.Infrastructure.Plugins;
 using CleanupForNotion.Core.Infrastructure.State;
@@ -79,6 +80,8 @@ public class EstimateExpensesWithSubscriptions(
       }
     }
 
+    LogBuckets(buckets);
+
     var estimatedTotal = buckets.Sum(b => b.Value);
     logger.LogDebug("Estimated total for all buckets: {Total}", estimatedTotal);
 
@@ -95,6 +98,14 @@ public class EstimateExpensesWithSubscriptions(
         .ConfigureAwait(false);
     await pluginStateProvider.SetInteger(Name, Description, PageCountKey, pages.Count, cancellationToken)
         .ConfigureAwait(false);
+  }
+
+  [ExcludeFromCodeCoverage(Justification = "Trivial trace logging")]
+  private void LogBuckets(Bucket[] buckets) {
+    if (!logger.IsEnabled(LogLevel.Trace)) return;
+    foreach (var b in buckets) {
+      logger.LogTrace("Bucket {Bucket} value: {Value}", b.Id, b.Value);
+    }
   }
 
   private class Bucket(HashSet<string>? names, decimal expected) {
