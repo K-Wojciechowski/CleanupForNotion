@@ -4,7 +4,7 @@ public record EstimateExpensesWithSubscriptionsOptions(
     string DataSourceId,
     string PropertyName,
     string OutputPageId,
-    string NamePropertyName,
+    string VendorPropertyName,
     string AmountPropertyName,
     ExpenseSubscription[] Subscriptions,
     int CurrencyDecimalPlaces,

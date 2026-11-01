@@ -51,29 +51,29 @@ public class EstimateExpensesWithSubscriptions(
         .ToArray();
 
     foreach (var page in pages) {
-      var nameProperty = page.Properties.GetValueOrNull(options.NamePropertyName);
+      var vendorProperty = page.Properties.GetValueOrNull(options.VendorPropertyName);
       var amountProperty = page.Properties.GetValueOrNull(options.AmountPropertyName);
 
-      var nameParts = nameProperty switch {
+      var vendorParts = vendorProperty switch {
           TitlePropertyValue tpv => tpv.Title,
           RichTextPropertyValue rtpv => rtpv.RichText,
-          _ => throw new Exception($"Page {page.Id} does not have a readable name")
+          _ => throw new Exception($"Page {page.Id} does not have a readable vendor")
       };
 
-      var name = string.Join(null, nameParts.Select(p => p.PlainText)).ToLower().Trim();
+      var vendor = string.Join(null, vendorParts.Select(p => p.PlainText)).ToLower().Trim();
 
       var doubleAmount = amountProperty is NumberPropertyValue npv
           ? (npv.Number ?? 0)
-          : throw new Exception($"Page {page} ({name}) does not have a readable amount");
+          : throw new Exception($"Page {page} ({vendor}) does not have a readable amount");
 
       var amount = Math.Round(((decimal)doubleAmount), options.CurrencyDecimalPlaces);
 
       foreach (var bucket in buckets) {
-        if (bucket.Names?.Contains(name) == false) {
+        if (bucket.Names?.Contains(vendor) == false) {
           continue;
         }
 
-        logger.LogTrace("Expense {Name} with amount {Amount} associated with bucket {Bucket}", name, amount, bucket.Id);
+        logger.LogTrace("Expense {Name} with amount {Amount} associated with bucket {Bucket}", vendor, amount, bucket.Id);
         bucket.Actual += amount;
         break;
       }

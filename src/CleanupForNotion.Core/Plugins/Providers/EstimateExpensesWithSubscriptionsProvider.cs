@@ -32,7 +32,7 @@ public class EstimateExpensesWithSubscriptionsProvider(
         DataSourceId: dataSourceId,
         PropertyName: propertyName,
         OutputPageId: options.GetString("OutputPageId"),
-        NamePropertyName: options.GetString("NamePropertyName"),
+        VendorPropertyName: options.GetString("VendorPropertyName"),
         AmountPropertyName: options.GetString("AmountPropertyName"),
         Subscriptions: subscriptions ?? throw new InvalidConfigurationException($"Missing subscription configuration for plugin {pluginIndex}"),
         CurrencyDecimalPlaces: options.GetInteger("CurrencyDecimalPlaces"),

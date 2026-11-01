@@ -18,6 +18,7 @@ Fully tested: 100% code coverage, enforced by the CI pipeline.
   * [DeleteWithoutRelationships](#deletewithoutrelationships)
   * [DeleteZeroSum](#deletezerosum)
   * [EnsureStaticRelatedPage](#ensurestaticrelatedpage)
+  * [EstimateExpensesWithSubscriptions](#estimateexpenseswithsubscriptions)
 * [Setup in Notion](#setup-in-notion)
 * [Configuration](#configuration)
 * [Deployment](#deployment)
@@ -86,6 +87,32 @@ For this to work, all purchases must have a relationship to the single row in th
 
 * **RelatedPageId** (string, mandatory) — The Notion ID of the page that all pages in the database must be related to.
 
+### EstimateExpensesWithSubscriptions
+
+This plugin estimates the total spend in a database of expenses, but assuming all subscriptions (or other constant purchases) have been charged to the card.
+
+This plugin assumes that you have two databases. The monthly expenses database has at least two columns, one for the vendor name, and another for the amount. The second database is where the plugin writes the result to, it can be a single row showing your totals and possibly the remaining amount.
+
+A list of subscriptions and their expected monthly amounts must be configured. For each subscription, expenses with matching vendors are totalled. If the subscription total is less than the expected monthly amount, the expected amount is considered to be the total. Those augmented totals are then added, along with the total of expenses which don’t match any subscription. In short:
+
+\[EstimatedTotal = ExpensesWithoutSubscriptions + \Sum_{s} \max \left(s_{ExpectedAmount}, s_{total} \right)\]
+
+This is another part of the “secondary bank’s credit card” database (as described alongside [DeleteOnNewMonthlyCycle](#deleteonnewmonthlycycle)).
+
+#### Plugin-specific configuration for EstimateExpensesWithoutSubscriptions
+
+* **PropertyName** (string, mandatory) — The name of the property to which the total will be written.
+* **OutputPageId** (string, mandatory) — The Notion ID of the page to which the total will be written.
+* **DataSourceId** (string, mandatory) — ID of the data source to work on (containing expenses).
+* **VendorPropertyName** (string, mandatory) — name of the vendor property in the data source.
+* **AmountPropertyName** (string, mandatory) — name of the amount property in the data source.
+* **Subscriptions** (array of objects, mandatory) — the subscriptions to assume will be present in every month:
+  * **Names** (array of strings, mandatory) — a list of vendor names that can be used for the subscription, case-insensitive.
+  * **ExpectedTotal** (integer, mandatory) — the expected total for this subscription, in the smallest unit of the currency (e.g. 1234 = $12.34).
+* **CurrencyDecimalPlaces** (integer, mandatory) — the number of decimal places used by the currency. Many currencies use `2`.
+
+*Note: the **GracePeriod** property is ignored by this plugin.*
+
 ## Setup in Notion
 
 ### Create integration
@@ -143,7 +170,7 @@ Plugins are configured in a **Plugins** array. Every plugin instance has its own
 
 ### Putting it all together
 
-Here is the an example CleanupForNotion configuration:
+Here is an example CleanupForNotion configuration:
 
 ```json
 {
@@ -185,6 +212,20 @@ Here is the an example CleanupForNotion configuration:
       "PropertyName": "SummaryRef",
       "RelatedPageId": "45454545454545454545454545454545",
       "GracePeriod": "00:01:00"
+    },
+    {
+      "PluginName": "EstimateExpensesWithSubscriptions",
+      "PluginDescription": "Estimate total forSecondary Bank Card Fee assuming all subscriptions are paid for",
+      "DataSourceId": "55555555555555555555555555555555",
+      "PropertyName": "Total with Subscriptions",
+      "OutputPageId": "56565656565656565656565656565656",
+      "VendorPropertyName": "Vendor",
+      "AmountPropertyName": "Amount",
+      "Subscriptions": [
+        {"Names": ["Notion"], "Amount": 1150},
+        {"Names": ["AWS", "Amazon Web Services"], "Amount": 1234}
+      ],
+      "CurrencyDecimalPlaces": 2
     }
   ]
 }

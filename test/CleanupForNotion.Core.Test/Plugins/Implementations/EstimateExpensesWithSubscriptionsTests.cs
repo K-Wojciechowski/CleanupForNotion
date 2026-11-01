@@ -16,18 +16,18 @@ public class EstimateExpensesWithSubscriptionsTests {
   private const string DataSourceId = "dataSourceId";
   private const string PropertyName = "estimatedTotal";
   private const string OutputPageId = "outputPageId";
-  private const string NamePropertyName = "name";
+  private const string VendorPropertyName = "vendor";
   private const string AmountPropertyName = "amount";
   private const string PluginDescription = "pluginDescription";
   private static readonly DateTime _lastEditedTime = new(2025, 1, 2, 3, 4, 5, DateTimeKind.Utc);
   private static readonly DateTimeOffset _lastEdited = new(_lastEditedTime);
 
   private static readonly string _lastEditedString =
-      _lastEdited.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+      _lastEdited.ToString("o", CultureInfo.InvariantCulture);
 
   private static readonly ExpenseSubscription[] _subscriptions = [
-      new ExpenseSubscription { Names = ["Sub1"], ExpectedTotal = 300 },
-      new ExpenseSubscription { Names = ["Sub2", "2 Sub"], ExpectedTotal = 1500 }
+      new() { Names = ["Sub1"], ExpectedTotal = 300 },
+      new() { Names = ["Sub2", "2 Sub"], ExpectedTotal = 1500 }
   ];
 
   [TestMethod]
@@ -139,7 +139,7 @@ public class EstimateExpensesWithSubscriptionsTests {
           DataSourceId,
           PropertyName,
           OutputPageId,
-          NamePropertyName,
+          VendorPropertyName,
           AmountPropertyName,
           _subscriptions,
           CurrencyDecimalPlaces: 2),
@@ -176,7 +176,7 @@ public class EstimateExpensesWithSubscriptionsTests {
       LastEditedTime = _lastEditedTime,
       Properties = new Dictionary<string, PropertyValue> {
           {
-              NamePropertyName,
+              VendorPropertyName,
               new TitlePropertyValue {
                   Title = nameParts.Select(part => (RichTextBase)new RichTextText { PlainText = part }).ToList()
               }

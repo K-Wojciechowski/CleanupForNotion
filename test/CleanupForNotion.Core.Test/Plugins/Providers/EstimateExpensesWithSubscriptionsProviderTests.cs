@@ -39,7 +39,7 @@ public class EstimateExpensesWithSubscriptionsProviderTests {
             ["DataSourceId"] = "dataSourceId",
             ["PropertyName"] = "propertyName",
             ["OutputPageId"] = "outputPageId",
-            ["NamePropertyName"] = "name",
+            ["VendorPropertyName"] = "vendor",
             ["AmountPropertyName"] = "amount",
             ["CurrencyDecimalPlaces"] = 2
         }));
@@ -53,7 +53,7 @@ public class EstimateExpensesWithSubscriptionsProviderTests {
     configuration.DataSourceId.ShouldBe("dataSourceId");
     configuration.PropertyName.ShouldBe("propertyName");
     configuration.OutputPageId.ShouldBe("outputPageId");
-    configuration.NamePropertyName.ShouldBe("name");
+    configuration.VendorPropertyName.ShouldBe("vendor");
     configuration.AmountPropertyName.ShouldBe("amount");
     configuration.CurrencyDecimalPlaces.ShouldBe(2);
     configuration.Subscriptions.Length.ShouldBe(2);
