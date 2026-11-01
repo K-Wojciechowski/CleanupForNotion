@@ -30,6 +30,7 @@ public class DeleteZeroSumProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));
@@ -53,6 +54,7 @@ public class DeleteZeroSumProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: description,
         RawOptions: new RawPluginOptions(options));

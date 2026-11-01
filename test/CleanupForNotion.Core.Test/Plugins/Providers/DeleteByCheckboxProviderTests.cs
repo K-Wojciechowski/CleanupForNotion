@@ -38,6 +38,7 @@ public class DeleteByCheckboxProviderTests {
     if (deleteIfChecked != null) options["DeleteIfChecked"] = deleteIfChecked;
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));
@@ -62,6 +63,7 @@ public class DeleteByCheckboxProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));
@@ -86,6 +88,7 @@ public class DeleteByCheckboxProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));

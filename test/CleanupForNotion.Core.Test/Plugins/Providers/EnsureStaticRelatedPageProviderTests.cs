@@ -35,6 +35,7 @@ public class EnsureStaticRelatedPageProviderTests {
     if (gracePeriod != null) options["GracePeriod"] = gracePeriod;
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));
@@ -57,6 +58,7 @@ public class EnsureStaticRelatedPageProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));
@@ -81,6 +83,7 @@ public class EnsureStaticRelatedPageProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));

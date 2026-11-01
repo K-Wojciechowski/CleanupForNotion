@@ -18,7 +18,7 @@ public class PluginSpecificationParserTests {
     var rawSpecification = GetBaseRawSpecification();
 
     // Act
-    var specification = parser.ParseSpecification(rawSpecification);
+    var specification = parser.ParseSpecification(rawSpecification, 0);
 
     // Assert
     specification.PluginName.ShouldBe(PluginName);
@@ -36,7 +36,7 @@ public class PluginSpecificationParserTests {
     rawSpecification.Remove(missingField).ShouldBeTrue();
 
     // Act
-    Action act = () => parser.ParseSpecification(rawSpecification);
+    Action act = () => parser.ParseSpecification(rawSpecification, 0);
 
     // Assert
     act.ShouldThrow<InvalidConfigurationException>()

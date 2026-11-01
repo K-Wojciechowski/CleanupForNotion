@@ -20,10 +20,14 @@ public sealed class RunnerTests {
 
   public RunnerTests() {
     _pluginSpecificationParser = Substitute.For<IPluginSpecificationParser>();
-    _pluginSpecificationParser.ParseSpecification(null!).ReturnsForAnyArgs(callInfo => {
+    _pluginSpecificationParser.ParseSpecification(null!, 0).ReturnsForAnyArgs(callInfo => {
       var options = callInfo.Arg<Dictionary<string, object>>();
       var name = (string)options["Name"];
-      return new PluginSpecification(name, name + "desc", new RawPluginOptions(options));
+      return new PluginSpecification(
+          PluginIndex: 0,
+          PluginName: name,
+          PluginDescription: name + "desc",
+          RawOptions: new RawPluginOptions(options));
     });
 
     _pluginActivator = Substitute.For<IPluginActivator>();

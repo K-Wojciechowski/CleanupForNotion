@@ -44,6 +44,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
     if (timeZoneName != null) options["TimeZoneName"] = timeZoneName;
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));
@@ -66,6 +67,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));
@@ -87,6 +89,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));
@@ -110,6 +113,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));
@@ -132,6 +136,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));
@@ -155,6 +160,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
         RawOptions: new RawPluginOptions(options));
