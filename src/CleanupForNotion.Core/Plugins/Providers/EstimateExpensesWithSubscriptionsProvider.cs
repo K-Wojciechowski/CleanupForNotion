@@ -45,6 +45,6 @@ public class EstimateExpensesWithSubscriptionsProvider(
       TimeProvider timeProvider,
       EstimateExpensesWithSubscriptionsOptions options,
       string pluginDescription) {
-    return new EstimateExpensesWithSubscriptions(logger, pluginStateProvider, timeProvider, options, pluginDescription);
+    return new EstimateExpensesWithSubscriptions(logger, pluginStateProvider, options, pluginDescription);
   }
 }

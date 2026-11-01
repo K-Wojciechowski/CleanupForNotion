@@ -14,6 +14,7 @@ public abstract class DeletePluginBase<TOptions> : IPlugin
     where TOptions : IBasicPluginOptions {
   public abstract string Name { get; }
   public string Description { get; }
+  public IBasicPluginOptions Configuration => Options;
 
   protected readonly TOptions Options;
   protected readonly ILogger<DeletePluginBase<TOptions>> Logger;

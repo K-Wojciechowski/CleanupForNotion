@@ -4,6 +4,7 @@ using CleanupForNotion.Core.Infrastructure.Notifications;
 using CleanupForNotion.Core.Infrastructure.NotionIntegration;
 using CleanupForNotion.Core.Infrastructure.PluginManagement;
 using CleanupForNotion.Core.Infrastructure.Plugins;
+using CleanupForNotion.Core.Plugins.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Testing;
@@ -171,6 +172,7 @@ public sealed class RunnerTests {
   private class FakePlugin(PluginSpecification pluginSpecification) : IPlugin {
     public string Name { get; } = pluginSpecification.PluginName;
     public string Description { get; } = pluginSpecification.PluginDescription;
+    public IBasicPluginOptions Configuration { get; } = new FakePluginOptions(string.Empty, string.Empty, null);
 
     public Task Run(ICfnNotionClient client, GlobalOptions globalOptions, CancellationToken cancellationToken) {
       return Task.CompletedTask;
@@ -178,4 +180,7 @@ public sealed class RunnerTests {
 
     public override string ToString() => Name;
   }
+
+  private record FakePluginOptions(string DataSourceId, string PropertyName, TimeSpan? GracePeriod)
+      : IBasicPluginOptions;
 }

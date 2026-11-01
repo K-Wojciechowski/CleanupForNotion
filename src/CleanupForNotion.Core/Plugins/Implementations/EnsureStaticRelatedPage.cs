@@ -16,6 +16,7 @@ public class EnsureStaticRelatedPage(
     string pluginDescription) : IPlugin {
   public string Name => "EnsureStaticRelatedPage";
   public string Description { get; } = pluginDescription;
+  public IBasicPluginOptions Configuration => options;
 
   public async Task Run(ICfnNotionClient client, GlobalOptions globalOptions, CancellationToken cancellationToken) {
     if (options.RelatedPageId == "?") {

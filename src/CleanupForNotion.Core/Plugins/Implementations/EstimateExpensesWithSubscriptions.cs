@@ -11,15 +11,15 @@ namespace CleanupForNotion.Core.Plugins.Implementations;
 public class EstimateExpensesWithSubscriptions(
     ILogger<EstimateExpensesWithSubscriptions> logger,
     IPluginStateProvider pluginStateProvider,
-    TimeProvider timeProvider,
     EstimateExpensesWithSubscriptionsOptions options,
     string pluginDescription) : IPlugin {
   private const string PageCountKey = "PageCount";
   private const string LastEditKey = "LastEdit";
   private static readonly DateTimeOffset _placeholderLastEdit = new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-  public string Name => "EnsureStaticRelatedPage";
+  public string Name => "EstimateExpensesWithSubscriptions";
   public string Description { get; } = pluginDescription;
+    public IBasicPluginOptions Configuration => options;
 
   public async Task Run(ICfnNotionClient client, GlobalOptions globalOptions, CancellationToken cancellationToken) {
     var pages = await client.QueryDataSourceAsync(options.DataSourceId, filter: null, cancellationToken)
