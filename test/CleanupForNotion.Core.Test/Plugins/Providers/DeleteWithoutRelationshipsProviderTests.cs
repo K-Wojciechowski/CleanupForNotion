@@ -1,6 +1,7 @@
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.State;
 using CleanupForNotion.Core.Plugins.Implementations;
+using CleanupForNotion.Core.Plugins.Options;
 using CleanupForNotion.Core.Plugins.Providers;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
@@ -25,7 +26,7 @@ public class DeleteWithoutRelationshipsProviderTests {
   [TestMethod]
   public void GetPlugin_ValidOptions_ReturnsPlugin() {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" }, { "PropertyName", "property name" },
     };
 
@@ -33,7 +34,7 @@ public class DeleteWithoutRelationshipsProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     var plugin = _provider.GetPlugin(pluginSpecification);
@@ -42,13 +43,17 @@ public class DeleteWithoutRelationshipsProviderTests {
     plugin.ShouldBeOfType<DeleteWithoutRelationships>();
     plugin.Name.ShouldBe("DeleteWithoutRelationships");
     plugin.Description.ShouldBe(PluginDescription);
+
+    var options = plugin.Configuration.ShouldBeOfType<DeleteWithoutRelationshipsOptions>();
+    options.DataSourceId.ShouldBe("data source id");
+    options.PropertyName.ShouldBe("property name");
   }
 
   [TestMethod]
   public void GetPlugin_MissingPropertyName_ThrowsException() {
     // Arrange
     const string description = "Plugin Description";
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "GracePeriod", "00:00:01" }
     };
@@ -57,7 +62,7 @@ public class DeleteWithoutRelationshipsProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: description,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     Action act = () => _provider.GetPlugin(pluginSpecification);

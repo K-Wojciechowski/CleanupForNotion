@@ -1,6 +1,7 @@
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.State;
 using CleanupForNotion.Core.Plugins.Implementations;
+using CleanupForNotion.Core.Plugins.Options;
 using CleanupForNotion.Core.Plugins.Providers;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
@@ -34,20 +35,20 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   [DataRow("00:00:01", "5", false, "Europe/Warsaw")]
   public void GetPlugin_ValidOptions_ReturnsPlugin(string? gracePeriod, object? cycleResetDay, bool? monthOverflowResets, string? timeZoneName) {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "CycleResetDay", cycleResetDay ?? 1 }
     };
-    if (gracePeriod != null) options["GracePeriod"] = gracePeriod;
-    if (monthOverflowResets != null) options["MonthOverflowResetsOnFirstDayOfNextMonth"] = monthOverflowResets;
-    if (timeZoneName != null) options["TimeZoneName"] = timeZoneName;
+    if (gracePeriod != null) rawOptions["GracePeriod"] = gracePeriod;
+    if (monthOverflowResets != null) rawOptions["MonthOverflowResetsOnFirstDayOfNextMonth"] = monthOverflowResets;
+    if (timeZoneName != null) rawOptions["TimeZoneName"] = timeZoneName;
 
     var pluginSpecification = new PluginSpecification(
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     var plugin = _provider.GetPlugin(pluginSpecification);
@@ -56,12 +57,20 @@ public class DeleteOnNewMonthlyCycleProviderTests {
     plugin.ShouldBeOfType<DeleteOnNewMonthlyCycle>();
     plugin.Name.ShouldBe("DeleteOnNewMonthlyCycle");
     plugin.Description.ShouldBe(PluginDescription);
+
+    var options = plugin.Configuration.ShouldBeOfType<DeleteOnNewMonthlyCycleOptions>();
+    options.DataSourceId.ShouldBe("data source id");
+    options.PropertyName.ShouldBe("property name");
+    options.CycleResetDay.ShouldBe(cycleResetDay is string s ? int.Parse(s) : (cycleResetDay ?? 1));
+    options.GracePeriod.ShouldBe(gracePeriod is null ? null : TimeSpan.FromSeconds(1));
+    options.MonthOverflowResetsOnFirstDayOfNextMonth.ShouldBe(monthOverflowResets ?? true);
+    options.TimeZoneName.ShouldBe(timeZoneName);
   }
 
   [TestMethod]
   public void GetPlugin_MissingPropertyName_ThrowsException() {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "CycleResetDay", 1 }
     };
@@ -70,7 +79,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     Action act = () => _provider.GetPlugin(pluginSpecification);
@@ -83,7 +92,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   [TestMethod]
   public void GetPlugin_MissingCycleResetDay_ThrowsException() {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "PropertyName", "property name" }
     };
@@ -92,7 +101,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     Action act = () => _provider.GetPlugin(pluginSpecification);
@@ -105,7 +114,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   [TestMethod]
   public void GetPlugin_InvalidGracePeriod_ThrowsException() {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "CycleResetDay", 1 },
@@ -116,7 +125,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     Action act = () => _provider.GetPlugin(pluginSpecification);
@@ -129,7 +138,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   [TestMethod]
   public void GetPlugin_InvalidCycleResetDay_ThrowsException() {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "CycleResetDay", "one" },
@@ -139,7 +148,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     Action act = () => _provider.GetPlugin(pluginSpecification);
@@ -152,7 +161,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   [TestMethod]
   public void GetPlugin_InvalidMonthOverflowResetsOnFirstDayOfNextMonth_ThrowsException() {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "CycleResetDay", 1 },
@@ -163,7 +172,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     Action act = () => _provider.GetPlugin(pluginSpecification);

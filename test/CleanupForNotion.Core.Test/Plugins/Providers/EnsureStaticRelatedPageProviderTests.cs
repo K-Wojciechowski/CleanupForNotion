@@ -1,6 +1,7 @@
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.State;
 using CleanupForNotion.Core.Plugins.Implementations;
+using CleanupForNotion.Core.Plugins.Options;
 using CleanupForNotion.Core.Plugins.Providers;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
@@ -27,18 +28,18 @@ public class EnsureStaticRelatedPageProviderTests {
   [DataRow("00:00:01")]
   public void GetPlugin_ValidOptions_ReturnsPlugin(string? gracePeriod) {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "RelatedPageId", "related page id" },
     };
-    if (gracePeriod != null) options["GracePeriod"] = gracePeriod;
+    if (gracePeriod != null) rawOptions["GracePeriod"] = gracePeriod;
 
     var pluginSpecification = new PluginSpecification(
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     var plugin = _provider.GetPlugin(pluginSpecification);
@@ -47,12 +48,18 @@ public class EnsureStaticRelatedPageProviderTests {
     plugin.ShouldBeOfType<EnsureStaticRelatedPage>();
     plugin.Name.ShouldBe("EnsureStaticRelatedPage");
     plugin.Description.ShouldBe(PluginDescription);
+
+    var options = plugin.Configuration.ShouldBeOfType<EnsureStaticRelatedPageOptions>();
+    options.DataSourceId.ShouldBe("data source id");
+    options.PropertyName.ShouldBe("property name");
+    options.RelatedPageId.ShouldBe("related page id");
+    options.GracePeriod.ShouldBe(gracePeriod is null ? null : TimeSpan.FromSeconds(1));
   }
 
   [TestMethod]
   public void GetPlugin_MissingRelatedPageId_ThrowsException() {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
     };
@@ -61,11 +68,10 @@ public class EnsureStaticRelatedPageProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     Action act = () => _provider.GetPlugin(pluginSpecification);
-
 
     // Assert
     act.ShouldThrow<InvalidConfigurationException>()
@@ -75,7 +81,7 @@ public class EnsureStaticRelatedPageProviderTests {
   [TestMethod]
   public void GetPlugin_InvalidRelatedPageIdType_ThrowsException() {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "GracePeriod", "00:00:01" },
@@ -86,7 +92,7 @@ public class EnsureStaticRelatedPageProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     Action act = () => _provider.GetPlugin(pluginSpecification);

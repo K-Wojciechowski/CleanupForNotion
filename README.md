@@ -109,7 +109,7 @@ This is another part of the “secondary bank’s credit card” database (as de
 * **VendorPropertyName** (string, mandatory) — name of the vendor property in both data sources.
 * **AmountPropertyName** (string, mandatory) — name of the amount property in both data sources.
 * **AlternateVendorPropertyName** (string, mandatory) — name of the alternate vendor property in the subscriptions data source.
-* **CurrencyDecimalPlaces** (integer, mandatory) — the number of decimal places used by the currency. Many currencies use `2`.
+* **CurrencyDecimalPlaces** (integer, defaults to 2) — the number of decimal places used by the currency.
 
 *Note: the **GracePeriod** property is ignored by this plugin.*
 
