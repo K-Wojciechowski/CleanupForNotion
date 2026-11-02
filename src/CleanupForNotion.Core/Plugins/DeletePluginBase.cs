@@ -10,29 +10,21 @@ using Notion.Client;
 
 namespace CleanupForNotion.Core.Plugins;
 
-public abstract class DeletePluginBase<TOptions> : IPlugin
+public abstract class DeletePluginBase<TOptions>(
+    ILogger<DeletePluginBase<TOptions>> logger,
+    IPluginStateProvider pluginStateProvider,
+    TimeProvider timeProvider,
+    TOptions options,
+    string description) : IPlugin
     where TOptions : IBasicPluginOptions {
   public abstract string Name { get; }
-  public string Description { get; }
+  public string Description { get; } = description;
   public IBasicPluginOptions Configuration => Options;
 
-  protected readonly TOptions Options;
-  protected readonly ILogger<DeletePluginBase<TOptions>> Logger;
-  protected readonly IPluginStateProvider PluginStateProvider;
-  protected readonly TimeProvider TimeProvider;
-
-  protected DeletePluginBase(
-      ILogger<DeletePluginBase<TOptions>> logger,
-      IPluginStateProvider pluginStateProvider,
-      TimeProvider timeProvider,
-      TOptions options,
-      string description) {
-    Logger = logger;
-    PluginStateProvider = pluginStateProvider;
-    TimeProvider = timeProvider;
-    Description = description;
-    Options = options;
-  }
+  protected readonly TOptions Options = options;
+  protected readonly ILogger<DeletePluginBase<TOptions>> Logger = logger;
+  protected readonly IPluginStateProvider PluginStateProvider = pluginStateProvider;
+  protected readonly TimeProvider TimeProvider = timeProvider;
 
   public abstract Task Run(ICfnNotionClient client, GlobalOptions globalOptions, CancellationToken cancellationToken);
 

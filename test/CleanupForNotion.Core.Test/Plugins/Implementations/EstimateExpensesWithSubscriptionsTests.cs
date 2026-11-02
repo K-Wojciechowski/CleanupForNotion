@@ -109,7 +109,19 @@ public class EstimateExpensesWithSubscriptionsTests {
     var plugin = CreatePlugin(stateProvider);
     var client = CreateClient(
         [CreatePage("subscription", "Sub1", 3)],
-        [CreatePage("expense", "sub1 ", 8.15)]);
+        [
+            new Page {
+                Id = "expense",
+                LastEditedTime = _lastEditedTime,
+                Properties = new Dictionary<string, PropertyValue> {
+                    {
+                        VendorPropertyName,
+                        new RichTextPropertyValue { RichText = [new RichTextText { PlainText = "sub1 " }] }
+                    },
+                    { AmountPropertyName, new NumberPropertyValue { Number = 8.15 } }
+                }
+            }
+        ]);
 
     await plugin.Run(client, new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
 
@@ -135,6 +147,60 @@ public class EstimateExpensesWithSubscriptionsTests {
         .ConfigureAwait(false);
     await stateProvider.Received().SetString(
         plugin.Name, PluginDescription, "PageCount", "0", CancellationToken.None).ConfigureAwait(false);
+  }
+
+  [TestMethod]
+  [DataRow(true, DisplayName = "subscription bad")]
+  [DataRow(false, DisplayName = "expense bad")]
+  public async Task Run_AmountNotNumber_Throws(bool subscriptionBad) {
+    var stateProvider = SubstituteState(null, null);
+    var plugin = CreatePlugin(stateProvider);
+    var goodPage = CreatePage("good", "Sub1", 3);
+
+    var badPage = new Page {
+        Id = "bad",
+        LastEditedTime = _lastEditedTime,
+        Properties = new Dictionary<string, PropertyValue> {
+            { VendorPropertyName, new TitlePropertyValue { Title = [new RichTextText { PlainText = "sub1" }] } },
+            { AmountPropertyName, new UrlPropertyValue { Url = "https://example.com/" } }
+        }
+    };
+
+    var client = CreateClient(
+        [subscriptionBad ? badPage : goodPage],
+        [subscriptionBad ? goodPage : badPage]);
+
+    Func<Task> act = async () =>
+        await plugin.Run(client, new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
+
+    await act.ShouldThrowAsync<InvalidDataException>("Page bad does not have a readable amount").ConfigureAwait(false);
+  }
+
+  [TestMethod]
+  [DataRow(true, DisplayName = "subscription bad")]
+  [DataRow(false, DisplayName = "expense bad")]
+  public async Task Run_VendorNotRichTextOrTitle_Throws(bool subscriptionBad) {
+    var stateProvider = SubstituteState(null, null);
+    var plugin = CreatePlugin(stateProvider);
+    var goodPage = CreatePage("good", "Sub1", 3);
+
+    var badPage = new Page {
+        Id = "bad",
+        LastEditedTime = _lastEditedTime,
+        Properties = new Dictionary<string, PropertyValue> {
+            { VendorPropertyName, new UrlPropertyValue { Url = "https://example.com/" } },
+            { AmountPropertyName, new NumberPropertyValue { Number = 21.37 } }
+        }
+    };
+
+    var client = CreateClient(
+        [subscriptionBad ? badPage : goodPage],
+        [subscriptionBad ? goodPage : badPage]);
+
+    Func<Task> act = async () =>
+        await plugin.Run(client, new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
+
+    await act.ShouldThrowAsync<InvalidDataException>("Page bad does not have a readable vendor").ConfigureAwait(false);
   }
 
   private static EstimateExpensesWithSubscriptions CreatePlugin(IPluginStateProvider stateProvider) => new(

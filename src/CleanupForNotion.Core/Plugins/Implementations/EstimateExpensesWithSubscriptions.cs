@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.NotionIntegration;
 using CleanupForNotion.Core.Infrastructure.Plugins;
@@ -98,7 +99,7 @@ public class EstimateExpensesWithSubscriptions(
 
     var doubleAmount = amountPresent && amountProperty is NumberPropertyValue npv
         ? (npv.Number ?? 0)
-        : throw new Exception($"Page {page} does not have a readable amount");
+        : throw new InvalidDataException($"Page {page} does not have a readable amount");
 
     return Math.Round((decimal)doubleAmount, options.CurrencyDecimalPlaces);
   }
@@ -106,13 +107,12 @@ public class EstimateExpensesWithSubscriptions(
   private string ExtractVendor(Page page) => ExtractVendor(page, options.VendorPropertyName);
 
   private static string ExtractVendor(Page page, string propertyName) {
-    PropertyValue? vendorProperty = null;
-    var vendorPresent = page.Properties.TryGetValue(propertyName, out vendorProperty);
+    var vendorPresent = page.Properties.TryGetValue(propertyName, out var vendorProperty);
 
     var vendorParts = vendorProperty switch {
         TitlePropertyValue tpv => tpv.Title,
         RichTextPropertyValue rtpv => rtpv.RichText,
-        _ => throw new Exception($"Page {page.Id} does not have a readable vendor")
+        _ => throw new InvalidDataException($"Page {page.Id} does not have a readable vendor")
     };
 
     return string.Join(null, vendorParts.Select(p => p.PlainText)).Trim().ToLower();
@@ -124,7 +124,7 @@ public class EstimateExpensesWithSubscriptions(
 
     return string.IsNullOrEmpty(alternateVendor)
         ? [mainVendor]
-        : alternateVendor.Split(";").Select(v => v.Trim()).Append(mainVendor).ToHashSet();
+        : [.. alternateVendor.Split(";").Select(v => v.Trim()), mainVendor];
   }
 
   [ExcludeFromCodeCoverage(Justification = "Trivial trace logging")]
