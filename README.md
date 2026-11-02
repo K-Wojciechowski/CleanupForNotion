@@ -99,6 +99,8 @@ For each subscription, expenses with matching vendors are totalled. If the subsc
 EstimatedTotal = \max_{Subscription} \left(Subscription.ExpectedAmount, \left(\sum_{Expense \in Subscription} Expense.Amount\right) \right)
 ```
 
+The sum of the estimated totals is the predicted spend for the month.
+
 This is another part of the “secondary bank’s credit card” database (as described alongside [DeleteOnNewMonthlyCycle](#deleteonnewmonthlycycle)).
 
 #### Plugin-specific configuration for EstimateExpensesWithoutSubscriptions
@@ -215,7 +217,7 @@ Here is an example CleanupForNotion configuration:
     },
     {
       "PluginName": "EstimateExpensesWithSubscriptions",
-      "PluginDescription": "Estimate total forSecondary Bank Card Fee assuming all subscriptions are paid for",
+      "PluginDescription": "Estimate total for Secondary Bank Card Fee assuming all subscriptions are paid for",
       "DataSourceId": "55555555555555555555555555555555",
       "PropertyName": "Total with Subscriptions",
       "ExpensesDataSourceId": "56565656565656565656565656565656",
