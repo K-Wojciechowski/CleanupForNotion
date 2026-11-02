@@ -91,26 +91,24 @@ For this to work, all purchases must have a relationship to the single row in th
 
 This plugin estimates the total spend in a database of expenses, but assuming all subscriptions (or other constant purchases) have been charged to the card.
 
-This plugin assumes that you have two databases. The monthly expenses database has at least two columns, one for the vendor name, and another for the amount. The second database is where the plugin writes the result to, it can be a single row showing your totals and possibly the remaining amount.
+This plugin assumes that you have two databases. The monthly expenses database has at least two columns, one for the vendor name, and another for the amount. The second database contains your subscriptions, with four fields: Vendor, Amount, Expected Total (filled in by the plugin), Alternate Names (optional, semicolon-separated). There must also be one row with a null or zero Amount - this is where expenses not associated with a subscription are placed.
 
-A list of subscriptions and their expected monthly amounts must be configured. For each subscription, expenses with matching vendors are totalled. If the subscription total is less than the expected monthly amount, the expected amount is considered to be the total. Those augmented totals are then added, along with the total of expenses which don’t match any subscription. In short:
+For each subscription, expenses with matching vendors are totalled. If the subscription total is less than the expected monthly amount, the expected amount is considered to be the total. Those augmented totals are then added, along with the total of expenses which don’t match any subscription. In short:
 
 ```math
-EstimatedTotal = ExpensesWithoutSubscriptions + \sum_{s} \max \left(s_{ExpectedAmount}, s_{total} \right)
+EstimatedTotal = \max_{subscription} \left(subscription.ExpectedAmount, \left(\sum_{Expense \in Subscription} Expense.Amount\right) \right)
 ```
 
 This is another part of the “secondary bank’s credit card” database (as described alongside [DeleteOnNewMonthlyCycle](#deleteonnewmonthlycycle)).
 
 #### Plugin-specific configuration for EstimateExpensesWithoutSubscriptions
 
-* **PropertyName** (string, mandatory) — The name of the property to which the total will be written.
-* **OutputPageId** (string, mandatory) — The Notion ID of the page to which the total will be written.
-* **DataSourceId** (string, mandatory) — ID of the data source to work on (containing expenses).
-* **VendorPropertyName** (string, mandatory) — name of the vendor property in the data source.
-* **AmountPropertyName** (string, mandatory) — name of the amount property in the data source.
-* **Subscriptions** (array of objects, mandatory) — the subscriptions to assume will be present in every month:
-  * **Names** (array of strings, mandatory) — a list of vendor names that can be used for the subscription, case-insensitive.
-  * **ExpectedTotal** (integer, mandatory) — the expected total for this subscription, in the smallest unit of the currency (e.g. 1234 = $12.34).
+* **DataSourceId** (string, mandatory) — ID of the data source with subscriptions.
+* **PropertyName** (string, mandatory) — The name of the subscription property to which the total will be written.
+* **ExpensesDataSourceId** (string, mandatory) — ID of the data source with expenses.
+* **VendorPropertyName** (string, mandatory) — name of the vendor property in both data sources.
+* **AmountPropertyName** (string, mandatory) — name of the amount property in both data sources.
+* **AlternateVendorPropertyName** (string, mandatory) — name of the alternate vendor property in the subscriptions data source.
 * **CurrencyDecimalPlaces** (integer, mandatory) — the number of decimal places used by the currency. Many currencies use `2`.
 
 *Note: the **GracePeriod** property is ignored by this plugin.*
@@ -220,13 +218,10 @@ Here is an example CleanupForNotion configuration:
       "PluginDescription": "Estimate total forSecondary Bank Card Fee assuming all subscriptions are paid for",
       "DataSourceId": "55555555555555555555555555555555",
       "PropertyName": "Total with Subscriptions",
-      "OutputPageId": "56565656565656565656565656565656",
+      "ExpensesDataSourceId": "56565656565656565656565656565656",
       "VendorPropertyName": "Vendor",
       "AmountPropertyName": "Amount",
-      "Subscriptions": [
-        {"Names": ["Notion"], "Amount": 1150},
-        {"Names": ["AWS", "Amazon Web Services"], "Amount": 1234}
-      ],
+      "AlternateVendorPropertyName": "Alternate Names",
       "CurrencyDecimalPlaces": 2
     }
   ]
