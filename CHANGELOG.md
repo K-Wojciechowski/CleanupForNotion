@@ -1,5 +1,9 @@
 # CleanupForNotion Changelog
 
+## 2.1.0
+
+* Add `EstimateExpensesWithSubscriptions` plugin
+
 ## 2.0.1
 
 * Upgrade Lambda to .NET 10
