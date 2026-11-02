@@ -20,15 +20,15 @@ public class EstimateExpensesWithSubscriptions(
 
   public string Name => "EstimateExpensesWithSubscriptions";
   public string Description { get; } = pluginDescription;
-    public IBasicPluginOptions Configuration => options;
+  public IBasicPluginOptions Configuration => options;
 
   public async Task Run(ICfnNotionClient client, GlobalOptions globalOptions, CancellationToken cancellationToken) {
-    var pages = await client.QueryDataSourceAsync(options.DataSourceId, filter: null, cancellationToken)
+    var expensePages = await client.QueryDataSourceAsync(options.ExpensesDataSourceId, filter: null, cancellationToken)
         .ConfigureAwait(false);
 
-    var currentLastEdit = pages.Count == 0
+    var currentLastEdit = expensePages.Count == 0
         ? _placeholderLastEdit
-        : new DateTimeOffset(pages.Max(p => p.LastEditedTime), TimeSpan.Zero);
+        : new DateTimeOffset(expensePages.Max(p => p.LastEditedTime), TimeSpan.Zero);
 
     var previousPageCount = await pluginStateProvider.GetInteger(Name, Description, PageCountKey, cancellationToken)
         .ConfigureAwait(false);
@@ -36,45 +36,39 @@ public class EstimateExpensesWithSubscriptions(
     var previousLastEdit = await pluginStateProvider.GetDateTime(Name, Description, LastEditKey, cancellationToken)
         .ConfigureAwait(false);
 
-    if (previousPageCount.HasValue && previousLastEdit.HasValue && previousPageCount.Value == pages.Count &&
+    if (previousPageCount.HasValue && previousLastEdit.HasValue && previousPageCount.Value == expensePages.Count &&
         previousLastEdit.Value == currentLastEdit) {
       logger.LogDebug("Not estimating expenses - no updates since last run");
       return;
     }
 
-    logger.LogDebug("Estimating total from {Count} expenses, last edit {LastEdit}", pages.Count, currentLastEdit);
+    logger.LogDebug("Estimating total from {Count} expenses, last edit {LastEdit}", expensePages.Count,
+        currentLastEdit);
 
-    var buckets = options.Subscriptions
+    var subscriptionPages = await client.QueryDataSourceAsync(options.DataSourceId, filter: null, cancellationToken)
+        .ConfigureAwait(false);
+
+    var buckets = subscriptionPages
         .Select(s => new Bucket(
-            s.Names.Select(n => n.ToLower()).ToHashSet(),
-            s.ExpectedTotal / (decimal)(Math.Pow(10, options.CurrencyDecimalPlaces))))
-        .Append(new Bucket(null, 0))
+            id: s.Id,
+            names: ExtractSubscriptionNames(s),
+            expected: ExtractAmount(s)
+        ))
+        .OrderByDescending(b => b.Expected)
         .ToArray();
 
-    foreach (var page in pages) {
-      var vendorProperty = page.Properties.GetValueOrNull(options.VendorPropertyName);
-      var amountProperty = page.Properties.GetValueOrNull(options.AmountPropertyName);
 
-      var vendorParts = vendorProperty switch {
-          TitlePropertyValue tpv => tpv.Title,
-          RichTextPropertyValue rtpv => rtpv.RichText,
-          _ => throw new Exception($"Page {page.Id} does not have a readable vendor")
-      };
-
-      var vendor = string.Join(null, vendorParts.Select(p => p.PlainText)).ToLower().Trim();
-
-      var doubleAmount = amountProperty is NumberPropertyValue npv
-          ? (npv.Number ?? 0)
-          : throw new Exception($"Page {page} ({vendor}) does not have a readable amount");
-
-      var amount = Math.Round(((decimal)doubleAmount), options.CurrencyDecimalPlaces);
+    foreach (var page in expensePages) {
+      var amount = ExtractAmount(page);
+      var vendor = ExtractVendor(page);
 
       foreach (var bucket in buckets) {
-        if (bucket.Names?.Contains(vendor) == false) {
+        if (!bucket.Names.Contains(vendor) && bucket.Expected != 0) {
           continue;
         }
 
-        logger.LogTrace("Expense {Name} with amount {Amount} associated with bucket {Bucket}", vendor, amount, bucket.Id);
+        logger.LogTrace("Expense {Name} with amount {Amount} associated with bucket {Bucket}", vendor, amount,
+            bucket.Id);
         bucket.Actual += amount;
         break;
       }
@@ -82,37 +76,73 @@ public class EstimateExpensesWithSubscriptions(
 
     LogBuckets(buckets);
 
-    var estimatedTotal = buckets.Sum(b => b.Value);
-    logger.LogDebug("Estimated total for all buckets: {Total}", estimatedTotal);
-
-    await client.UpdatePageAsync(
-        options.OutputPageId,
-        new PagesUpdateParameters {
-            Properties = new Dictionary<string, PropertyValue> {
-                { options.PropertyName, new NumberPropertyValue { Number = (double)estimatedTotal } }
-            }
-        },
-        cancellationToken).ConfigureAwait(false);
+    foreach (var bucket in buckets) {
+      await client.UpdatePageAsync(
+          bucket.Id,
+          new PagesUpdateParameters {
+              Properties = new Dictionary<string, PropertyValue> {
+                  { options.PropertyName, new NumberPropertyValue { Number = (double)bucket.Value } }
+              }
+          },
+          cancellationToken).ConfigureAwait(false);
+    }
 
     await pluginStateProvider.SetDateTime(Name, Description, LastEditKey, currentLastEdit, cancellationToken)
         .ConfigureAwait(false);
-    await pluginStateProvider.SetInteger(Name, Description, PageCountKey, pages.Count, cancellationToken)
+    await pluginStateProvider.SetInteger(Name, Description, PageCountKey, expensePages.Count, cancellationToken)
         .ConfigureAwait(false);
+  }
+
+  private decimal ExtractAmount(Page page) {
+    var amountProperty = page.Properties.GetValueOrNull(options.AmountPropertyName);
+
+    var doubleAmount = amountProperty is NumberPropertyValue npv
+        ? (npv.Number ?? 0)
+        : throw new Exception($"Page {page} does not have a readable amount");
+
+    return Math.Round(((decimal)doubleAmount), options.CurrencyDecimalPlaces);
+  }
+
+  private string ExtractVendor(Page page) => ExtractVendor(page, options.VendorPropertyName);
+
+  private static string ExtractVendor(Page page, string propertyName) {
+    var vendorProperty = page.Properties.GetValueOrNull(propertyName);
+
+    var vendorParts = vendorProperty switch {
+        TitlePropertyValue tpv => tpv.Title,
+        RichTextPropertyValue rtpv => rtpv.RichText,
+        _ => throw new Exception($"Page {page.Id} does not have a readable vendor")
+    };
+
+    return string.Join(null, vendorParts.Select(p => p.PlainText)).Trim().ToLower();
+  }
+
+  private HashSet<string> ExtractSubscriptionNames(Page page) {
+    var mainVendor = ExtractVendor(page, options.VendorPropertyName);
+    var alternateVendor = ExtractVendor(page, options.AlternateVendorPropertyName);
+
+    return string.IsNullOrEmpty(alternateVendor)
+        ? [mainVendor]
+        : alternateVendor.Split(";").Select(v => v.Trim()).Append(mainVendor).ToHashSet();
   }
 
   [ExcludeFromCodeCoverage(Justification = "Trivial trace logging")]
   private void LogBuckets(Bucket[] buckets) {
     if (!logger.IsEnabled(LogLevel.Trace)) return;
     foreach (var b in buckets) {
-      logger.LogTrace("Bucket {Bucket} value: {Value}", b.Id, b.Value);
+      logger.LogTrace("Bucket {Bucket} ({Name}) value: {Value}", b.Id, b.Names.First(), b.Value);
     }
   }
 
-  private class Bucket(HashSet<string>? names, decimal expected) {
-    public HashSet<string>? Names { get; } = names;
-    public decimal Actual { get; set; }
-    public decimal Value => Math.Max(expected, Actual);
+  private class Bucket(string id, HashSet<string> names, decimal expected) {
+    public string Id { get; } = id;
 
-    public string Id { get; } = names?.First() ?? "(null)";
+    public HashSet<string> Names { get; } = names;
+
+    public decimal Expected { get; } = expected;
+
+    public decimal Actual { get; set; }
+
+    public decimal Value => Math.Max(Expected, Actual);
   }
 }

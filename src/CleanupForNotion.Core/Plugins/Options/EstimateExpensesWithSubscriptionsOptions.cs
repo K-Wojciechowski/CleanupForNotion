@@ -3,9 +3,9 @@
 public record EstimateExpensesWithSubscriptionsOptions(
     string DataSourceId,
     string PropertyName,
-    string OutputPageId,
+    string ExpensesDataSourceId,
     string VendorPropertyName,
     string AmountPropertyName,
-    ExpenseSubscription[] Subscriptions,
+    string AlternateVendorPropertyName,
     int CurrencyDecimalPlaces,
     TimeSpan? GracePeriod = null) : IBasicPluginOptions;

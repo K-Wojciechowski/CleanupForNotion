@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 namespace CleanupForNotion.Core.Plugins.Providers;
 
 public class EstimateExpensesWithSubscriptionsProvider(
-    IConfiguration configuration,
     ILoggerFactory loggerFactory,
     IPluginStateProvider pluginStateProvider,
     TimeProvider timeProvider)
@@ -24,17 +23,13 @@ public class EstimateExpensesWithSubscriptionsProvider(
       string propertyName,
       TimeSpan? gracePeriod,
       int pluginIndex) {
-    var subscriptions = configuration
-        .GetSection($"CleanupForNotion:Plugins:{pluginIndex}:Subscriptions")
-        .Get<ExpenseSubscription[]>();
-
     return new EstimateExpensesWithSubscriptionsOptions(
         DataSourceId: dataSourceId,
         PropertyName: propertyName,
-        OutputPageId: options.GetString("OutputPageId"),
+        ExpensesDataSourceId: options.GetString("ExpensesDataSourceId"),
         VendorPropertyName: options.GetString("VendorPropertyName"),
         AmountPropertyName: options.GetString("AmountPropertyName"),
-        Subscriptions: subscriptions ?? throw new InvalidConfigurationException($"Missing subscription configuration for plugin {pluginIndex}"),
+        AlternateVendorPropertyName: options.GetString("AlternateVendorPropertyName"),
         CurrencyDecimalPlaces: options.GetInteger("CurrencyDecimalPlaces"),
         GracePeriod: gracePeriod);
   }
