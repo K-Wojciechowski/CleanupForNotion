@@ -6,7 +6,7 @@ public static class CfnNotionClientExtensions {
   public static async Task<List<Page>> QueryDataSourceAsync(
       this ICfnNotionClient cfnNotionClient,
       string dataSourceId,
-      Filter filter,
+      Filter? filter,
       CancellationToken cancellationToken) {
     var request = new QueryDataSourceRequest { DataSourceId = dataSourceId, Filter = filter };
     var queryResults = await cfnNotionClient.QueryDataSourceRawAsync(request, cancellationToken)

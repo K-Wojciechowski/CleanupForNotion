@@ -1,4 +1,5 @@
 using CleanupForNotion.Core.Infrastructure.PluginManagement;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
@@ -15,6 +16,7 @@ public class CfnServiceCollectionExtensionsTests {
     var provider = new DefaultServiceProviderFactory(options)
         .CreateServiceProvider(new ServiceCollection()
             .AddLogging()
+            .AddSingleton<IConfiguration>(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>()).Build())
             .AddSingleton(TimeProvider.System)
             .AddCfnServices());
 
@@ -31,6 +33,7 @@ public class CfnServiceCollectionExtensionsTests {
     // Act
     Action act = () => new DefaultServiceProviderFactory(options)
         .CreateServiceProvider(new ServiceCollection()
+            .AddSingleton<IConfiguration>(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>()).Build())
             .AddSingleton(TestHelpers.GetCfnOptions())
             .AddSingleton(TimeProvider.System)
             .AddCfnServices());
@@ -49,6 +52,7 @@ public class CfnServiceCollectionExtensionsTests {
     Action act = () => new DefaultServiceProviderFactory(options)
         .CreateServiceProvider(new ServiceCollection()
             .AddLogging()
+            .AddSingleton<IConfiguration>(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>()).Build())
             .AddSingleton(TestHelpers.GetCfnOptions())
             .AddCfnServices());
 

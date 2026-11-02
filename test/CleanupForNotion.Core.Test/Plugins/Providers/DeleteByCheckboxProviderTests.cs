@@ -1,6 +1,7 @@
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.State;
 using CleanupForNotion.Core.Plugins.Implementations;
+using CleanupForNotion.Core.Plugins.Options;
 using CleanupForNotion.Core.Plugins.Providers;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
@@ -31,16 +32,17 @@ public class DeleteByCheckboxProviderTests {
   [DataRow("00:00:01", "false")]
   public void GetPlugin_ValidOptions_ReturnsPlugin(string? gracePeriod, string? deleteIfChecked) {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" }, { "PropertyName", "property name" },
     };
-    if (gracePeriod != null) options["GracePeriod"] = gracePeriod;
-    if (deleteIfChecked != null) options["DeleteIfChecked"] = deleteIfChecked;
+    if (gracePeriod != null) rawOptions["GracePeriod"] = gracePeriod;
+    if (deleteIfChecked != null) rawOptions["DeleteIfChecked"] = deleteIfChecked;
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     var plugin = _provider.GetPlugin(pluginSpecification);
@@ -49,12 +51,18 @@ public class DeleteByCheckboxProviderTests {
     plugin.ShouldBeOfType<DeleteByCheckbox>();
     plugin.Name.ShouldBe("DeleteByCheckbox");
     plugin.Description.ShouldBe(PluginDescription);
+
+    var options = plugin.Configuration.ShouldBeOfType<DeleteByCheckboxOptions>();
+    options.DataSourceId.ShouldBe("data source id");
+    options.PropertyName.ShouldBe("property name");
+    options.GracePeriod.ShouldBe(gracePeriod is null ? null : TimeSpan.FromSeconds(1));
+    options.DeleteIfChecked.ShouldBe(deleteIfChecked != "false");
   }
 
   [TestMethod]
   public void GetPlugin_InvalidGracePeriod_ThrowsException() {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "DeleteIfChecked", "true" },
@@ -62,9 +70,10 @@ public class DeleteByCheckboxProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     Action act = () => _provider.GetPlugin(pluginSpecification);
@@ -78,7 +87,7 @@ public class DeleteByCheckboxProviderTests {
   [TestMethod]
   public void GetPlugin_InvalidDeleteIfChecked_ThrowsException() {
     // Arrange
-    var options = new Dictionary<string, object> {
+    var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "PropertyName", "property name" },
         { "GracePeriod", "00:00:01" },
@@ -86,9 +95,10 @@ public class DeleteByCheckboxProviderTests {
     };
 
     var pluginSpecification = new PluginSpecification(
+        PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
-        RawOptions: new RawPluginOptions(options));
+        RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
     Action act = () => _provider.GetPlugin(pluginSpecification);

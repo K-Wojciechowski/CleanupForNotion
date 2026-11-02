@@ -24,4 +24,26 @@ public static class PluginStateProviderExtensions {
     var stringValue = value.ToString("o", CultureInfo.InvariantCulture);
     await pluginStateProvider.SetString(pluginName, pluginDescription, key, stringValue, cancellationToken).ConfigureAwait(false);
   }
+
+  public static async Task<int?> GetInteger(
+      this IPluginStateProvider pluginStateProvider,
+      string pluginName,
+      string pluginDescription,
+      string key,
+      CancellationToken cancellationToken) {
+    var stringValue = await pluginStateProvider.GetString(pluginName, pluginDescription, key, cancellationToken).ConfigureAwait(false);
+    if (stringValue == null) return null;
+    return int.Parse(stringValue, CultureInfo.InvariantCulture);
+  }
+
+  public static async Task SetInteger(
+      this IPluginStateProvider pluginStateProvider,
+      string pluginName,
+      string pluginDescription,
+      string key,
+      int value,
+      CancellationToken cancellationToken) {
+    var stringValue = value.ToString(CultureInfo.InvariantCulture);
+    await pluginStateProvider.SetString(pluginName, pluginDescription, key, stringValue, cancellationToken).ConfigureAwait(false);
+  }
 }

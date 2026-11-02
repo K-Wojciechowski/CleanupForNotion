@@ -24,6 +24,7 @@ public static class CfnServiceCollectionExtensions {
       .AddSingleton<IPluginProvider, DeleteWithoutRelationshipsProvider>()
       .AddSingleton<IPluginProvider, DeleteZeroSumProvider>()
       .AddSingleton<IPluginProvider, EnsureStaticRelatedPageProvider>()
+      .AddSingleton<IPluginProvider, EstimateExpensesWithSubscriptionsProvider>()
       .AddSingleton<IRunnerSemaphore, RunnerSemaphore>();
   }
 }

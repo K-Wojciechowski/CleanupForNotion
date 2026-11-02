@@ -13,7 +13,9 @@ public class RawPluginOptions(Dictionary<string, object> options) {
     return options.GetValueOrDefault(key) switch {
         null => null,
         int intValue => intValue,
-        string stringValue => int.TryParse(stringValue, out int result) ? result : throw new InvalidConfigurationException($"Option '{key}' is of invalid format (expected integer)"),
+        string stringValue => int.TryParse(stringValue, out int result)
+            ? result
+            : throw new InvalidConfigurationException($"Option '{key}' is of invalid format (expected integer)"),
         _ => throw new InvalidConfigurationException($"Option '{key}' is of invalid type (expected int)")
     };
   }
@@ -45,11 +47,9 @@ public class RawPluginOptions(Dictionary<string, object> options) {
     throw new InvalidConfigurationException($"Option '{key}' is of invalid format (expected 'true' or 'false')");
   }
 
-  public string GetString(string key) {
-    return GetOptionalString(key) ?? throw new InvalidConfigurationException($"Missing required option '{key}'");
-  }
+  public string GetString(string key)
+    => GetOptionalString(key) ?? throw new InvalidConfigurationException($"Missing required option '{key}'");
 
-  public int GetInteger(string key) {
-    return GetOptionalInteger(key) ?? throw new InvalidConfigurationException($"Missing required option '{key}'");
-  }
+  public int GetInteger(string key)
+    => GetOptionalInteger(key) ?? throw new InvalidConfigurationException($"Missing required option '{key}'");
 }

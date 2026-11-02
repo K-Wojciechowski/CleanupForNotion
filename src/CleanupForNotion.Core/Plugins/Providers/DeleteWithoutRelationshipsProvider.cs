@@ -16,11 +16,11 @@ public class DeleteWithoutRelationshipsProvider(
         timeProvider) {
   public override string Name => "DeleteWithoutRelationships";
 
-  protected override DeleteWithoutRelationshipsOptions GetOptions(
-      RawPluginOptions options,
+  protected override DeleteWithoutRelationshipsOptions GetOptions(RawPluginOptions options,
       string dataSourceId,
       string propertyName,
-      TimeSpan? gracePeriod) {
+      TimeSpan? gracePeriod,
+      int pluginIndex) {
     return new DeleteWithoutRelationshipsOptions(
         dataSourceId,
         propertyName,

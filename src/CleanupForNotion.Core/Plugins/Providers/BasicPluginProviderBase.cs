@@ -20,13 +20,14 @@ public abstract class BasicPluginProviderBase<TPlugin, TOptions>(
     var propertyName = rawOptions.GetString("PropertyName");
     var gracePeriod = rawOptions.GetOptionalTimeSpan("GracePeriod");
 
-    var options = GetOptions(rawOptions, dataSourceId, propertyName, gracePeriod);
+    var options = GetOptions(rawOptions, dataSourceId, propertyName, gracePeriod, pluginSpecification.PluginIndex);
     var logger = loggerFactory.CreateLogger<TPlugin>();
 
     return CreatePlugin(logger, pluginStateProvider, timeProvider, options, pluginSpecification.PluginDescription);
   }
 
-  protected abstract TOptions GetOptions(RawPluginOptions options, string dataSourceId, string propertyName, TimeSpan? gracePeriod);
+  protected abstract TOptions GetOptions(RawPluginOptions options, string dataSourceId, string propertyName,
+      TimeSpan? gracePeriod, int pluginIndex);
 
   protected abstract IPlugin CreatePlugin(
       ILogger<TPlugin> logger,

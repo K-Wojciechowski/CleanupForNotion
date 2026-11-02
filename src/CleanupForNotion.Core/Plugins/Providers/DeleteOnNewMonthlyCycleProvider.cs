@@ -16,11 +16,11 @@ public class DeleteOnNewMonthlyCycleProvider(
         timeProvider) {
   public override string Name => "DeleteOnNewMonthlyCycle";
 
-  protected override DeleteOnNewMonthlyCycleOptions GetOptions(
-      RawPluginOptions options,
+  protected override DeleteOnNewMonthlyCycleOptions GetOptions(RawPluginOptions options,
       string dataSourceId,
       string propertyName,
-      TimeSpan? gracePeriod) {
+      TimeSpan? gracePeriod,
+      int pluginIndex) {
     return new DeleteOnNewMonthlyCycleOptions(
         DataSourceId: dataSourceId,
         PropertyName: propertyName,
