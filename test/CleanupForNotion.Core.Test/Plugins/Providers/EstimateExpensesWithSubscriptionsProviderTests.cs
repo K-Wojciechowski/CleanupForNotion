@@ -12,25 +12,13 @@ namespace CleanupForNotion.Core.Test.Plugins.Providers;
 
 [TestClass]
 public class EstimateExpensesWithSubscriptionsProviderTests {
-  private static readonly IConfiguration _pluginConfiguration = new ConfigurationBuilder()
-      .AddInMemoryCollection(new Dictionary<string, string?> {
-          ["CleanupForNotion:Plugins:0:Subscriptions:0:Names:0"] = "Unused",
-          ["CleanupForNotion:Plugins:0:Subscriptions:0:ExpectedTotal"] = "1000",
-          ["CleanupForNotion:Plugins:3:Subscriptions:0:Names:0"] = "One Sub",
-          ["CleanupForNotion:Plugins:3:Subscriptions:0:ExpectedTotal"] = "1500",
-          ["CleanupForNotion:Plugins:3:Subscriptions:1:Names:0"] = "Two Sub",
-          ["CleanupForNotion:Plugins:3:Subscriptions:1:Names:1"] = "Sub Two",
-          ["CleanupForNotion:Plugins:3:Subscriptions:1:ExpectedTotal"] = "5000"
-      })
-      .Build();
-
   [TestMethod]
   public void GetPlugin_SubscriptionsConfiguredAtPluginIndex_ReturnsPlugin() {
     var provider = new EstimateExpensesWithSubscriptionsProvider(
-        _pluginConfiguration,
         new NullLoggerFactory(),
         Substitute.For<IPluginStateProvider>(),
         TimeProvider.System);
+
     var pluginSpecification = new PluginSpecification(
         PluginIndex: 3,
         PluginName: string.Empty,
@@ -38,9 +26,11 @@ public class EstimateExpensesWithSubscriptionsProviderTests {
         RawOptions: new RawPluginOptions(new Dictionary<string, object> {
             ["DataSourceId"] = "dataSourceId",
             ["PropertyName"] = "propertyName",
+            ["ExpensesDataSourceId"] = "expensesDataSourceId",
             ["OutputPageId"] = "outputPageId",
             ["VendorPropertyName"] = "vendor",
             ["AmountPropertyName"] = "amount",
+            ["AlternateVendorPropertyName"] = "altvendor",
             ["CurrencyDecimalPlaces"] = 2
         }));
 
@@ -52,14 +42,10 @@ public class EstimateExpensesWithSubscriptionsProviderTests {
     var configuration = plugin.Configuration.ShouldBeOfType<EstimateExpensesWithSubscriptionsOptions>();
     configuration.DataSourceId.ShouldBe("dataSourceId");
     configuration.PropertyName.ShouldBe("propertyName");
-    configuration.OutputPageId.ShouldBe("outputPageId");
+    configuration.ExpensesDataSourceId.ShouldBe("expensesDataSourceId");
     configuration.VendorPropertyName.ShouldBe("vendor");
     configuration.AmountPropertyName.ShouldBe("amount");
+    configuration.AlternateVendorPropertyName.ShouldBe("altvendor");
     configuration.CurrencyDecimalPlaces.ShouldBe(2);
-    configuration.Subscriptions.Length.ShouldBe(2);
-    configuration.Subscriptions[0].Names.ShouldBe(["One Sub"]);
-    configuration.Subscriptions[0].ExpectedTotal.ShouldBe(1500);
-    configuration.Subscriptions[1].Names.ShouldBe(["Two Sub", "Sub Two"]);
-    configuration.Subscriptions[1].ExpectedTotal.ShouldBe(5000);
   }
 }

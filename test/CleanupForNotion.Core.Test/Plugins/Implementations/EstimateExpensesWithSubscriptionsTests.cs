@@ -14,21 +14,17 @@ namespace CleanupForNotion.Core.Test.Plugins.Implementations;
 [TestClass]
 public class EstimateExpensesWithSubscriptionsTests {
   private const string DataSourceId = "dataSourceId";
+  private const string ExpensesDataSourceId = "expensesDataSourceId";
   private const string PropertyName = "estimatedTotal";
-  private const string OutputPageId = "outputPageId";
   private const string VendorPropertyName = "vendor";
   private const string AmountPropertyName = "amount";
+  private const string AlternateVendorPropertyName = "alternateVendor";
   private const string PluginDescription = "pluginDescription";
   private static readonly DateTime _lastEditedTime = new(2025, 1, 2, 3, 4, 5, DateTimeKind.Utc);
   private static readonly DateTimeOffset _lastEdited = new(_lastEditedTime);
 
   private static readonly string _lastEditedString =
       _lastEdited.ToString("o", CultureInfo.InvariantCulture);
-
-  private static readonly ExpenseSubscription[] _subscriptions = [
-      new() { Names = ["Sub1"], ExpectedTotal = 300 },
-      new() { Names = ["Sub2", "2 Sub"], ExpectedTotal = 1500 }
-  ];
 
   [TestMethod]
   public void Name_Get_ReturnsEstimateExpensesWithSubscriptions() {
@@ -37,14 +33,19 @@ public class EstimateExpensesWithSubscriptionsTests {
 
   [TestMethod]
   public async Task Run_ExpensesExist_UpdatesTotalAndSavesQueryState() {
-    var pages = new List<Page> {
-        CreatePage("subscription1", ["Sub1"], 5),
-        CreatePage("subscription2", ["  SUB", "2 "], 8.15),
-        CreatePage("subscription3", ["2 sub"], 4.05),
-        CreatePage("not sub", ["2sub"], 0.14),
-        CreatePage("other", ["unconfigured"], 1.234)
+    var expensePages = new List<Page> {
+        CreatePage("expense1", " Sub1 ", 5),
+        CreatePage("expense2", "  SUB2 ", 8.15),
+        CreatePage("expense3", "2 sub", 9.05),
+        CreatePage("not sub", "2sub", 0.14),
+        CreatePage("other", "unconfigured", 1.234)
     };
-    var client = CreateClient(pages);
+    var subscriptionPages = new List<Page> {
+        CreatePage("subscription1", "Sub1", 3),
+        CreatePage("subscription2", "Sub2", 15, "2 Sub"),
+        CreatePage("unassigned", "Unassigned", 0)
+    };
+    var client = CreateClient(subscriptionPages, expensePages);
     var stateProvider = Substitute.For<IPluginStateProvider>();
     stateProvider.GetString(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), CancellationToken.None)
         .Returns((string?)null);
@@ -52,25 +53,22 @@ public class EstimateExpensesWithSubscriptionsTests {
 
     await plugin.Run(client, new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
 
-    var update = client.ReceivedCalls()
-        .Single(call => call.GetMethodInfo().Name == "UpdatePageAsync")
-        .GetArguments();
-    update[0].ShouldBe(OutputPageId);
-    var parameters = update[1].ShouldBeOfType<PagesUpdateParameters>();
-    parameters.Properties.ShouldContainKey(PropertyName);
-    parameters.Properties[PropertyName].ShouldBeOfType<NumberPropertyValue>().Number.ShouldBe(21.37);
+    GetUpdatedTotal(client, "subscription1").ShouldBe(5);
+    GetUpdatedTotal(client, "subscription2").ShouldBe(17.2);
+    GetUpdatedTotal(client, "unassigned").ShouldBe(1.37);
 
     await stateProvider.Received().SetString(
             plugin.Name, PluginDescription, "LastEdit", _lastEditedString, CancellationToken.None)
         .ConfigureAwait(false);
     await stateProvider.Received().SetString(
-            plugin.Name, PluginDescription, "PageCount", pages.Count.ToString(CultureInfo.InvariantCulture), CancellationToken.None)
+            plugin.Name, PluginDescription, "PageCount", expensePages.Count.ToString(CultureInfo.InvariantCulture),
+            CancellationToken.None)
         .ConfigureAwait(false);
   }
 
   [TestMethod]
   public async Task Run_QueryStateUnchanged_DoesNotUpdateOutputOrState() {
-    var client = CreateClient([CreatePage("subscription", ["sub1"], 8.15)]);
+    var client = CreateClient([], [CreatePage("expense", "sub1", 8.15)]);
     var stateProvider = Substitute.For<IPluginStateProvider>();
     stateProvider.GetString(Arg.Any<string>(), Arg.Any<string>(), "PageCount", CancellationToken.None)
         .Returns("1");
@@ -93,11 +91,13 @@ public class EstimateExpensesWithSubscriptionsTests {
   public async Task Run_PageCountChanged_RecalculatesAndSavesState() {
     var stateProvider = SubstituteState("2", _lastEditedString);
     var plugin = CreatePlugin(stateProvider);
-    var client = CreateClient([CreatePage("subscription", ["Sub1"], 1.23)]);
+    var client = CreateClient(
+        [CreatePage("subscription", "Sub1", 18)],
+        [CreatePage("expense", "Sub1", 1.23)]);
 
     await plugin.Run(client, new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
 
-    GetUpdatedTotal(client).ShouldBe(18);
+    GetUpdatedTotal(client, "subscription").ShouldBe(18);
     await stateProvider.Received().SetString(
         plugin.Name, PluginDescription, "PageCount", "1", CancellationToken.None).ConfigureAwait(false);
   }
@@ -107,24 +107,29 @@ public class EstimateExpensesWithSubscriptionsTests {
     const string previousLastEdited = "2025-01-02T03:04:04.0000000+00:00";
     var stateProvider = SubstituteState("1", previousLastEdited);
     var plugin = CreatePlugin(stateProvider);
-    var client = CreateClient([CreatePage("subscription", ["sub1 "], 8.15)]);
+    var client = CreateClient(
+        [CreatePage("subscription", "Sub1", 3)],
+        [CreatePage("expense", "sub1 ", 8.15)]);
 
     await plugin.Run(client, new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
 
-    GetUpdatedTotal(client).ShouldBe(23.15);
+    GetUpdatedTotal(client, "subscription").ShouldBe(8.15);
     await stateProvider.Received().SetString(
         plugin.Name, PluginDescription, "LastEdit", _lastEditedString, CancellationToken.None).ConfigureAwait(false);
   }
 
   [TestMethod]
-  public async Task Run_NoPages_UpdatesToExpectedSubscriptionMinimumsAndSavesPlaceholderState() {
+  public async Task Run_NoExpenses_UpdatesToExpectedSubscriptionMinimumsAndSavesPlaceholderState() {
     var stateProvider = SubstituteState(null, null);
     var plugin = CreatePlugin(stateProvider);
-    var client = CreateClient([]);
+    var client = CreateClient(
+        [CreatePage("subscription1", "Sub1", 3), CreatePage("subscription2", "Sub2", 15, "2 Sub")],
+        []);
 
     await plugin.Run(client, new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
 
-    GetUpdatedTotal(client).ShouldBe(18);
+    GetUpdatedTotal(client, "subscription1").ShouldBe(3);
+    GetUpdatedTotal(client, "subscription2").ShouldBe(15);
     await stateProvider.Received().SetString(
             plugin.Name, PluginDescription, "LastEdit", "2000-01-01T00:00:00.0000000+00:00", CancellationToken.None)
         .ConfigureAwait(false);
@@ -136,20 +141,28 @@ public class EstimateExpensesWithSubscriptionsTests {
       new FakeLogger<EstimateExpensesWithSubscriptions>(),
       stateProvider,
       new EstimateExpensesWithSubscriptionsOptions(
-          DataSourceId,
-          PropertyName,
-          OutputPageId,
-          VendorPropertyName,
-          AmountPropertyName,
-          _subscriptions,
+          DataSourceId: DataSourceId,
+          PropertyName: PropertyName,
+          ExpensesDataSourceId: ExpensesDataSourceId,
+          VendorPropertyName: VendorPropertyName,
+          AmountPropertyName: AmountPropertyName,
+          AlternateVendorPropertyName: AlternateVendorPropertyName,
           CurrencyDecimalPlaces: 2),
       PluginDescription);
 
-  private static ICfnNotionClient CreateClient(List<Page> pages) {
+  private static ICfnNotionClient CreateClient(List<Page> subscriptionPages, List<Page> expensePages) {
     var client = Substitute.For<ICfnNotionClient>();
-    client.QueryDataSourceRawAsync(Arg.Any<QueryDataSourceRequest>(), CancellationToken.None)
+    client.QueryDataSourceRawAsync(
+            Arg.Is<QueryDataSourceRequest>(request => request.DataSourceId == DataSourceId),
+            CancellationToken.None)
         .Returns(new QueryDataSourceResponse {
-            Results = pages.Cast<IQueryDataSourceResponseObject>().ToList(), HasMore = false
+            Results = subscriptionPages.Cast<IQueryDataSourceResponseObject>().ToList(), HasMore = false
+        });
+    client.QueryDataSourceRawAsync(
+            Arg.Is<QueryDataSourceRequest>(request => request.DataSourceId == ExpensesDataSourceId),
+            CancellationToken.None)
+        .Returns(new QueryDataSourceResponse {
+            Results = expensePages.Cast<IQueryDataSourceResponseObject>().ToList(), HasMore = false
         });
     return client;
   }
@@ -163,25 +176,24 @@ public class EstimateExpensesWithSubscriptionsTests {
     return stateProvider;
   }
 
-  private static double? GetUpdatedTotal(ICfnNotionClient client) => client.ReceivedCalls()
-      .Single(call => call.GetMethodInfo().Name == "UpdatePageAsync")
-      .GetArguments()[1]
+  private static double? GetUpdatedTotal(ICfnNotionClient client, string pageId) => client.ReceivedCalls()
+      .Where(call => call.GetMethodInfo().Name == "UpdatePageAsync")
+      .Select(call => call.GetArguments())
+      .Single(arguments => (string)arguments[0]! == pageId)[1]
       .ShouldBeOfType<PagesUpdateParameters>()
       .Properties[PropertyName]
       .ShouldBeOfType<NumberPropertyValue>()
       .Number;
 
-  private static Page CreatePage(string id, string[] nameParts, double amount) => new() {
+  private static Page CreatePage(string id, string vendor, double amount, string alternateVendor = "") => new() {
       Id = id,
       LastEditedTime = _lastEditedTime,
       Properties = new Dictionary<string, PropertyValue> {
-          {
-              VendorPropertyName,
-              new TitlePropertyValue {
-                  Title = nameParts.Select(part => (RichTextBase)new RichTextText { PlainText = part }).ToList()
-              }
-          },
-          { AmountPropertyName, new NumberPropertyValue { Number = amount } }
+          { VendorPropertyName, new TitlePropertyValue { Title = [new RichTextText { PlainText = vendor }] } },
+          { AmountPropertyName, new NumberPropertyValue { Number = amount } }, {
+              AlternateVendorPropertyName,
+              new TitlePropertyValue { Title = [new RichTextText { PlainText = alternateVendor }] }
+          }
       }
   };
 }
