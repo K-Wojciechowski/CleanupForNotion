@@ -108,7 +108,10 @@ public class EstimateExpensesWithSubscriptionsTests {
     var stateProvider = SubstituteState("1", previousLastEdited);
     var plugin = CreatePlugin(stateProvider);
     var client = CreateClient(
-        [CreatePage("subscription", "Sub1", 3)],
+        [
+            CreatePage("subscription", "Sub1", 3),
+            CreatePage("blank", "blank", null),
+        ],
         [
             new Page {
                 Id = "expense",
@@ -126,6 +129,7 @@ public class EstimateExpensesWithSubscriptionsTests {
     await plugin.Run(client, new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
 
     GetUpdatedTotal(client, "subscription").ShouldBe(8.15);
+    GetUpdatedTotal(client, "blank").ShouldBe(0);
     await stateProvider.Received().SetString(
         plugin.Name, PluginDescription, "LastEdit", _lastEditedString, CancellationToken.None).ConfigureAwait(false);
   }
@@ -251,7 +255,7 @@ public class EstimateExpensesWithSubscriptionsTests {
       .ShouldBeOfType<NumberPropertyValue>()
       .Number;
 
-  private static Page CreatePage(string id, string vendor, double amount, string alternateVendor = "") => new() {
+  private static Page CreatePage(string id, string vendor, double? amount, string alternateVendor = "") => new() {
       Id = id,
       LastEditedTime = _lastEditedTime,
       Properties = new Dictionary<string, PropertyValue> {

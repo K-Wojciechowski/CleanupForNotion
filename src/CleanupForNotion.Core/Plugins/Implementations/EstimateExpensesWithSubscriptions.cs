@@ -95,9 +95,9 @@ public class EstimateExpensesWithSubscriptions(
   }
 
   private decimal ExtractAmount(Page page) {
-    var amountPresent= page.Properties.TryGetValue(options.AmountPropertyName, out var amountProperty);
+    page.Properties.TryGetValue(options.AmountPropertyName, out var amountProperty);
 
-    var doubleAmount = amountPresent && amountProperty is NumberPropertyValue npv
+    var doubleAmount = amountProperty is NumberPropertyValue npv
         ? (npv.Number ?? 0)
         : throw new InvalidDataException($"Page {page} does not have a readable amount");
 
@@ -107,7 +107,7 @@ public class EstimateExpensesWithSubscriptions(
   private string ExtractVendor(Page page) => ExtractVendor(page, options.VendorPropertyName);
 
   private static string ExtractVendor(Page page, string propertyName) {
-    var vendorPresent = page.Properties.TryGetValue(propertyName, out var vendorProperty);
+    page.Properties.TryGetValue(propertyName, out var vendorProperty);
 
     var vendorParts = vendorProperty switch {
         TitlePropertyValue tpv => tpv.Title,
