@@ -96,7 +96,7 @@ This plugin assumes that you have two databases. The monthly expenses database h
 For each subscription, expenses with matching vendors are totalled. If the subscription total is less than the expected monthly amount, the expected amount is considered to be the total. Those augmented totals are then added, along with the total of expenses which don’t match any subscription. In short:
 
 ```math
-EstimatedTotal = \max_{subscription} \left(subscription.ExpectedAmount, \left(\sum_{Expense \in Subscription} Expense.Amount\right) \right)
+EstimatedTotal = \max_{Subscription} \left(Subscription.ExpectedAmount, \left(\sum_{Expense \in Subscription} Expense.Amount\right) \right)
 ```
 
 This is another part of the “secondary bank’s credit card” database (as described alongside [DeleteOnNewMonthlyCycle](#deleteonnewmonthlycycle)).

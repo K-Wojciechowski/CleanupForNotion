@@ -100,7 +100,7 @@ public class EstimateExpensesWithSubscriptions(
         ? (npv.Number ?? 0)
         : throw new Exception($"Page {page} does not have a readable amount");
 
-    return Math.Round(((decimal)doubleAmount), options.CurrencyDecimalPlaces);
+    return Math.Round((decimal)doubleAmount, options.CurrencyDecimalPlaces);
   }
 
   private string ExtractVendor(Page page) => ExtractVendor(page, options.VendorPropertyName);
