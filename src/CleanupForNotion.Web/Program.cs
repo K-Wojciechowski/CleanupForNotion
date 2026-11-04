@@ -100,14 +100,33 @@ public class Program {
 
       var body = JsonSerializer.Deserialize<NotionWebhookBody>(bodyBytes);
 
-      if (body?.Entity.Type != "data_source") {
-        logger.LogError("Entity is not data_source");
+      if (body is null) {
         return Results.BadRequest();
       }
 
-      var dataSourceId = body.Entity.Id;
+      var eventEntityType = body.Type.Split(".")[0];
 
-      logger.LogInformation("Data source in webhook request: {DataSourceId}", dataSourceId);
+      string? dataSourceId;
+
+      switch (eventEntityType)
+      {
+        case "data_source":
+          dataSourceId = body.Entity.Id;
+          break;
+        case "page":
+          dataSourceId = body.Data.Parent.DataSourceId;
+          break;
+        default:
+          logger.LogError("Unexpected entity type {EntityType} for webhook request of type {Type}", eventEntityType, body.Type);
+          return Results.BadRequest();
+      }
+
+      logger.LogInformation("Webhook request: Type={Type}, DataSourceId={DataSourceId}", body.Type, dataSourceId);
+
+      if (dataSourceId == null) {
+        logger.LogDebug("Webhook not associated with data source, ignoring");
+        return Results.Ok();
+      }
 
       if (options.Value.Webhooks is null) {
         logger.LogError("Webhooks not configured");
