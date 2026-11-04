@@ -13,7 +13,7 @@ public class WebTests {
     // Arrange
     using var factory = new CfnWebApplicationFactory();
     var client = factory.CreateClient();
-    var channel = factory.Services.GetRequiredService<Channel<DateTimeOffset>>();
+    var channel = factory.Services.GetRequiredService<Channel<RunRequest>>();
     var timeProvider = factory.Services.GetRequiredService<TimeProvider>();
     channel.Reader.TryPeek(out _).ShouldBeFalse();
 
@@ -38,7 +38,7 @@ public class WebTests {
     using var factory = new CfnWebApplicationFactory();
     const int requestCount = 1000;
     var client = factory.CreateClient();
-    var channel = factory.Services.GetRequiredService<Channel<DateTimeOffset>>();
+    var channel = factory.Services.GetRequiredService<Channel<RunRequest>>();
     var timeProvider = factory.Services.GetRequiredService<TimeProvider>();
     channel.Reader.TryPeek(out _).ShouldBeFalse();
 

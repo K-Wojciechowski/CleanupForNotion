@@ -19,7 +19,7 @@ public class FrequencyBasedLoop(
       using (var serviceScope = serviceScopeFactory.CreateScope()) {
         var runner = serviceScope.ServiceProvider.GetRequiredService<IRunner>();
         try {
-          await runner.RunCleanup(globalOptionsProvider.GlobalOptions, stoppingToken).ConfigureAwait(false);
+          await runner.RunCleanup(globalOptionsProvider.GlobalOptions, null, stoppingToken).ConfigureAwait(false);
         } catch (Exception exc) {
           logger.LogError(exc, "Runner failed with exception: {Error}", exc.Message);
           if (!globalOptionsProvider.GlobalOptions.RunFrequency.HasValue) {

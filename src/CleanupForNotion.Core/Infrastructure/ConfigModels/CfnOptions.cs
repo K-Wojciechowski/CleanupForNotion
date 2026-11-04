@@ -10,4 +10,8 @@ public class CfnOptions {
   public string? StateFilePath { get; init; }
 
   public required List<Dictionary<string, object>> Plugins { get; init; }
+
+  public string? WebhookSecret { get; init; }
+
+  public required List<WebhookConfiguration>? Webhooks { get; init; }
 }

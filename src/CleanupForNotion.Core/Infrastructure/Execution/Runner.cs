@@ -22,7 +22,7 @@ public class Runner(
   private const string AlreadyRunningMessage = "A cleanup is already running.";
   private static readonly TimeSpan _semaphoreWaitTime = TimeSpan.FromSeconds(10);
 
-  public async Task RunCleanup(GlobalOptions globalOptions, CancellationToken cancellationToken) {
+  public async Task RunCleanup(GlobalOptions globalOptions, string? groupId, CancellationToken cancellationToken) {
     // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
     var rawPlugins = options.Value?.Plugins;
     if (rawPlugins == null || rawPlugins.Count == 0) {
@@ -42,6 +42,7 @@ public class Runner(
 
     var plugins = rawPlugins
       .Select(pluginSpecificationParser.ParseSpecification)
+      .Where(p => groupId == null || p.GroupId == groupId)
       .Select(pluginActivator.ActivatePlugin)
       .ToArray();
 
