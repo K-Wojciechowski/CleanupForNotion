@@ -12,14 +12,13 @@ public class CfnWebApplicationFactory(
     var options = new CfnOptions {
         AuthToken = "", Plugins = [], WebhookSecret = webhookSecret, Webhooks = webhookConfigurations
     };
+    builder.ConfigureLogging(b => b.SetMinimumLevel(traceLoggingEnabled ? LogLevel.Trace : LogLevel.Debug));
 
     builder.ConfigureServices(services => {
       var hostedServices = services.Where(s => s.ServiceType == typeof(IHostedService)).ToList();
       foreach (var s in hostedServices) services.Remove(s);
       services.AddFakeLogging(o => {
-        if (!traceLoggingEnabled) {
-          o.FilteredLevels = Enum.GetValues<LogLevel>().Where(l => l != LogLevel.Trace).ToHashSet();
-        }
+          o.FilteredLevels = Enum.GetValues<LogLevel>().Where(l => traceLoggingEnabled || l != LogLevel.Trace).ToHashSet();
       });
       services.AddSingleton(Options.Create(options));
     });
