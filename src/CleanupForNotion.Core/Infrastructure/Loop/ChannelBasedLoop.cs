@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace CleanupForNotion.Core.Infrastructure.Loop;
 
 public class ChannelBasedLoop(
-    Channel<DateTimeOffset> channel,
+    Channel<RunRequest> channel,
     IGlobalOptionsProvider globalOptionsProvider,
     ILogger<ChannelBasedLoop> logger,
     TimeProvider timeProvider,
@@ -18,23 +18,29 @@ public class ChannelBasedLoop(
     await Task.Delay(100, stoppingToken).ConfigureAwait(false);
 
     while (!stoppingToken.IsCancellationRequested) {
-      var trigger = await channel.Reader.ReadAsync(stoppingToken).ConfigureAwait(false);
+      var (triggerTime, pluginId) = await channel.Reader.ReadAsync(stoppingToken).ConfigureAwait(false);
 
       var startTime = timeProvider.GetUtcNow();
-      logger.LogTrace("Received trigger from {TriggerDate:O} at {Date:O} (in {Duration} ms)", trigger, startTime,
-          (startTime - trigger).TotalMilliseconds);
+
+      if (logger.IsEnabled(LogLevel.Trace)) {
+        logger.LogTrace("Received trigger from {TriggerTime:O} for plugin {PluginId} at {Date:O} (in {Duration} ms)",
+            triggerTime,
+            pluginId ?? "(all plugins)",
+            startTime,
+            (startTime - triggerTime).TotalMilliseconds);
+      }
 
       using var serviceScope = serviceScopeFactory.CreateScope();
       var runner = serviceScope.ServiceProvider.GetRequiredService<IRunner>();
       try {
-        await runner.RunCleanup(globalOptionsProvider.GlobalOptions, stoppingToken).ConfigureAwait(false);
+        await runner.RunCleanup(globalOptionsProvider.GlobalOptions, pluginId, stoppingToken).ConfigureAwait(false);
       } catch (Exception exc) {
-        logger.LogError(exc, "Failed trigger from {TriggerTime:O} with exception: {Error}", trigger, exc.Message);
+        logger.LogError(exc, "Failed trigger from {TriggerTime:O} with exception: {Error}", triggerTime, exc.Message);
         continue;
       }
 
       var endTime = timeProvider.GetUtcNow();
-      logger.LogTrace("Finished trigger from {TriggerTime:O} at {Date:O} (in {Duration} ms)", trigger, endTime,
+      logger.LogTrace("Finished trigger from {TriggerTime:O} at {Date:O} (in {Duration} ms)", triggerTime, endTime,
           (endTime - startTime).TotalMilliseconds);
     }
   }

@@ -16,7 +16,7 @@ public class OneShotLoop(
 
     var runner = serviceScope.ServiceProvider.GetRequiredService<IRunner>();
     try {
-      await runner.RunCleanup(globalOptionsProvider.GlobalOptions, stoppingToken).ConfigureAwait(false);
+      await runner.RunCleanup(globalOptionsProvider.GlobalOptions, null, stoppingToken).ConfigureAwait(false);
     } catch (Exception exc) {
       logger.LogError(exc, "Runner failed with exception: {Error}", exc.Message);
       throw;

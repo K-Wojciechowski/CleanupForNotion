@@ -23,7 +23,7 @@ public abstract class BasicPluginProviderBase<TPlugin, TOptions>(
     var options = GetOptions(rawOptions, dataSourceId, propertyName, gracePeriod, pluginSpecification.PluginIndex);
     var logger = loggerFactory.CreateLogger<TPlugin>();
 
-    return CreatePlugin(logger, pluginStateProvider, timeProvider, options, pluginSpecification.PluginDescription);
+    return CreatePlugin(logger, pluginStateProvider, timeProvider, options, pluginSpecification.PluginDescription, pluginSpecification.PluginId);
   }
 
   protected abstract TOptions GetOptions(RawPluginOptions options, string dataSourceId, string propertyName,
@@ -34,5 +34,6 @@ public abstract class BasicPluginProviderBase<TPlugin, TOptions>(
       IPluginStateProvider pluginStateProvider,
       TimeProvider timeProvider,
       TOptions options,
-      string pluginDescription);
+      string pluginDescription,
+      string? pluginId);
 }

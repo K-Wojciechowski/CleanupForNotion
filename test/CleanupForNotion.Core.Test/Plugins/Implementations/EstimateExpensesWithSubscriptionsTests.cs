@@ -218,7 +218,8 @@ public class EstimateExpensesWithSubscriptionsTests {
           AmountPropertyName: AmountPropertyName,
           AlternateVendorPropertyName: AlternateVendorPropertyName,
           CurrencyDecimalPlaces: 2),
-      PluginDescription);
+      PluginDescription,
+      pluginId: null);
 
   private static ICfnNotionClient CreateClient(List<Page> subscriptionPages, List<Page> expensePages) {
     var client = Substitute.For<ICfnNotionClient>();

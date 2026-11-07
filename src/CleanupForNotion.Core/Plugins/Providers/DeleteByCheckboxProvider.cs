@@ -1,4 +1,5 @@
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
+using CleanupForNotion.Core.Infrastructure.Plugins;
 using CleanupForNotion.Core.Infrastructure.State;
 using CleanupForNotion.Core.Plugins.Implementations;
 using CleanupForNotion.Core.Plugins.Options;
@@ -16,7 +17,8 @@ public class DeleteByCheckboxProvider(
         timeProvider) {
   public override string Name => "DeleteByCheckbox";
 
-  protected override DeleteByCheckboxOptions GetOptions(RawPluginOptions options,
+  protected override DeleteByCheckboxOptions GetOptions(
+      RawPluginOptions options,
       string dataSourceId,
       string propertyName,
       TimeSpan? gracePeriod,
@@ -28,12 +30,13 @@ public class DeleteByCheckboxProvider(
         gracePeriod);
   }
 
-  protected override DeleteByCheckbox CreatePlugin(
+  protected override IPlugin CreatePlugin(
       ILogger<DeleteByCheckbox> logger,
       IPluginStateProvider pluginStateProvider,
       TimeProvider timeProvider,
       DeleteByCheckboxOptions options,
-      string pluginDescription) {
-    return new DeleteByCheckbox(logger, pluginStateProvider, timeProvider, options, pluginDescription);
+      string pluginDescription,
+      string? pluginId) {
+    return new DeleteByCheckbox(logger, pluginStateProvider, timeProvider, options, pluginDescription, pluginId);
   }
 }

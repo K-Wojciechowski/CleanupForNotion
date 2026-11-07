@@ -20,13 +20,19 @@ public class DeleteZeroSumTests {
 
   [TestMethod]
   public void Name_Get_ReturnsDeleteZeroSum() {
-    new DeleteZeroSum(null!, null!, null!, null!, null!).Name.ShouldBe("DeleteZeroSum");
+    new DeleteZeroSum(null!, null!, null!, null!, null!, null!).Name.ShouldBe("DeleteZeroSum");
+  }
+
+  [TestMethod]
+  public void Id_Get_ReturnsId() {
+    var id = Guid.NewGuid().ToString();
+    new DeleteZeroSum(null!, null!, null!, null!, null!, id).Id.ShouldBe(id);
   }
 
   [TestMethod]
   public void Description_Get_ReturnsDescription() {
     var description = Guid.NewGuid().ToString();
-    new DeleteZeroSum(null!, null!, null!, null!, description).Description.ShouldBe(description);
+    new DeleteZeroSum(null!, null!, null!, null!, description, null!).Description.ShouldBe(description);
   }
 
   [TestMethod]
@@ -80,8 +86,13 @@ public class DeleteZeroSumTests {
     var timeProvider = new FakeTimeProvider();
     var options = new DeleteZeroSumOptions(DataSourceId: DataSourceId, PropertyName: PropertyName);
 
-    var plugin = new DeleteZeroSum(logger, Substitute.For<IPluginStateProvider>(), timeProvider, options,
-        PluginDescription);
+    var plugin = new DeleteZeroSum(
+        logger,
+        Substitute.For<IPluginStateProvider>(),
+        timeProvider,
+        options,
+        PluginDescription,
+        pluginId: null);
 
     // Act
     await plugin.Run(client, new GlobalOptions { DryRun = dryRun }, CancellationToken.None).ConfigureAwait(false);

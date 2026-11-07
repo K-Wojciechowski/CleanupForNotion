@@ -3,5 +3,5 @@ using CleanupForNotion.Core.Infrastructure.ConfigModels;
 namespace CleanupForNotion.Core.Infrastructure.Execution;
 
 public interface IRunner {
-  public Task RunCleanup(GlobalOptions globalOptions, CancellationToken cancellationToken);
+  public Task RunCleanup(GlobalOptions globalOptions, string? pluginId, CancellationToken cancellationToken);
 }

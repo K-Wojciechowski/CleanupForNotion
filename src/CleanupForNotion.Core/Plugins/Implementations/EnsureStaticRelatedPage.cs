@@ -13,7 +13,9 @@ public class EnsureStaticRelatedPage(
     ILogger<EnsureStaticRelatedPage> logger,
     TimeProvider timeProvider,
     EnsureStaticRelatedPageOptions options,
-    string pluginDescription) : IPlugin {
+    string pluginDescription,
+    string? pluginId) : IPlugin {
+  public string? Id { get; } = pluginId;
   public string Name => "EnsureStaticRelatedPage";
   public string Description { get; } = pluginDescription;
   public IBasicPluginOptions Configuration => options;

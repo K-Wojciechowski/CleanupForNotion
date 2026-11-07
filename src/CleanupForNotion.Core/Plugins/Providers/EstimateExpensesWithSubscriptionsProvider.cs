@@ -1,4 +1,5 @@
 ﻿using CleanupForNotion.Core.Infrastructure.ConfigModels;
+using CleanupForNotion.Core.Infrastructure.Plugins;
 using CleanupForNotion.Core.Infrastructure.State;
 using CleanupForNotion.Core.Plugins.Implementations;
 using CleanupForNotion.Core.Plugins.Options;
@@ -34,12 +35,13 @@ public class EstimateExpensesWithSubscriptionsProvider(
         GracePeriod: gracePeriod);
   }
 
-  protected override EstimateExpensesWithSubscriptions CreatePlugin(
+  protected override IPlugin CreatePlugin(
       ILogger<EstimateExpensesWithSubscriptions> logger,
       IPluginStateProvider pluginStateProvider,
       TimeProvider timeProvider,
       EstimateExpensesWithSubscriptionsOptions options,
-      string pluginDescription) {
-    return new EstimateExpensesWithSubscriptions(logger, pluginStateProvider, options, pluginDescription);
+      string pluginDescription,
+      string? pluginId) {
+    return new EstimateExpensesWithSubscriptions(logger, pluginStateProvider, options, pluginDescription, pluginId);
   }
 }

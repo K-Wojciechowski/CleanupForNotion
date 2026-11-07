@@ -15,10 +15,13 @@ public abstract class DeletePluginBase<TOptions>(
     IPluginStateProvider pluginStateProvider,
     TimeProvider timeProvider,
     TOptions options,
-    string description) : IPlugin
+    string pluginDescription,
+    string? pluginId) : IPlugin
     where TOptions : IBasicPluginOptions {
+  public string? Id { get; } = pluginId;
+
   public abstract string Name { get; }
-  public string Description { get; } = description;
+  public string Description { get; } = pluginDescription;
   public IBasicPluginOptions Configuration => Options;
 
   protected readonly TOptions Options = options;

@@ -16,6 +16,7 @@ public class EnsureStaticRelatedPageTests {
   private const string DataSourceId = "dataSourceId";
   private const string PropertyName = "propertyName";
   private const string PluginDescription = "pluginDescription";
+  private const string PluginId = "pluginId";
   private const string RelatedPageId = "relatedPageId";
 
   [TestMethod]
@@ -30,7 +31,7 @@ public class EnsureStaticRelatedPageTests {
         PropertyName: PropertyName,
         RelatedPageId: RelatedPageId
     );
-    var plugin = new EnsureStaticRelatedPage(logger, timeProvider, options, PluginDescription);
+    var plugin = new EnsureStaticRelatedPage(logger, timeProvider, options, PluginDescription, PluginId);
 
     var pages = new List<Page> {
         new() {
@@ -123,7 +124,7 @@ public class EnsureStaticRelatedPageTests {
         PropertyName: PropertyName,
         RelatedPageId: RelatedPageId
     );
-    var plugin = new EnsureStaticRelatedPage(logger, timeProvider, options, PluginDescription);
+    var plugin = new EnsureStaticRelatedPage(logger, timeProvider, options, PluginDescription, PluginId);
 
     var client = Substitute.For<ICfnNotionClient>();
     client.QueryDataSourceRawAsync(Arg.Any<QueryDataSourceRequest>(), CancellationToken.None)
@@ -166,7 +167,7 @@ public class EnsureStaticRelatedPageTests {
         PropertyName: PropertyName,
         RelatedPageId: "?"
     );
-    var plugin = new EnsureStaticRelatedPage(logger, timeProvider, options, PluginDescription);
+    var plugin = new EnsureStaticRelatedPage(logger, timeProvider, options, PluginDescription, PluginId);
 
     var pages = new List<Page> {
         new() {

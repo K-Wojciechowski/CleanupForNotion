@@ -13,8 +13,9 @@ public class DeleteZeroSum(
     IPluginStateProvider pluginStateProvider,
     TimeProvider timeProvider,
     DeleteZeroSumOptions options,
-    string pluginDescription)
-    : DeletePluginBase<DeleteZeroSumOptions>(logger, pluginStateProvider, timeProvider, options, pluginDescription) {
+    string pluginDescription,
+    string? pluginId)
+    : DeletePluginBase<DeleteZeroSumOptions>(logger, pluginStateProvider, timeProvider, options, pluginDescription, pluginId) {
   public override string Name => "DeleteZeroSum";
 
   public override async Task Run(ICfnNotionClient client, GlobalOptions globalOptions,

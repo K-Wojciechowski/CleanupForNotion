@@ -1,4 +1,5 @@
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
+using CleanupForNotion.Core.Infrastructure.Plugins;
 using CleanupForNotion.Core.Infrastructure.State;
 using CleanupForNotion.Core.Plugins.Implementations;
 using CleanupForNotion.Core.Plugins.Options;
@@ -16,7 +17,8 @@ public class DeleteWithoutRelationshipsProvider(
         timeProvider) {
   public override string Name => "DeleteWithoutRelationships";
 
-  protected override DeleteWithoutRelationshipsOptions GetOptions(RawPluginOptions options,
+  protected override DeleteWithoutRelationshipsOptions GetOptions(
+      RawPluginOptions options,
       string dataSourceId,
       string propertyName,
       TimeSpan? gracePeriod,
@@ -27,12 +29,13 @@ public class DeleteWithoutRelationshipsProvider(
         gracePeriod);
   }
 
-  protected override DeleteWithoutRelationships CreatePlugin(
+  protected override IPlugin CreatePlugin(
       ILogger<DeleteWithoutRelationships> logger,
       IPluginStateProvider pluginStateProvider,
       TimeProvider timeProvider,
       DeleteWithoutRelationshipsOptions options,
-      string pluginDescription) {
-    return new DeleteWithoutRelationships(logger, pluginStateProvider, timeProvider, options, pluginDescription);
+      string pluginDescription,
+      string? pluginId) {
+    return new DeleteWithoutRelationships(logger, pluginStateProvider, timeProvider, options, pluginDescription, pluginId);
   }
 }

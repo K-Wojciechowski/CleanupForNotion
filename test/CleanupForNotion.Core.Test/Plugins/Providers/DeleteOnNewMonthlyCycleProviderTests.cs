@@ -12,6 +12,7 @@ namespace CleanupForNotion.Core.Test.Plugins.Providers;
 [TestClass]
 public class DeleteOnNewMonthlyCycleProviderTests {
   private const string PluginDescription = "Plugin Description";
+  private const string PluginId = "Plugin Id";
 
   private readonly DeleteOnNewMonthlyCycleProvider _provider = new(
       new NullLoggerFactory(),
@@ -48,6 +49,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
+        PluginId: PluginId,
         RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
@@ -79,6 +81,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
+        PluginId: PluginId,
         RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
@@ -101,6 +104,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
+        PluginId: PluginId,
         RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
@@ -125,6 +129,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
+        PluginId: PluginId,
         RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
@@ -148,6 +153,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
+        PluginId: PluginId,
         RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
@@ -172,6 +178,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
+        PluginId: PluginId,
         RawOptions: new RawPluginOptions(rawOptions));
 
     // Act

@@ -14,11 +14,13 @@ public class EstimateExpensesWithSubscriptions(
     ILogger<EstimateExpensesWithSubscriptions> logger,
     IPluginStateProvider pluginStateProvider,
     EstimateExpensesWithSubscriptionsOptions options,
-    string pluginDescription) : IPlugin {
+    string pluginDescription,
+    string? pluginId) : IPlugin {
   private const string PageCountKey = "PageCount";
   private const string LastEditKey = "LastEdit";
   private static readonly DateTimeOffset _placeholderLastEdit = new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
+  public string? Id { get; } = pluginId;
   public string Name => "EstimateExpensesWithSubscriptions";
   public string Description { get; } = pluginDescription;
   public IBasicPluginOptions Configuration => options;
@@ -68,8 +70,8 @@ public class EstimateExpensesWithSubscriptions(
           continue;
         }
 
-        logger.LogTrace("Expense {Name} with amount {Amount} associated with bucket {Bucket}", vendor, amount,
-            bucket.Id);
+        logger.LogTrace("Expense {Name} with amount {Amount} associated with bucket {Bucket}",
+            vendor, amount, bucket);
         bucket.Actual += amount;
         break;
       }
@@ -131,7 +133,7 @@ public class EstimateExpensesWithSubscriptions(
   private void LogBuckets(Bucket[] buckets) {
     if (!logger.IsEnabled(LogLevel.Trace)) return;
     foreach (var b in buckets) {
-      logger.LogTrace("Bucket {Bucket} ({Name}) value: {Value}", b.Id, b.Names.First(), b.Value);
+      logger.LogTrace("Bucket {Bucket} value: {Value}", b, b.Value);
     }
   }
 
@@ -145,5 +147,9 @@ public class EstimateExpensesWithSubscriptions(
     public decimal Actual { get; set; }
 
     public decimal Value => Math.Max(Expected, Actual);
+
+    private string _description = $"{id} ({names.FirstOrDefault()})";
+
+    public override string ToString() => _description;
   }
 }

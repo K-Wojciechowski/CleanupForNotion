@@ -20,7 +20,7 @@ public class OneShotLoopTests {
     var logger = NullLogger<OneShotLoop>.Instance;
     var runner = Substitute.For<IRunner>();
 
-    runner.RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>())
+    runner.RunCleanup(Arg.Any<GlobalOptions>(), null, Arg.Any<CancellationToken>())
         .Returns(Task.CompletedTask);
 
     var services = new ServiceCollection()
@@ -38,7 +38,7 @@ public class OneShotLoopTests {
     await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
 
     // Assert
-    await runner.ReceivedWithAnyArgs(1).RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>())
+    await runner.ReceivedWithAnyArgs(1).RunCleanup(Arg.Any<GlobalOptions>(), null, Arg.Any<CancellationToken>())
         .ConfigureAwait(false);
   }
 
@@ -50,7 +50,7 @@ public class OneShotLoopTests {
     var logger = new FakeLogger<OneShotLoop>();
     var runner = Substitute.For<IRunner>();
 
-    runner.RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>())
+    runner.RunCleanup(Arg.Any<GlobalOptions>(), null, Arg.Any<CancellationToken>())
         .Returns(async _ => {
           await Task.Delay(100).ConfigureAwait(false);
           throw new Exception("kaboom");
@@ -74,7 +74,7 @@ public class OneShotLoopTests {
 
     // Assert
     (await act.ShouldThrowAsync<Exception>().ConfigureAwait(false)).Message.ShouldBe("kaboom");
-    await runner.ReceivedWithAnyArgs(1).RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>())
+    await runner.ReceivedWithAnyArgs(1).RunCleanup(Arg.Any<GlobalOptions>(), null, Arg.Any<CancellationToken>())
         .ConfigureAwait(false);
     logger.LatestRecord.Message.ShouldContain("kaboom");
   }

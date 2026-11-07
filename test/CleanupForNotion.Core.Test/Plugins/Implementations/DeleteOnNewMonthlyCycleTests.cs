@@ -32,13 +32,19 @@ public class DeleteOnNewMonthlyCycleTests : DeletePluginTestsBase {
 
   [TestMethod]
   public void Name_Get_ReturnsDeleteOnNewMonthlyCycle() {
-    new DeleteOnNewMonthlyCycle(null!, null!, null!, null!, null!).Name.ShouldBe(PluginName);
+    new DeleteOnNewMonthlyCycle(null!, null!, null!, null!, null!, null!).Name.ShouldBe(PluginName);
+  }
+
+  [TestMethod]
+  public void Id_Get_ReturnsId() {
+    var id = Guid.NewGuid().ToString();
+    new DeleteOnNewMonthlyCycle(null!, null!, null!, null!, null!, id).Id.ShouldBe(id);
   }
 
   [TestMethod]
   public void Description_Get_ReturnsDescription() {
     var description = Guid.NewGuid().ToString();
-    new DeleteOnNewMonthlyCycle(null!, null!, null!, null!, description).Description.ShouldBe(description);
+    new DeleteOnNewMonthlyCycle(null!, null!, null!, null!, description, null!).Description.ShouldBe(description);
   }
 
   [TestMethod]
@@ -132,7 +138,7 @@ public class DeleteOnNewMonthlyCycleTests : DeletePluginTestsBase {
     var logger = new FakeLogger<DeleteOnNewMonthlyCycle>();
     var pluginStateProvider = CreateMockStateProvider(lastRun);
     var timeProvider = new FakeTimeProvider(now);
-    var plugin = new DeleteOnNewMonthlyCycle(logger, pluginStateProvider, timeProvider, options, PluginDescription);
+    var plugin = new DeleteOnNewMonthlyCycle(logger, pluginStateProvider, timeProvider, options, PluginDescription, null!);
 
     var client = CreateMockNotionClient();
 
@@ -162,7 +168,7 @@ public class DeleteOnNewMonthlyCycleTests : DeletePluginTestsBase {
     var logger = new FakeLogger<DeleteOnNewMonthlyCycle>();
     var pluginStateProvider = CreateMockStateProvider(lastRun);
     var timeProvider = new FakeTimeProvider(now);
-    var plugin = new DeleteOnNewMonthlyCycle(logger, pluginStateProvider, timeProvider, options, PluginDescription);
+    var plugin = new DeleteOnNewMonthlyCycle(logger, pluginStateProvider, timeProvider, options, PluginDescription, null!);
 
     var client = Substitute.For<ICfnNotionClient>();
 
