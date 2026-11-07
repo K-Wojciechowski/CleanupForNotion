@@ -164,11 +164,22 @@ https://www.notion.so/workspace-name/Page-Name-22222222222222222222222222222222
 
 Plugins are configured in a **Plugins** array. Every plugin instance has its own configuration JSON object. The configuration JSON object contains:
 
-* **PluginName** (string, mandatory) — the name of the plugin. Valid values: `DeleteByCheckbox`, `DeleteOnNewMonthlyCycle`, `DeleteWithoutRelationships`, `DeleteZeroSum`. One plugin may be used multiple times in the configuration.
+* **PluginName** (string, mandatory) — the name of the plugin. Valid values: `DeleteByCheckbox`, `DeleteOnNewMonthlyCycle`, `DeleteWithoutRelationships`, `DeleteZeroSum`, `EnsureStaticRelatedPage`, `EstimateExpensesWithSubscriptions`. One plugin may be used multiple times in the configuration.
 * **PluginDescription** (string, mandatory) — the description of the plugin instance. Should be unique and human-readable.
+* **PluginId** (string, optional) — the ID of the plugin. Optional, used for webhooks or for executing a single plugin.
 * **DataSourceId** (string, mandatory) — ID of the data source to work on. See [Setup in Notion](#setup-in-notion) for retrieval instructions.
 * **PropertyName** (string, mandatory) — name of the property to base deletion checks on. This is the human-readable name visible in the database.
 * **GracePeriod** (string, `"HH:MM:SS"`, optional) — defines the time after the last edit for which the page will not be modified. Defaults to 1 hour.
+
+### Webhooks
+
+1. Expose the `webhooks` endpoint publicly. You probably don’t want to expose the entire server, as it allows running cleanup without any authentication.
+2. [Set up the webhook in your Notion integration](https://developers.notion.com/reference/webhooks#getting-started-with-webhooks). CleanupForNotion currently supports page and data source change events.
+3. The request with `verification_token` will be logged when it reaches the server.
+4. In `appsettings.json`, set **WebhookSecret** to the value of the `verification_token`.
+5. Configure a webhook actions under the **Webhooks** key. It is a list of objects with **DataSourceId** (string) and **PluginIds** (array of string) keys. See below for an example.
+
+Webhooks are currently supported only in the *Web application* model.
 
 ### Putting it all together
 
@@ -192,14 +203,16 @@ Here is an example CleanupForNotion configuration:
       "PluginName": "DeleteByCheckbox",
       "PluginDescription": "Delete checked items",
       "DataSourceId": "11111111111111111111111111111111",
-      "PropertyName": "Delete"
+      "PropertyName": "Delete",
+      "PluginId": "one"
     },
     {
       "PluginName": "DeleteWithoutRelationships",
       "PluginDescription": "Delete log rows with no items",
       "DataSourceId": "22222222222222222222222222222222",
       "PropertyName": "Items",
-      "GracePeriod": "00:10:00"
+      "GracePeriod": "00:10:00",
+      "PluginId": "two"
     },
     {
       "PluginName": "DeleteZeroSum",
@@ -226,6 +239,11 @@ Here is an example CleanupForNotion configuration:
       "AlternateVendorPropertyName": "Alternate Names",
       "CurrencyDecimalPlaces": 2
     }
+  ],
+  "WebhookSecret": "XXX",
+  "Webhooks": [
+    {"DataSourceId": "11111111111111111111111111111111", "PluginIds": ["one", "two"]}
+    {"DataSourceId": "22222222222222222222222222222222", "PluginIds": ["two"]}
   ]
 }
 ```
@@ -258,9 +276,13 @@ In this model, CleanupForNotion runs as an ASP.NET Core web application.
 
 If `RunFrequency` is configured, cleanup will be automatically executed on a timer. If it is null, cleanups need to be manually triggered over HTTP.
 
-The HTTP API is extremely simple: a `POST /` call will trigger a cleanup. With the default port, call `curl -XPOST http://localhost:2836/`.
+The HTTP API is simple:
 
-The API should not be exposed on the public Internet.
+* `POST /` — trigger a full cleanup. With the default port, call `curl -XPOST http://localhost:2836/`.
+* `POST /plugin/{pluginId}` — trigger a single plugin by its ID.
+* `POST /webhook` — react to changes sent by Notion.
+
+The entire API should not be exposed on the public Internet. If using webhooks, expose only the webhook endpoint.
 
 The easiest way to run the application in this model is with Docker and Docker Compose. The Docker image is hosted on [GitHub Container Registry](https://github.com/K-Wojciechowski/CleanupForNotion/pkgs/container/cleanupfornotion), with the latest release available as `docker pull ghcr.io/k-wojciechowski/cleanupfornotion:latest`.
 
