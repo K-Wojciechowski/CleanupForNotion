@@ -1,5 +1,6 @@
 using System.Threading.Channels;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
+using CleanupForNotion.Core.Infrastructure.Execution;
 using CleanupForNotion.Core.Infrastructure.Loop;
 using CleanupForNotion.Core.Infrastructure.PluginManagement;
 using Microsoft.Extensions.Logging.Testing;
@@ -13,7 +14,7 @@ public class ChannelTimerBackgroundServiceTests {
   [TestMethod]
   public async Task ExecuteAsync_RunFrequencyNotConfigured_ReturnsImmediately() {
     // Arrange
-    var channel = Channel.CreateUnbounded<DateTimeOffset>();
+    var channel = Channel.CreateUnbounded<RunRequest>();
     var timeProvider = TimeProvider.System;
     var logger = new FakeLogger<ChannelTimerBackgroundService>();
     var service = new ChannelTimerBackgroundService(
@@ -37,7 +38,7 @@ public class ChannelTimerBackgroundServiceTests {
   [TestMethod]
   public async Task ExecuteAsync_RunFrequencyConfigured_RunsForeverAndWritesToChannel() {
     // Arrange
-    var channel = Channel.CreateUnbounded<DateTimeOffset>();
+    var channel = Channel.CreateUnbounded<RunRequest>();
     var timeProvider = TimeProvider.System;
     var logger = new FakeLogger<ChannelTimerBackgroundService>();
     var runFrequency = TimeSpan.FromMilliseconds(400);
@@ -63,6 +64,7 @@ public class ChannelTimerBackgroundServiceTests {
     var triggers = channel.Reader
         .ReadAllAsync(CancellationToken.None)
         .ToBlockingEnumerable(CancellationToken.None)
+        .Select(r => r.TriggerTime)
         .ToList();
     triggers.Count.ShouldBeInRange(4, 6);
     // cannot expect too much precision with high frequencies

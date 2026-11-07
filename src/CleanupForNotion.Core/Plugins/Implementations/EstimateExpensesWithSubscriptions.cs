@@ -14,11 +14,13 @@ public class EstimateExpensesWithSubscriptions(
     ILogger<EstimateExpensesWithSubscriptions> logger,
     IPluginStateProvider pluginStateProvider,
     EstimateExpensesWithSubscriptionsOptions options,
-    string pluginDescription) : IPlugin {
+    string pluginDescription,
+    string? pluginId) : IPlugin {
   private const string PageCountKey = "PageCount";
   private const string LastEditKey = "LastEdit";
   private static readonly DateTimeOffset _placeholderLastEdit = new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
+  public string? Id { get; } = pluginId;
   public string Name => "EstimateExpensesWithSubscriptions";
   public string Description { get; } = pluginDescription;
   public IBasicPluginOptions Configuration => options;

@@ -12,8 +12,9 @@ public class DeleteWithoutRelationships(
   IPluginStateProvider pluginStateProvider,
   TimeProvider timeProvider,
   DeleteWithoutRelationshipsOptions options,
-  string pluginDescription)
-  : DeletePluginBase<DeleteWithoutRelationshipsOptions>(logger, pluginStateProvider, timeProvider, options, pluginDescription) {
+  string pluginDescription,
+  string? pluginId)
+  : DeletePluginBase<DeleteWithoutRelationshipsOptions>(logger, pluginStateProvider, timeProvider, options, pluginDescription, pluginId) {
 
   public override string Name => "DeleteWithoutRelationships";
 

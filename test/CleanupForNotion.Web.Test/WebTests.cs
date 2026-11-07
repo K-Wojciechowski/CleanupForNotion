@@ -1,5 +1,6 @@
 using System.Net;
 using System.Threading.Channels;
+using CleanupForNotion.Core.Infrastructure.Execution;
 using Shouldly;
 
 namespace CleanupForNotion.Web.Test;
@@ -19,16 +20,16 @@ public class WebTests {
 
     // Act
     var before = timeProvider.GetUtcNow();
-    var response = await client.PostAsync(requestUri: "", content: null).ConfigureAwait(false);
+    var response = await client.PostAsync(requestUri: "", content: null, TestContext.CancellationToken).ConfigureAwait(false);
     var after = timeProvider.GetUtcNow();
 
     // Assert
-    var channelItem = await channel.Reader.ReadAsync().ConfigureAwait(false);
-    channelItem.ShouldBeInRange(before.Subtract(_delta), after.Add(_delta));
+    var runRequest = await channel.Reader.ReadAsync(TestContext.CancellationToken).ConfigureAwait(false);
+    runRequest.TriggerTime.ShouldBeInRange(before.Subtract(_delta), after.Add(_delta));
     channel.Reader.TryPeek(out _).ShouldBeFalse();
 
     response.StatusCode.ShouldBe(HttpStatusCode.OK);
-    var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+    var responseText = await response.Content.ReadAsStringAsync(TestContext.CancellationToken).ConfigureAwait(false);
     responseText.ShouldBe("Triggered");
   }
 
@@ -45,17 +46,17 @@ public class WebTests {
     // Act
     var before = timeProvider.GetUtcNow();
     for (var i = 0; i < requestCount; i++) {
-      var response = await client.PostAsync(requestUri: "", content: null).ConfigureAwait(false);
+      var response = await client.PostAsync(requestUri: "", content: null, TestContext.CancellationToken).ConfigureAwait(false);
       response.StatusCode.ShouldBe(HttpStatusCode.OK);
-      var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+      var responseText = await response.Content.ReadAsStringAsync(TestContext.CancellationToken).ConfigureAwait(false);
       responseText.ShouldBe("Triggered");
     }
     var after = timeProvider.GetUtcNow();
 
     // Assert
     for (var i = 0; i < requestCount; i++) {
-      var channelItem = await channel.Reader.ReadAsync().ConfigureAwait(false);
-      channelItem.ShouldBeInRange(before.Subtract(_delta), after.Add(_delta));
+      var runRequest = await channel.Reader.ReadAsync(TestContext.CancellationToken).ConfigureAwait(false);
+      runRequest.TriggerTime.ShouldBeInRange(before.Subtract(_delta), after.Add(_delta));
     }
 
     channel.Reader.TryPeek(out _).ShouldBeFalse();
@@ -63,4 +64,6 @@ public class WebTests {
     var averageRequestTime = (after - before).TotalMilliseconds / requestCount;
     averageRequestTime.ShouldBeLessThan(20);
   }
+
+  public TestContext TestContext { get; set; }
 }

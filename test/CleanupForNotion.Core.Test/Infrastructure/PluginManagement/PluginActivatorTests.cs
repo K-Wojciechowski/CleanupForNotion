@@ -8,11 +8,11 @@ namespace CleanupForNotion.Core.Test.Infrastructure.PluginManagement;
 
 [TestClass]
 public class PluginActivatorTests {
-  private readonly PluginSpecification _expectedPluginSpecification =
-      new(PluginIndex: 0, PluginName: "TestPlugin", PluginDescription: "Description", RawOptions: new RawPluginOptions([]));
+  private static readonly PluginSpecification _expectedPluginSpecification =
+      new(PluginIndex: 0, PluginName: "TestPlugin", PluginDescription: "Description", PluginId: "PluginId", RawOptions: new RawPluginOptions([]));
 
-  private readonly PluginSpecification _unexpectedPluginSpecification =
-      new(PluginIndex: 1, PluginName: "MissingPlugin", PluginDescription: "Description", RawOptions: new RawPluginOptions([]));
+  private static readonly PluginSpecification _unexpectedPluginSpecification =
+      _expectedPluginSpecification with { PluginName = "MissingPlugin" };
 
   private readonly IPlugin _expectedPlugin = Substitute.For<IPlugin>();
 

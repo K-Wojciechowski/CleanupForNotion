@@ -23,7 +23,7 @@ public class FrequencyBasedLoopTests {
         .AddScoped<IRunner>(_ => runner)
         .BuildServiceProvider();
 
-    runner.RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>()).Returns(Task.Delay(200, CancellationToken.None));
+    runner.RunCleanup(Arg.Any<GlobalOptions>(), null, Arg.Any<CancellationToken>()).Returns(Task.Delay(200, CancellationToken.None));
 
     var loop = new FrequencyBasedLoop(
         globalOptionsProvider: globalOptionsProvider,
@@ -39,7 +39,7 @@ public class FrequencyBasedLoopTests {
 
     // Assert
     loop.ExecuteTask?.IsCompletedSuccessfully.ShouldBeTrue();
-    await runner.Received(1).RunCleanup(globalOptionsProvider.GlobalOptions, Arg.Any<CancellationToken>())
+    await runner.Received(1).RunCleanup(globalOptionsProvider.GlobalOptions, null, Arg.Any<CancellationToken>())
         .ConfigureAwait(false);
     hostApplicationLifetime.Received(1).StopApplication();
   }
@@ -69,7 +69,7 @@ public class FrequencyBasedLoopTests {
     await loop.StopAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 
     // Assert
-    await runner.Received().RunCleanup(globalOptionsProvider.GlobalOptions, Arg.Any<CancellationToken>()).ConfigureAwait(false);
+    await runner.Received().RunCleanup(globalOptionsProvider.GlobalOptions, null, Arg.Any<CancellationToken>()).ConfigureAwait(false);
     var callCount = runner.ReceivedCalls().Count();
     callCount.ShouldBeInRange(3, 4);
     hostApplicationLifetime.DidNotReceiveWithAnyArgs().StopApplication();
@@ -83,7 +83,7 @@ public class FrequencyBasedLoopTests {
     var hostApplicationLifetime = Substitute.For<IHostApplicationLifetime>();
     var logger = new FakeLogger<FrequencyBasedLoop>();
     var runner = Substitute.For<IRunner>();
-    runner.RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>())
+    runner.RunCleanup(Arg.Any<GlobalOptions>(), null, Arg.Any<CancellationToken>())
         .Returns(_ => throw new Exception("kaboom"));
 
     var services = new ServiceCollection()
@@ -116,7 +116,7 @@ public class FrequencyBasedLoopTests {
     var logger = new FakeLogger<FrequencyBasedLoop>();
     var runner = Substitute.For<IRunner>();
     var runCount = 0;
-    runner.RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<CancellationToken>())
+    runner.RunCleanup(Arg.Any<GlobalOptions>(), null, Arg.Any<CancellationToken>())
         .Returns(_ => {
           runCount++;
           if (runCount == 2) {
@@ -143,7 +143,7 @@ public class FrequencyBasedLoopTests {
     await loop.StopAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 
     // Assert
-    await runner.ReceivedWithAnyArgs().RunCleanup(default!, default).ConfigureAwait(false);
+    await runner.ReceivedWithAnyArgs().RunCleanup(null!, null, CancellationToken.None).ConfigureAwait(false);
     var callCount = runner.ReceivedCalls().Count();
     callCount.ShouldBeInRange(3, 4);
     hostApplicationLifetime.DidNotReceiveWithAnyArgs().StopApplication();

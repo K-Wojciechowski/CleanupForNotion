@@ -42,14 +42,14 @@ public class Program {
           return "Triggered";
         });
 
-    app.MapPost("/group/{groupId}", async (
-        [FromRoute] string groupId,
+    app.MapPost("/plugin/{pluginId}", async (
+        [FromRoute] string pluginId,
         Channel<RunRequest> channel,
         TimeProvider timeProvider,
         CancellationToken cancellationToken) => {
-      await channel.Writer.WriteAsync(new RunRequest(timeProvider.GetUtcNow(), groupId), cancellationToken).ConfigureAwait(false);
+      await channel.Writer.WriteAsync(new RunRequest(timeProvider.GetUtcNow(), pluginId), cancellationToken).ConfigureAwait(false);
 
-      return "Triggered group";
+      return "Triggered plugin";
     });
 
     app.MapPost("/webhook", async (
@@ -133,16 +133,16 @@ public class Program {
         return Results.Ok();
       }
 
-      var groupIds = options.Value.Webhooks
+      var pluginIds = options.Value.Webhooks
           .Where(e => e.DataSourceId == dataSourceId)
-          .SelectMany(w => w.GroupIds)
+          .SelectMany(w => w.PluginIds)
           .Distinct()
           .ToList();
 
-      logger.LogInformation("Group IDs in webhook request: {GroupIds}", string.Join(", ", groupIds));
+      logger.LogInformation("Plugin IDs in webhook request: {PluginIds}", string.Join(", ", pluginIds));
 
-      foreach (var groupId in groupIds) {
-        await channel.Writer.WriteAsync(new RunRequest(timeProvider.GetUtcNow(), groupId), cancellationToken).ConfigureAwait(false);
+      foreach (var pluginId in pluginIds) {
+        await channel.Writer.WriteAsync(new RunRequest(timeProvider.GetUtcNow(), pluginId), cancellationToken).ConfigureAwait(false);
       }
 
       return Results.Ok();

@@ -12,6 +12,7 @@ namespace CleanupForNotion.Core.Test.Plugins.Providers;
 [TestClass]
 public class DeleteByCheckboxProviderTests {
   private const string PluginDescription = "Plugin Description";
+  private const string PluginId = "Plugin ID";
 
   private readonly DeleteByCheckboxProvider _provider = new(
       new NullLoggerFactory(),
@@ -42,6 +43,7 @@ public class DeleteByCheckboxProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
+        PluginId: PluginId,
         RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
@@ -73,6 +75,7 @@ public class DeleteByCheckboxProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
+        PluginId: PluginId,
         RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
@@ -98,6 +101,7 @@ public class DeleteByCheckboxProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
+        PluginId: PluginId,
         RawOptions: new RawPluginOptions(rawOptions));
 
     // Act

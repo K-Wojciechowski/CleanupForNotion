@@ -13,5 +13,5 @@ public class CfnOptions {
 
   public string? WebhookSecret { get; init; }
 
-  public required List<WebhookConfiguration>? Webhooks { get; init; }
+  public List<WebhookConfiguration>? Webhooks { get; init; }
 }

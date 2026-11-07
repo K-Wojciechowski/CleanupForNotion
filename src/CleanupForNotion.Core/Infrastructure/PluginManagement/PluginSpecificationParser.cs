@@ -7,7 +7,7 @@ public class PluginSpecificationParser : IPluginSpecificationParser {
       PluginIndex: pluginIndex,
       PluginName: Get(rawSpecification, "PluginName"),
       PluginDescription: Get(rawSpecification, "PluginDescription"),
-      GroupId: rawSpecification.GetValueOrDefault("GroupId") as string,
+      PluginId: rawSpecification.GetValueOrDefault("PluginId") as string,
       RawOptions: new RawPluginOptions(rawSpecification));
 
   private static string Get(Dictionary<string, object> rawSpecification, string key) =>

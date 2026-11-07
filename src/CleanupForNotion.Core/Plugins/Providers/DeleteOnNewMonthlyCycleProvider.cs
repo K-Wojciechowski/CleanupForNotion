@@ -16,7 +16,8 @@ public class DeleteOnNewMonthlyCycleProvider(
         timeProvider) {
   public override string Name => "DeleteOnNewMonthlyCycle";
 
-  protected override DeleteOnNewMonthlyCycleOptions GetOptions(RawPluginOptions options,
+  protected override DeleteOnNewMonthlyCycleOptions GetOptions(
+      RawPluginOptions options,
       string dataSourceId,
       string propertyName,
       TimeSpan? gracePeriod,
@@ -35,7 +36,8 @@ public class DeleteOnNewMonthlyCycleProvider(
       IPluginStateProvider pluginStateProvider,
       TimeProvider timeProvider,
       DeleteOnNewMonthlyCycleOptions options,
-      string pluginDescription) {
-    return new DeleteOnNewMonthlyCycle(logger, pluginStateProvider, timeProvider, options, pluginDescription);
+      string pluginDescription,
+      string? pluginId) {
+    return new DeleteOnNewMonthlyCycle(logger, pluginStateProvider, timeProvider, options, pluginDescription, pluginId);
   }
 }

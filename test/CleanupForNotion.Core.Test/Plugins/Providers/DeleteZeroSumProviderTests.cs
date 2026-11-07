@@ -12,6 +12,7 @@ namespace CleanupForNotion.Core.Test.Plugins.Providers;
 [TestClass]
 public class DeleteZeroSumProviderTests {
   private const string PluginDescription = "Plugin Description";
+  private const string PluginId = "Plugin ID";
 
   private readonly DeleteZeroSumProvider _provider = new(
       new NullLoggerFactory(),
@@ -34,6 +35,7 @@ public class DeleteZeroSumProviderTests {
         PluginIndex: 0,
         PluginName: string.Empty,
         PluginDescription: PluginDescription,
+        PluginId: PluginId,
         RawOptions: new RawPluginOptions(rawOptions));
 
     // Act
@@ -43,6 +45,7 @@ public class DeleteZeroSumProviderTests {
     plugin.ShouldBeOfType<DeleteZeroSum>();
     plugin.Name.ShouldBe("DeleteZeroSum");
     plugin.Description.ShouldBe(PluginDescription);
+    plugin.Id.ShouldBe(PluginId);
 
     var options = plugin.Configuration.ShouldBeOfType<DeleteZeroSumOptions>();
     options.DataSourceId.ShouldBe("data source id");
@@ -52,7 +55,6 @@ public class DeleteZeroSumProviderTests {
   [TestMethod]
   public void GetPlugin_MissingPropertyName_ThrowsException() {
     // Arrange
-    const string description = "Plugin Description";
     var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
         { "GracePeriod", "00:00:01" }
@@ -61,7 +63,8 @@ public class DeleteZeroSumProviderTests {
     var pluginSpecification = new PluginSpecification(
         PluginIndex: 0,
         PluginName: string.Empty,
-        PluginDescription: description,
+        PluginDescription: PluginDescription,
+        PluginId: PluginId,
         RawOptions: new RawPluginOptions(rawOptions));
 
     // Act

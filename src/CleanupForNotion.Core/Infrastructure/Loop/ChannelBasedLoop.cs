@@ -18,14 +18,14 @@ public class ChannelBasedLoop(
     await Task.Delay(100, stoppingToken).ConfigureAwait(false);
 
     while (!stoppingToken.IsCancellationRequested) {
-      var (triggerTime, groupId) = await channel.Reader.ReadAsync(stoppingToken).ConfigureAwait(false);
+      var (triggerTime, pluginId) = await channel.Reader.ReadAsync(stoppingToken).ConfigureAwait(false);
 
       var startTime = timeProvider.GetUtcNow();
 
       if (logger.IsEnabled(LogLevel.Trace)) {
-        logger.LogTrace("Received trigger from {TriggerTime:O} for group {GroupId} at {Date:O} (in {Duration} ms)",
+        logger.LogTrace("Received trigger from {TriggerTime:O} for plugin {PluginId} at {Date:O} (in {Duration} ms)",
             triggerTime,
-            groupId ?? "(null)",
+            pluginId ?? "(all plugins)",
             startTime,
             (startTime - triggerTime).TotalMilliseconds);
       }
@@ -33,7 +33,7 @@ public class ChannelBasedLoop(
       using var serviceScope = serviceScopeFactory.CreateScope();
       var runner = serviceScope.ServiceProvider.GetRequiredService<IRunner>();
       try {
-        await runner.RunCleanup(globalOptionsProvider.GlobalOptions, groupId, stoppingToken).ConfigureAwait(false);
+        await runner.RunCleanup(globalOptionsProvider.GlobalOptions, pluginId, stoppingToken).ConfigureAwait(false);
       } catch (Exception exc) {
         logger.LogError(exc, "Failed trigger from {TriggerTime:O} with exception: {Error}", triggerTime, exc.Message);
         continue;

@@ -15,12 +15,12 @@ public class DeleteOnNewMonthlyCycle : DeletePluginBase<DeleteOnNewMonthlyCycleO
 
   private readonly DeleteOnNewMonthlyCycleOptions _options;
 
-  public DeleteOnNewMonthlyCycle(
-      ILogger<DeletePluginBase<DeleteOnNewMonthlyCycleOptions>> logger,
+  public DeleteOnNewMonthlyCycle(ILogger<DeletePluginBase<DeleteOnNewMonthlyCycleOptions>> logger,
       IPluginStateProvider pluginStateProvider,
       TimeProvider timeProvider,
       DeleteOnNewMonthlyCycleOptions options,
-      string description) : base(logger, pluginStateProvider, timeProvider, options, description) {
+      string pluginDescription,
+      string? pluginId) : base(logger, pluginStateProvider, timeProvider, options, pluginDescription, pluginId) {
     _options = options;
   }
 

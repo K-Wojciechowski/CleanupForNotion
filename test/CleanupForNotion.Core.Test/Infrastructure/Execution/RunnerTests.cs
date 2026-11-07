@@ -28,6 +28,7 @@ public sealed class RunnerTests {
           PluginIndex: 0,
           PluginName: name,
           PluginDescription: name + "desc",
+          PluginId: options.GetValueOrDefault("PluginId") as string,
           RawOptions: new RawPluginOptions(options));
     });
 
@@ -49,14 +50,14 @@ public sealed class RunnerTests {
     => await RunCleanup_NoPlugins_ThrowsException([]).ConfigureAwait(false);
 
   [TestMethod]
-  public async Task RunCleanup_ValidPlugins_RunsInOrder() {
+  public async Task RunCleanup_ValidPluginsAndNoPluginId_RunsAllPluginsInOrder() {
     // Arrange
     var logger = new FakeLogger<Runner>();
 
     var notificationSender = Substitute.For<INotificationSender>();
 
     var rawPlugins = new List<Dictionary<string, object>> {
-        new() { { "Name", "Plugin1" } }, new() { { "Name", "Plugin2" } }
+        new() { { "Name", "Plugin1" } }, new() { { "Name", "Plugin2" }, { "PluginId", "Plugin2Id"} }
     };
 
     var runner = new Runner(
@@ -69,15 +70,50 @@ public sealed class RunnerTests {
         runnerSemaphore: new RunnerSemaphore()
     );
 
-    await runner.RunCleanup(new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
+    await runner.RunCleanup(new GlobalOptions(), null, CancellationToken.None).ConfigureAwait(false);
 
     var logMessages = logger.Collector.GetSnapshot();
     logMessages.ShouldAllBe(l => l.Level == LogLevel.Information);
+    logMessages.Count.ShouldBe(4);
 
     logMessages[0].Message.ShouldBe("Running plugin Plugin1 (Plugin1desc)");
     logMessages[1].Message.ShouldMatch(@"Finished plugin Plugin1 in \d+(\.\d+)? ms");
-    logMessages[2].Message.ShouldBe("Running plugin Plugin2 (Plugin2desc)");
-    logMessages[3].Message.ShouldMatch(@"Finished plugin Plugin2 in \d+(\.\d+)? ms");
+    logMessages[2].Message.ShouldBe("Running plugin Plugin2 (Plugin2desc) [Plugin2Id]");
+    logMessages[3].Message.ShouldMatch(@"Finished plugin Plugin2 \[Plugin2Id\] in \d+(\.\d+)? ms");
+
+    await notificationSender.ReceivedWithAnyArgs().NotifyRunFinished(default, default).ConfigureAwait(false);
+  }
+
+  [TestMethod]
+  public async Task RunCleanup_ValidPluginsAndPluginId_RunsSelectedPluginOnly() {
+    // Arrange
+    var logger = new FakeLogger<Runner>();
+
+    var notificationSender = Substitute.For<INotificationSender>();
+    const string pluginId = "Plugin2Id";
+
+    var rawPlugins = new List<Dictionary<string, object>> {
+        new() { { "Name", "Plugin1" } }, new() { { "Name", "Plugin2" }, { "PluginId", pluginId } }
+    };
+
+    var runner = new Runner(
+        notionClient: null!,
+        logger: logger,
+        notificationSender: notificationSender,
+        options: TestHelpers.GetCfnOptions(rawPlugins),
+        pluginActivator: _pluginActivator,
+        pluginSpecificationParser: _pluginSpecificationParser,
+        runnerSemaphore: new RunnerSemaphore()
+    );
+
+    await runner.RunCleanup(new GlobalOptions(), pluginId, CancellationToken.None).ConfigureAwait(false);
+
+    var logMessages = logger.Collector.GetSnapshot();
+    logMessages.ShouldAllBe(l => l.Level == LogLevel.Information);
+    logMessages.Count.ShouldBe(2);
+
+    logMessages[0].Message.ShouldBe("Running plugin Plugin2 (Plugin2desc) [Plugin2Id]");
+    logMessages[1].Message.ShouldMatch(@"Finished plugin Plugin2 \[Plugin2Id\] in \d+(\.\d+)? ms");
 
     await notificationSender.ReceivedWithAnyArgs().NotifyRunFinished(default, default).ConfigureAwait(false);
   }
@@ -103,7 +139,7 @@ public sealed class RunnerTests {
 
     var semaphoreHolder = await semaphore.AcquireAsync(TimeSpan.FromSeconds(1), CancellationToken.None).ConfigureAwait(false);
 
-    var runTask = runner.RunCleanup(new GlobalOptions(), CancellationToken.None);
+    var runTask = runner.RunCleanup(new GlobalOptions(), null, CancellationToken.None);
 
     await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
     semaphoreHolder.Dispose();
@@ -133,7 +169,7 @@ public sealed class RunnerTests {
 
     using var _ = await semaphore.AcquireAsync(TimeSpan.FromSeconds(1), CancellationToken.None).ConfigureAwait(false);
 
-    Func<Task> act = async () => await runner.RunCleanup(new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
+    Func<Task> act = async () => await runner.RunCleanup(new GlobalOptions(), null, CancellationToken.None).ConfigureAwait(false);
 
     (await act.ShouldThrowAsync<TimeoutException>().ConfigureAwait(false))
         .Message.ShouldBe("A cleanup is already running.");
@@ -159,7 +195,7 @@ public sealed class RunnerTests {
 
     // Act
     Func<Task> act = async () =>
-        await runner.RunCleanup(globalOptions: new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
+        await runner.RunCleanup(globalOptions: new GlobalOptions(), null, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
     (await act.ShouldThrowAsync<InvalidConfigurationException>().ConfigureAwait(false)).Message.ShouldBe(
@@ -170,6 +206,7 @@ public sealed class RunnerTests {
   }
 
   private class FakePlugin(PluginSpecification pluginSpecification) : IPlugin {
+    public string? Id { get; } = pluginSpecification.PluginId;
     public string Name { get; } = pluginSpecification.PluginName;
     public string Description { get; } = pluginSpecification.PluginDescription;
     public IBasicPluginOptions Configuration { get; } = new FakePluginOptions(string.Empty, string.Empty, null);

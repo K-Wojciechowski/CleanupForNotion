@@ -11,13 +11,19 @@ namespace CleanupForNotion.Core.Test.Plugins.Implementations;
 public class DeleteWithoutRelationshipsTests : BasicDeletePluginTestsBase<DeleteWithoutRelationships, DeleteWithoutRelationshipsOptions> {
   [TestMethod]
   public void Name_Get_ReturnsDeleteWithoutRelationships() {
-    new DeleteWithoutRelationships(null!, null!, null!, null!, null!).Name.ShouldBe("DeleteWithoutRelationships");
+    new DeleteWithoutRelationships(null!, null!, null!, null!, null!, null!).Name.ShouldBe("DeleteWithoutRelationships");
+  }
+
+  [TestMethod]
+  public void Id_Get_ReturnsId() {
+    var id = Guid.NewGuid().ToString();
+    new DeleteWithoutRelationships(null!, null!, null!, null!, null!, id).Id.ShouldBe(id);
   }
 
   [TestMethod]
   public void Description_Get_ReturnsDescription() {
     var description = Guid.NewGuid().ToString();
-    new DeleteWithoutRelationships(null!, null!, null!, null!, description).Description.ShouldBe(description);
+    new DeleteWithoutRelationships(null!, null!, null!, null!, description, null!).Description.ShouldBe(description);
   }
 
   [TestMethod]
@@ -36,7 +42,8 @@ public class DeleteWithoutRelationshipsTests : BasicDeletePluginTestsBase<Delete
             pluginStateProvider: Substitute.For<IPluginStateProvider>(),
             timeProvider: timeProvider,
             options: options,
-            pluginDescription: string.Empty
+            pluginDescription: string.Empty,
+            pluginId: null
         ),
         filters: [new RelationFilter(options.PropertyName, isEmpty: true)],
         options: options,

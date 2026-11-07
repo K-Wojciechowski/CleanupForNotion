@@ -12,8 +12,9 @@ public class DeleteByCheckbox(
   IPluginStateProvider pluginStateProvider,
   TimeProvider timeProvider,
   DeleteByCheckboxOptions options,
-  string pluginDescription)
-  : DeletePluginBase<DeleteByCheckboxOptions>(logger, pluginStateProvider, timeProvider, options, pluginDescription) {
+  string pluginDescription,
+  string? pluginId)
+  : DeletePluginBase<DeleteByCheckboxOptions>(logger, pluginStateProvider, timeProvider, options, pluginDescription, pluginId) {
 
   public override string Name => "DeleteByCheckbox";
 

@@ -11,13 +11,19 @@ namespace CleanupForNotion.Core.Test.Plugins.Implementations;
 public class DeleteByCheckboxTests : BasicDeletePluginTestsBase<DeleteByCheckbox, DeleteByCheckboxOptions> {
   [TestMethod]
   public void Name_Get_ReturnsDeleteByCheckbox() {
-    new DeleteByCheckbox(null!, null!, null!, null!, null!).Name.ShouldBe("DeleteByCheckbox");
+    new DeleteByCheckbox(null!, null!, null!, null!, null!, null!).Name.ShouldBe("DeleteByCheckbox");
+  }
+
+  [TestMethod]
+  public void Id_Get_ReturnsId() {
+    var id = Guid.NewGuid().ToString();
+    new DeleteByCheckbox(null!, null!, null!, null!, null!, id).Id.ShouldBe(id);
   }
 
   [TestMethod]
   public void Description_Get_ReturnsDescription() {
     var description = Guid.NewGuid().ToString();
-    new DeleteByCheckbox(null!, null!, null!, null!, description).Description.ShouldBe(description);
+    new DeleteByCheckbox(null!, null!, null!, null!, description, null!).Description.ShouldBe(description);
   }
 
   [TestMethod]
@@ -39,7 +45,8 @@ public class DeleteByCheckboxTests : BasicDeletePluginTestsBase<DeleteByCheckbox
             pluginStateProvider: Substitute.For<IPluginStateProvider>(),
             timeProvider: timeProvider,
             options: options,
-            pluginDescription: string.Empty
+            pluginDescription: string.Empty,
+            pluginId: null
         ),
         filters: [new CheckboxFilter(options.PropertyName, options.DeleteIfChecked)],
         options: options,

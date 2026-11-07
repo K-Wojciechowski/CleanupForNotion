@@ -22,7 +22,7 @@ public class Runner(
   private const string AlreadyRunningMessage = "A cleanup is already running.";
   private static readonly TimeSpan _semaphoreWaitTime = TimeSpan.FromSeconds(10);
 
-  public async Task RunCleanup(GlobalOptions globalOptions, string? groupId, CancellationToken cancellationToken) {
+  public async Task RunCleanup(GlobalOptions globalOptions, string? pluginId, CancellationToken cancellationToken) {
     // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
     var rawPlugins = options.Value?.Plugins;
     if (rawPlugins == null || rawPlugins.Count == 0) {
@@ -42,15 +42,24 @@ public class Runner(
 
     var plugins = rawPlugins
       .Select(pluginSpecificationParser.ParseSpecification)
-      .Where(p => groupId == null || p.GroupId == groupId)
+      .Where(p => pluginId == null || p.PluginId == pluginId)
       .Select(pluginActivator.ActivatePlugin)
       .ToArray();
 
     foreach (var plugin in plugins) {
-      logger.LogInformation("Running plugin {Plugin} ({Description})", plugin, plugin.Description);
+      if (plugin.Id != null) {
+        logger.LogInformation("Running plugin {Plugin} ({Description}) [{PluginId}]", plugin, plugin.Description, plugin.Id);
+      } else {
+        logger.LogInformation("Running plugin {Plugin} ({Description})", plugin, plugin.Description);
+      }
+
       var stopwatch = Stopwatch.StartNew();
       await plugin.Run(notionClient, globalOptions, cancellationToken).ConfigureAwait(false);
-      logger.LogInformation("Finished plugin {Plugin} in {Duration} ms", plugin, stopwatch.ElapsedMilliseconds);
+      if (plugin.Id != null) {
+        logger.LogInformation("Finished plugin {Plugin} [{PluginId}] in {Duration} ms", plugin, plugin.Id, stopwatch.ElapsedMilliseconds);
+      } else {
+        logger.LogInformation("Finished plugin {Plugin} in {Duration} ms", plugin, stopwatch.ElapsedMilliseconds);
+      }
     }
 
     await notificationSender.NotifyRunFinished(globalOptions.DryRun, cancellationToken).ConfigureAwait(false);
