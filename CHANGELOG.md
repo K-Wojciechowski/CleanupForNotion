@@ -1,5 +1,10 @@
 # CleanupForNotion Changelog
 
+## 2.2.0
+
+* Add support for triggering cleanup based on webhooks from Notion
+* Plugins can now have IDs
+
 ## 2.1.0
 
 * Add `EstimateExpensesWithSubscriptions` plugin
