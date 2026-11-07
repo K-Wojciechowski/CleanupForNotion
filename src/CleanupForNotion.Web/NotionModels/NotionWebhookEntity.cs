@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace CleanupForNotion.Web;
+namespace CleanupForNotion.Web.NotionModels;
 
 public class NotionWebhookEntity {
   [JsonPropertyName(("id"))]

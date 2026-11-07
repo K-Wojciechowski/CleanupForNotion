@@ -5,6 +5,7 @@ using CleanupForNotion.Core;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Execution;
 using CleanupForNotion.Core.Infrastructure.Loop;
+using CleanupForNotion.Web.NotionModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Notion.Client;
@@ -64,7 +65,7 @@ public class Program {
       var contentLength = httpContext.Request.ContentLength;
 
       if (contentLength == null || (webhookSecret == null && contentLength > 1024)) {
-        logger.LogTrace("Request rejected due to invalid content length");
+        logger.LogTrace("Webhook request rejected due to invalid content length");
         return Results.BadRequest();
       }
 
@@ -73,7 +74,12 @@ public class Program {
 
       if (webhookSecret == null) {
         var bodyString = safeUtf8Encoding.GetString(bodyBytes);
-        logger.LogInformation("Received new webhook request with body {Body}", bodyString.Replace("\n", ""));
+        logger.LogInformation("Received new webhook request with body {Body}", bodyString.Replace("\n", "").Trim());
+        return Results.Ok();
+      }
+
+      if (options.Value.Webhooks is null) {
+        logger.LogError("Webhooks not configured");
         return Results.Ok();
       }
 
@@ -81,6 +87,7 @@ public class Program {
 
       if (string.IsNullOrEmpty(signatureHeader)) {
         logger.LogTrace("Received unsigned webhook request");
+        return Results.BadRequest();
       }
 
       var signatureValid = await NotionWebhookSignature.VerifySignatureAsync(bodyBytes, signatureHeader, webhookSecret)
@@ -98,9 +105,16 @@ public class Program {
         logger.LogTrace("Received request body: {Body}", bodyString);
       }
 
-      var body = JsonSerializer.Deserialize<NotionWebhookBody>(bodyBytes);
+      NotionWebhookBody? body;
+      try {
+        body = JsonSerializer.Deserialize<NotionWebhookBody>(bodyBytes);
+      } catch (JsonException exc) {
+        logger.LogError(exc, "Failed to deserialize body");
+        return Results.BadRequest();
+      }
 
       if (body is null) {
+        logger.LogError("Body is 'null'");
         return Results.BadRequest();
       }
 
@@ -125,11 +139,6 @@ public class Program {
 
       if (dataSourceId == null) {
         logger.LogDebug("Webhook not associated with data source, ignoring");
-        return Results.Ok();
-      }
-
-      if (options.Value.Webhooks is null) {
-        logger.LogError("Webhooks not configured");
         return Results.Ok();
       }
 

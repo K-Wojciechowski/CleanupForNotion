@@ -4,6 +4,7 @@
 // TODO: remove when upgrading to Notion.Net v6
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace Notion.Client
     /// The signature is sent by Notion in the <c>X-Notion-Signature</c> header and
     /// follows the format <c>sha256=&lt;64-char-lowercase-hex&gt;</c>.
     /// </summary>
+    [ExcludeFromCodeCoverage(Justification = "Temporarily copied third-party code")]
     public static class NotionWebhookSignature
     {
         private const string SignaturePrefix = "sha256=";
