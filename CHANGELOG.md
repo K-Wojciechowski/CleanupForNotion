@@ -1,5 +1,9 @@
 # CleanupForNotion Changelog
 
+## 2.3.0
+
+* Allow storing state in a PostgreSQL database
+
 ## 2.2.0
 
 * Add support for triggering cleanup based on webhooks from Notion
