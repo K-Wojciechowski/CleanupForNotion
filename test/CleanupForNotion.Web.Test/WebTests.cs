@@ -193,6 +193,7 @@ public class WebTests {
     channel.Reader.TryPeek(out _).ShouldBeFalse();
     const string body = "invalid json which will not be parsed";
     var content = new StringContent(body, Encoding.UTF8, "application/json");
+    content.Headers.Add("X-Notion-Signature", "sha256-invalid");
 
     // Act
     var response = await client.PostAsync("webhook", content, TestContext.CancellationToken)

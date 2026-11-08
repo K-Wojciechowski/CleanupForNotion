@@ -48,7 +48,8 @@ public class Program {
         Channel<RunRequest> channel,
         TimeProvider timeProvider,
         CancellationToken cancellationToken) => {
-      await channel.Writer.WriteAsync(new RunRequest(timeProvider.GetUtcNow(), pluginId), cancellationToken).ConfigureAwait(false);
+      await channel.Writer.WriteAsync(new RunRequest(timeProvider.GetUtcNow(), pluginId), cancellationToken)
+          .ConfigureAwait(false);
 
       return "Triggered plugin";
     });
@@ -69,6 +70,14 @@ public class Program {
         return Results.BadRequest();
       }
 
+      var hasSignature = httpContext.Request.Headers.TryGetValue("X-Notion-Signature", out var signatureHeaders);
+      var signatureHeader = hasSignature ? signatureHeaders.ToString() : string.Empty;
+
+      if (webhookSecret != null && string.IsNullOrEmpty(signatureHeader)) {
+        logger.LogTrace("Received unsigned webhook request");
+        return Results.BadRequest();
+      }
+
       var bodyBytes = new byte[contentLength.Value];
       _ = await httpContext.Request.Body.ReadAsync(bodyBytes, cancellationToken).ConfigureAwait(false);
 
@@ -81,13 +90,6 @@ public class Program {
       if (options.Value.Webhooks is null) {
         logger.LogError("Webhooks not configured");
         return Results.Ok();
-      }
-
-      var signatureHeader = httpContext.Request.Headers["X-Notion-Signature"].ToString();
-
-      if (string.IsNullOrEmpty(signatureHeader)) {
-        logger.LogTrace("Received unsigned webhook request");
-        return Results.BadRequest();
       }
 
       var signatureValid = await NotionWebhookSignature.VerifySignatureAsync(bodyBytes, signatureHeader, webhookSecret)
@@ -122,8 +124,7 @@ public class Program {
 
       string? dataSourceId;
 
-      switch (eventEntityType)
-      {
+      switch (eventEntityType) {
         case "data_source":
           dataSourceId = body.Entity.Id;
           break;
@@ -131,7 +132,8 @@ public class Program {
           dataSourceId = body.Data.Parent.DataSourceId;
           break;
         default:
-          logger.LogError("Unexpected entity type {EntityType} for webhook request of type {Type}", eventEntityType, body.Type);
+          logger.LogError("Unexpected entity type {EntityType} for webhook request of type {Type}", eventEntityType,
+              body.Type);
           return Results.BadRequest();
       }
 
@@ -151,7 +153,8 @@ public class Program {
       logger.LogInformation("Plugin IDs in webhook request: {PluginIds}", string.Join(", ", pluginIds));
 
       foreach (var pluginId in pluginIds) {
-        await channel.Writer.WriteAsync(new RunRequest(timeProvider.GetUtcNow(), pluginId), cancellationToken).ConfigureAwait(false);
+        await channel.Writer.WriteAsync(new RunRequest(timeProvider.GetUtcNow(), pluginId), cancellationToken)
+            .ConfigureAwait(false);
       }
 
       return Results.Ok();
