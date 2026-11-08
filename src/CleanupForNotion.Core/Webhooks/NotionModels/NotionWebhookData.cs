@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace CleanupForNotion.Web.NotionModels;
+namespace CleanupForNotion.Core.Webhooks.NotionModels;
 
 public class NotionWebhookData {
   [JsonPropertyName("parent")]

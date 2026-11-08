@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace CleanupForNotion.Web.NotionModels;
+namespace CleanupForNotion.Core.Webhooks.NotionModels;
 
 // bare minimum required to extract data source id
 public class NotionWebhookBody {

@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Threading.Channels;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Execution;
-using CleanupForNotion.Web.NotionModels;
+using CleanupForNotion.Core.Webhooks.NotionModels;
 using Notion.Client;
 using Shouldly;
 
