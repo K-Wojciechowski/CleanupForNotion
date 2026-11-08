@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.NotionIntegration;
 using CleanupForNotion.Core.Infrastructure.Plugins;
@@ -33,10 +32,10 @@ public class EstimateExpensesWithSubscriptions(
         ? _placeholderLastEdit
         : new DateTimeOffset(expensePages.Max(p => p.LastEditedTime), TimeSpan.Zero);
 
-    var previousPageCount = await pluginStateProvider.GetInteger(Name, Description, PageCountKey, cancellationToken)
+    var previousPageCount = await pluginStateProvider.GetInteger(this, PageCountKey, cancellationToken)
         .ConfigureAwait(false);
 
-    var previousLastEdit = await pluginStateProvider.GetDateTime(Name, Description, LastEditKey, cancellationToken)
+    var previousLastEdit = await pluginStateProvider.GetDateTime(this, LastEditKey, cancellationToken)
         .ConfigureAwait(false);
 
     if (previousPageCount.HasValue && previousLastEdit.HasValue && previousPageCount.Value == expensePages.Count &&
@@ -90,9 +89,9 @@ public class EstimateExpensesWithSubscriptions(
           cancellationToken).ConfigureAwait(false);
     }
 
-    await pluginStateProvider.SetDateTime(Name, Description, LastEditKey, currentLastEdit, cancellationToken)
+    await pluginStateProvider.SetDateTime(this, LastEditKey, currentLastEdit, cancellationToken)
         .ConfigureAwait(false);
-    await pluginStateProvider.SetInteger(Name, Description, PageCountKey, expensePages.Count, cancellationToken)
+    await pluginStateProvider.SetInteger(this, PageCountKey, expensePages.Count, cancellationToken)
         .ConfigureAwait(false);
   }
 

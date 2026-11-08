@@ -20,7 +20,17 @@ Fully tested: 100% code coverage, enforced by the CI pipeline.
   * [EnsureStaticRelatedPage](#ensurestaticrelatedpage)
   * [EstimateExpensesWithSubscriptions](#estimateexpenseswithsubscriptions)
 * [Setup in Notion](#setup-in-notion)
+  * [Create integration](#create-integration)
+  * [Add access from integration settings](#add-access-from-integration-settings)
+  * [Add access from page settings](#add-access-from-page-settings)
+  * [Get data source IDs](#get-data-source-ids)
+  * [Get page IDs](#get-page-ids)
 * [Configuration](#configuration)
+  * [General options](#general-options)
+  * [Defining and configuring plugins](#defining-and-configuring-plugins)
+  * [State storage](#state-storage)
+  * [Webhooks](#webhooks)
+  * [Putting it all together](#putting-it-all-together)
 * [Deployment](#deployment)
   * [Web application (in Docker)](#web-application-in-docker)
   * [AWS](#aws)
@@ -156,7 +166,8 @@ https://www.notion.so/workspace-name/Page-Name-22222222222222222222222222222222
 ### General options
 
 * **AuthToken** (string, mandatory) — the Notion authentication token. See the [Setup in Notion](#setup-in-notion) section for details.
-* **StateFilePath** (string, optional) — the path to a file in which some plugins may persist state between runs. If not defined, some plugins may not work correctly.
+* **StateEngine** (string, optional) — the engine used persist state between runs. Defaults to `InMemory`. See below for supported engines.
+* **StateAccessDetails** (string, optional) — the engine-specific identifier used to access the state store.
 * **RunFrequency** (string, `"HH:MM:SS"`, optional) — the frequency of automated cleanups. Behavior depends on the deployment model.
 * **DryRun** (boolean, defaults to `false`) — if true, no actual changes will be made to the Notion databases (but checks will still be done and items that would have been changed will be logged).
 
@@ -170,6 +181,15 @@ Plugins are configured in a **Plugins** array. Every plugin instance has its own
 * **DataSourceId** (string, mandatory) — ID of the data source to work on. See [Setup in Notion](#setup-in-notion) for retrieval instructions.
 * **PropertyName** (string, mandatory) — name of the property to base deletion checks on. This is the human-readable name visible in the database.
 * **GracePeriod** (string, `"HH:MM:SS"`, optional) — defines the time after the last edit for which the page will not be modified. Defaults to 1 hour.
+
+### State storage
+
+There are four state storage engines available:
+
+* `InMemory` — stores the state in memory. Data is not persisted between runs. This engine is recommended for testing only, although it may work well enough for long-running processes (Console/Web deployment with non-null `RunFrequency`). This engine is used when the **StateEngine** option is not defined.
+* `File` — stores the state in a flat file. The **StateAccessDetails** setting should contain the path of the state file.
+* `PostgreSQL` — stores the state in a PostgreSQL database. The **StateAccessDetails** setting should contain the connection string for Npgsql, e.g. `"Host=localhost;Username=postgres;Password=postgres;Database=cfn`
+* `DynamoDB` — stores the state in a DynamoDB table. This engine is only available in the AWS deployment model, and it is the only engine supported in that model (the configuration is ignored).
 
 ### Webhooks
 
@@ -188,7 +208,8 @@ Here is an example CleanupForNotion configuration:
 ```json
 {
   "AuthToken": "ntn_XXX",
-  "StateFilePath": "/srv/CleanupForNotion/cfnstate.json",
+  "StateEngine": "File",
+  "StateAccessDetails": "/srv/CleanupForNotion/cfnstate.json",
   "RunFrequency": "01:00:00",
   "Plugins": [
     {

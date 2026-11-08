@@ -5,6 +5,7 @@ using Amazon.SecurityToken;
 using Amazon.SecurityToken.Model;
 using CleanupForNotion.Aws.DynamoDb;
 using CleanupForNotion.Core.Infrastructure.Notifications;
+using CleanupForNotion.Core.Infrastructure.Plugins;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Shouldly;
@@ -73,42 +74,42 @@ public class AwsIntegrationTests {
       var stateProvider2 = new DynamoDbPluginStateProvider(dynamoDbClient, logger, notificationSender, options);
 
       // Read
-      (await stateProvider.GetString("N1", "D1", "K1", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V1");
-      (await stateProvider.GetString("N2", "D2", "K2", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V2");
-      (await stateProvider.GetString("N3", "D3", "K3", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V3");
-      (await stateProvider.GetString("N1", "D1", "K4", CancellationToken.None).ConfigureAwait(false)).ShouldBeNull();
+      (await stateProvider.GetString(new P("N1", "D1"), "K1", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V1");
+      (await stateProvider.GetString(new P("N2", "D2"), "K2", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V2");
+      (await stateProvider.GetString(new P("N3", "D3"), "K3", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V3");
+      (await stateProvider.GetString(new P("N1", "D1"), "K4", CancellationToken.None).ConfigureAwait(false)).ShouldBeNull();
 
       // Write
-      await stateProvider.SetString("N1", "D1", "K4", "V4", CancellationToken.None).ConfigureAwait(false);
-      await stateProvider.SetString("N2", "D2", "K2", "V5", CancellationToken.None).ConfigureAwait(false);
-      await stateProvider.Remove("N3", "D3", "K3", CancellationToken.None).ConfigureAwait(false);
+      await stateProvider.SetString(new P("N1", "D1"), "K4", "V4", CancellationToken.None).ConfigureAwait(false);
+      await stateProvider.SetString(new P("N2", "D2"), "K2", "V5", CancellationToken.None).ConfigureAwait(false);
+      await stateProvider.Remove(new P("N3", "D3"), "K3", CancellationToken.None).ConfigureAwait(false);
 
       // First state provider sees new data
-      (await stateProvider.GetString("N1", "D1", "K1", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V1");
-      (await stateProvider.GetString("N2", "D2", "K2", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V5");
-      (await stateProvider.GetString("N3", "D3", "K3", CancellationToken.None).ConfigureAwait(false)).ShouldBeNull();
-      (await stateProvider.GetString("N1", "D1", "K4", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V4");
+      (await stateProvider.GetString(new P("N1", "D1"), "K1", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V1");
+      (await stateProvider.GetString(new P("N2", "D2"), "K2", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V5");
+      (await stateProvider.GetString(new P("N3", "D3"), "K3", CancellationToken.None).ConfigureAwait(false)).ShouldBeNull();
+      (await stateProvider.GetString(new P("N1", "D1"), "K4", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V4");
 
       // Database still contains old data
-      (await stateProvider2.GetString("N1", "D1", "K1", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V1");
-      (await stateProvider2.GetString("N2", "D2", "K2", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V2");
-      (await stateProvider2.GetString("N3", "D3", "K3", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V3");
-      (await stateProvider2.GetString("N1", "D1", "K4", CancellationToken.None).ConfigureAwait(false)).ShouldBeNull();
+      (await stateProvider2.GetString(new P("N1", "D1"), "K1", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V1");
+      (await stateProvider2.GetString(new P("N2", "D2"), "K2", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V2");
+      (await stateProvider2.GetString(new P("N3", "D3"), "K3", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V3");
+      (await stateProvider2.GetString(new P("N1", "D1"), "K4", CancellationToken.None).ConfigureAwait(false)).ShouldBeNull();
 
       // Save
       await stateProvider.OnRunFinished(dryRun: false, CancellationToken.None).ConfigureAwait(false);
 
       // Read again
-      (await stateProvider.GetString("N1", "D1", "K1", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V1");
-      (await stateProvider.GetString("N2", "D2", "K2", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V5");
-      (await stateProvider.GetString("N3", "D3", "K3", CancellationToken.None).ConfigureAwait(false)).ShouldBeNull();
-      (await stateProvider.GetString("N1", "D1", "K4", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V4");
+      (await stateProvider.GetString(new P("N1", "D1"), "K1", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V1");
+      (await stateProvider.GetString(new P("N2", "D2"), "K2", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V5");
+      (await stateProvider.GetString(new P("N3", "D3"), "K3", CancellationToken.None).ConfigureAwait(false)).ShouldBeNull();
+      (await stateProvider.GetString(new P("N1", "D1"), "K4", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V4");
 
       // Both providers should return the same
-      (await stateProvider2.GetString("N1", "D1", "K1", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V1");
-      (await stateProvider2.GetString("N2", "D2", "K2", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V5");
-      (await stateProvider2.GetString("N3", "D3", "K3", CancellationToken.None).ConfigureAwait(false)).ShouldBeNull();
-      (await stateProvider2.GetString("N1", "D1", "K4", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V4");
+      (await stateProvider2.GetString(new P("N1", "D1"), "K1", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V1");
+      (await stateProvider2.GetString(new P("N2", "D2"), "K2", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V5");
+      (await stateProvider2.GetString(new P("N3", "D3"), "K3", CancellationToken.None).ConfigureAwait(false)).ShouldBeNull();
+      (await stateProvider2.GetString(new P("N1", "D1"), "K4", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V4");
     } finally {
       await dynamoDbClient.DeleteTableAsync(tableName).ConfigureAwait(false);
     }
@@ -132,4 +133,6 @@ public class AwsIntegrationTests {
             { DynamoDbConstants.ValueKeyName, new AttributeValue(value) }
         }).ConfigureAwait(false);
   }
+
+  private record P(string Name, string Description, string? Id = null) : IPluginIdentifiers;
 }

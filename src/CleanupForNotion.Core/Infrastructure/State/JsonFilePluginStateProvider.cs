@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Notifications;
+using CleanupForNotion.Core.Infrastructure.Plugins;
 using CleanupForNotion.Core.Infrastructure.Semaphores;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -25,29 +26,29 @@ public class JsonFilePluginStateProvider : IPluginStateProvider, INotificationLi
     _logger = logger;
     _notificationSender = notificationSender;
     _notificationSender.Register(this);
-    _filePath = options.Value.StateFilePath;
+    _filePath = options.Value.StateAccessDetails ?? options.Value.StateFilePath;
 
     _data = [];
   }
 
   #region Data access
 
-  public async Task<string?> GetString(string pluginName, string pluginDescription, string key, CancellationToken cancellationToken) {
+  public async Task<string?> GetString(IPluginIdentifiers pluginIdentifiers, string key, CancellationToken cancellationToken) {
     using var _ = await GetAccess(cancellationToken).ConfigureAwait(false);
-    var encodedKey = GetEncodedKey(pluginName, pluginDescription, key);
+    var encodedKey = GetEncodedKey(pluginIdentifiers, key);
     return _data.GetValueOrDefault(encodedKey);
   }
 
-  public async Task SetString(string pluginName, string pluginDescription, string key, string value, CancellationToken cancellationToken) {
+  public async Task SetString(IPluginIdentifiers pluginIdentifiers, string key, string value, CancellationToken cancellationToken) {
     using var _ = await GetAccess(cancellationToken).ConfigureAwait(false);
-    var encodedKey = GetEncodedKey(pluginName, pluginDescription, key);
+    var encodedKey = GetEncodedKey(pluginIdentifiers, key);
     _data[encodedKey] = value;
     _dirty = true;
   }
 
-  public async Task Remove(string pluginName, string pluginDescription, string key, CancellationToken cancellationToken) {
+  public async Task Remove(IPluginIdentifiers pluginIdentifiers, string key, CancellationToken cancellationToken) {
     using var _ = await GetAccess(cancellationToken).ConfigureAwait(false);
-    var encodedKey = GetEncodedKey(pluginName, pluginDescription, key);
+    var encodedKey = GetEncodedKey(pluginIdentifiers, key);
     _data.Remove(encodedKey);
     _dirty = true;
   }
@@ -77,7 +78,7 @@ public class JsonFilePluginStateProvider : IPluginStateProvider, INotificationLi
     if (_initialized || _filePath == null) return semaphoreHolder;
 
     try {
-      var json = File.ReadAllText(_filePath);
+      var json = await File.ReadAllTextAsync(_filePath, cancellationToken).ConfigureAwait(false);
       _data = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ??
               throw new Exception("Null state deserialized");
     } catch (Exception exc) {
@@ -111,7 +112,9 @@ public class JsonFilePluginStateProvider : IPluginStateProvider, INotificationLi
 
   #region Helpers
 
-  private static string GetEncodedKey(string pluginName, string pluginDescription, string key) {
+  private static string GetEncodedKey(IPluginIdentifiers pluginIdentifiers, string key) {
+    var pluginName = pluginIdentifiers.Name;
+    var pluginDescription = pluginIdentifiers.Description;
     var sb = new StringBuilder(2 + pluginName.Length + pluginDescription.Length);
     sb.Append(pluginName);
     sb.Append('\x1c');

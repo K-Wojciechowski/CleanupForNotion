@@ -2,6 +2,7 @@ using System.Text.Json;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using CleanupForNotion.Core.Infrastructure.Notifications;
+using CleanupForNotion.Core.Infrastructure.Plugins;
 using CleanupForNotion.Core.Infrastructure.Semaphores;
 using CleanupForNotion.Core.Infrastructure.State;
 using Microsoft.Extensions.Logging;
@@ -42,9 +43,8 @@ public class DynamoDbPluginStateProvider : IPluginStateProvider, INotificationLi
     _options = options;
   }
 
-  public async Task<string?> GetString(string pluginName, string pluginDescription, string key,
-      CancellationToken cancellationToken) {
-    var stateKey = new DynamoDbStateKey(pluginName, pluginDescription, key);
+  public async Task<string?> GetString(IPluginIdentifiers pluginIdentifiers, string key, CancellationToken cancellationToken) {
+    var stateKey = new DynamoDbStateKey(pluginIdentifiers, key);
 
     using var _ = await _semaphore.AcquireAsync(cancellationToken).ConfigureAwait(false);
     if (_pendingWrites.TryGetValue(stateKey, out var pendingWrite)) {
@@ -78,17 +78,15 @@ public class DynamoDbPluginStateProvider : IPluginStateProvider, INotificationLi
     return value;
   }
 
-  public async Task SetString(string pluginName, string pluginDescription, string key, string value,
-      CancellationToken cancellationToken) {
-    var stateKey = new DynamoDbStateKey(pluginName, pluginDescription, key);
+  public async Task SetString(IPluginIdentifiers pluginIdentifiers, string key, string value, CancellationToken cancellationToken) {
+    var stateKey = new DynamoDbStateKey(pluginIdentifiers, key);
 
     using var _ = await _semaphore.AcquireAsync(cancellationToken).ConfigureAwait(false);
     _pendingWrites[stateKey] = value;
   }
 
-  public async Task Remove(string pluginName, string pluginDescription, string key,
-      CancellationToken cancellationToken) {
-    var stateKey = new DynamoDbStateKey(pluginName, pluginDescription, key);
+  public async Task Remove(IPluginIdentifiers pluginIdentifiers, string key, CancellationToken cancellationToken) {
+    var stateKey = new DynamoDbStateKey(pluginIdentifiers, key);
 
     using var _ = await _semaphore.AcquireAsync(cancellationToken).ConfigureAwait(false);
     _pendingWrites[stateKey] = null;

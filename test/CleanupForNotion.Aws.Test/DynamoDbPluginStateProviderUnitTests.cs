@@ -2,6 +2,7 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using CleanupForNotion.Aws.DynamoDb;
 using CleanupForNotion.Core.Infrastructure.Notifications;
+using CleanupForNotion.Core.Infrastructure.Plugins;
 using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -73,9 +74,9 @@ public class DynamoDbPluginStateProviderUnitTests {
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
     // Act
-    var result = await provider.GetString(pluginName, pluginDescription, key, CancellationToken.None)
+    var result = await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
-    var result2 = await provider.GetString(pluginName, pluginDescription, key, CancellationToken.None)
+    var result2 = await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
 
     // Assert
@@ -115,9 +116,9 @@ public class DynamoDbPluginStateProviderUnitTests {
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
     // Act
-    var result = await provider.GetString(pluginName, pluginDescription, key, CancellationToken.None)
+    var result = await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
-    var result2 = await provider.GetString(pluginName, pluginDescription, key, CancellationToken.None)
+    var result2 = await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
 
     // Assert
@@ -167,7 +168,7 @@ public class DynamoDbPluginStateProviderUnitTests {
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
     // Act
-    var result = await provider.GetString(pluginName, pluginDescription, key, CancellationToken.None)
+    var result = await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
 
     // Assert
@@ -205,7 +206,7 @@ public class DynamoDbPluginStateProviderUnitTests {
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
     // Act
-    Func<Task> act = async () => await provider.GetString(pluginName, pluginDescription, key, CancellationToken.None)
+    Func<Task> act = async () => await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
 
     // Assert
@@ -231,7 +232,7 @@ public class DynamoDbPluginStateProviderUnitTests {
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
     // Act
-    await provider.SetString(pluginName, pluginDescription, key, value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(pluginName, pluginDescription), key, value, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
     client.ReceivedCalls().ShouldBeEmpty();
@@ -250,7 +251,7 @@ public class DynamoDbPluginStateProviderUnitTests {
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
     // Act
-    await provider.Remove(pluginName, pluginDescription, key, CancellationToken.None).ConfigureAwait(false);
+    await provider.Remove(new P(pluginName, pluginDescription), key, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
     client.ReceivedCalls().ShouldBeEmpty();
@@ -288,10 +289,10 @@ public class DynamoDbPluginStateProviderUnitTests {
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
     // Act
-    var result = await provider.GetString(pluginName, pluginDescription, key, CancellationToken.None)
+    var result = await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
-    await provider.SetString(pluginName, pluginDescription, key, value2, CancellationToken.None).ConfigureAwait(false);
-    var result2 = await provider.GetString(pluginName, pluginDescription, key, CancellationToken.None)
+    await provider.SetString(new P(pluginName, pluginDescription), key, value2, CancellationToken.None).ConfigureAwait(false);
+    var result2 = await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
 
     // Assert
@@ -337,10 +338,10 @@ public class DynamoDbPluginStateProviderUnitTests {
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
     // Act
-    var result = await provider.GetString(pluginName, pluginDescription, key, CancellationToken.None)
+    var result = await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
-    await provider.Remove(pluginName, pluginDescription, key, CancellationToken.None).ConfigureAwait(false);
-    var result2 = await provider.GetString(pluginName, pluginDescription, key, CancellationToken.None)
+    await provider.Remove(new P(pluginName, pluginDescription), key, CancellationToken.None).ConfigureAwait(false);
+    var result2 = await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
 
     // Assert
@@ -373,7 +374,7 @@ public class DynamoDbPluginStateProviderUnitTests {
     var notificationSender = Substitute.For<INotificationSender>();
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
-    await provider.SetString(pluginName, pluginDescription, key, value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(pluginName, pluginDescription), key, value, CancellationToken.None).ConfigureAwait(false);
 
     // Act
     await provider.OnRunFinished(dryRun: true, CancellationToken.None).ConfigureAwait(false);
@@ -408,7 +409,7 @@ public class DynamoDbPluginStateProviderUnitTests {
     var notificationSender = Substitute.For<INotificationSender>();
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
-    await provider.GetString(pluginName, pluginDescription, key, CancellationToken.None).ConfigureAwait(false);
+    await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None).ConfigureAwait(false);
 
     // Act
     await provider.OnRunFinished(dryRun: false, CancellationToken.None).ConfigureAwait(false);
@@ -435,7 +436,7 @@ public class DynamoDbPluginStateProviderUnitTests {
     client.BatchWriteItemAsync(Arg.Any<BatchWriteItemRequest>(), Arg.Any<CancellationToken>())
         .Returns(new BatchWriteItemResponse { UnprocessedItems = null });
 
-    await provider.SetString(pluginName, pluginDescription, key, value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(pluginName, pluginDescription), key, value, CancellationToken.None).ConfigureAwait(false);
 
     // Act
     await provider.OnRunFinished(dryRun: false, CancellationToken.None).ConfigureAwait(false);
@@ -471,7 +472,7 @@ public class DynamoDbPluginStateProviderUnitTests {
     client.BatchWriteItemAsync(Arg.Any<BatchWriteItemRequest>(), Arg.Any<CancellationToken>())
         .Returns(new BatchWriteItemResponse { UnprocessedItems = null });
 
-    await provider.Remove(pluginName, pluginDescription, key, CancellationToken.None).ConfigureAwait(false);
+    await provider.Remove(new P(pluginName, pluginDescription), key, CancellationToken.None).ConfigureAwait(false);
 
     // Act
     await provider.OnRunFinished(dryRun: false, CancellationToken.None).ConfigureAwait(false);
@@ -515,14 +516,14 @@ public class DynamoDbPluginStateProviderUnitTests {
         expectedDeleteRequests.Add(new Dictionary<string, string> {
             { DynamoDbConstants.PartitionKeyName, partitionKey }, { DynamoDbConstants.SortKeyName, key }
         });
-        await provider.Remove(pluginName, pluginDescription, key, CancellationToken.None).ConfigureAwait(false);
+        await provider.Remove(new P(pluginName, pluginDescription), key, CancellationToken.None).ConfigureAwait(false);
       } else {
         expectedPutRequests.Add(new Dictionary<string, string> {
             { DynamoDbConstants.PartitionKeyName, partitionKey },
             { DynamoDbConstants.SortKeyName, key },
             { DynamoDbConstants.ValueKeyName, value }
         });
-        await provider.SetString(pluginName, pluginDescription, key, value, CancellationToken.None)
+        await provider.SetString(new P(pluginName, pluginDescription), key, value, CancellationToken.None)
             .ConfigureAwait(false);
       }
     }
@@ -584,8 +585,8 @@ public class DynamoDbPluginStateProviderUnitTests {
             Arg.Any<CancellationToken>())
         .Returns(new BatchWriteItemResponse { UnprocessedItems = null });
 
-    await provider.SetString(pluginName, pluginDescription, key1, value, CancellationToken.None).ConfigureAwait(false);
-    await provider.Remove(pluginName, pluginDescription, key2, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(pluginName, pluginDescription), key1, value, CancellationToken.None).ConfigureAwait(false);
+    await provider.Remove(new P(pluginName, pluginDescription), key2, CancellationToken.None).ConfigureAwait(false);
 
     // Act
     await provider.OnRunFinished(dryRun: false, CancellationToken.None).ConfigureAwait(false);
@@ -619,7 +620,7 @@ public class DynamoDbPluginStateProviderUnitTests {
             Arg.Any<CancellationToken>())
         .Returns(r => new BatchWriteItemResponse { UnprocessedItems = r.Arg<BatchWriteItemRequest>().RequestItems });
 
-    await provider.Remove(pluginName, pluginDescription, key, CancellationToken.None).ConfigureAwait(false);
+    await provider.Remove(new P(pluginName, pluginDescription), key, CancellationToken.None).ConfigureAwait(false);
 
     // Act
     using var cancellationTokenSource = new CancellationTokenSource();
@@ -650,7 +651,7 @@ public class DynamoDbPluginStateProviderUnitTests {
             _ => throw new Exception("try again"),
             _ => new BatchWriteItemResponse { UnprocessedItems = null });
 
-    await provider.Remove(pluginName, pluginDescription, key, CancellationToken.None).ConfigureAwait(false);
+    await provider.Remove(new P(pluginName, pluginDescription), key, CancellationToken.None).ConfigureAwait(false);
 
     // Act
     await provider.OnRunFinished(dryRun: false, CancellationToken.None).ConfigureAwait(false);
@@ -677,7 +678,7 @@ public class DynamoDbPluginStateProviderUnitTests {
         .Throws(exception);
 
     // Act
-    await provider.Remove(pluginName, pluginDescription, key, CancellationToken.None).ConfigureAwait(false);
+    await provider.Remove(new P(pluginName, pluginDescription), key, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
     Func<Task> act = async () => await provider.OnRunFinished(dryRun: false, CancellationToken.None).ConfigureAwait(false);
@@ -686,4 +687,6 @@ public class DynamoDbPluginStateProviderUnitTests {
     await client.Received(5).BatchWriteItemAsync(Arg.Any<BatchWriteItemRequest>(), Arg.Any<CancellationToken>())
         .ConfigureAwait(false);
   }
+
+  private record P(string Name, string Description, string? Id = null) : IPluginIdentifiers;
 }

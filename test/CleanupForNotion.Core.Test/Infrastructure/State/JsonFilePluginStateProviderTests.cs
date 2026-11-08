@@ -1,6 +1,7 @@
 using System.Text.Json;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Notifications;
+using CleanupForNotion.Core.Infrastructure.Plugins;
 using CleanupForNotion.Core.Infrastructure.State;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
@@ -17,11 +18,12 @@ public class JsonFilePluginStateProviderTests {
   private const string Key = "k";
   private const string Value = "v";
 
-  private static IOptions<CfnOptions> GetOptions(string? filePath = null) =>
+  private static IOptions<CfnOptions> GetOptions(string? stateAccessDetails = null, string? stateFilePath = null) =>
     new OptionsWrapper<CfnOptions>(new CfnOptions {
       AuthToken = string.Empty,
       Plugins = [],
-      StateFilePath = filePath
+      StateAccessDetails = stateAccessDetails,
+      StateFilePath = stateFilePath
     });
 
   [TestMethod]
@@ -59,12 +61,12 @@ public class JsonFilePluginStateProviderTests {
     using var tempFile = new TempFile();
     var logger = new FakeLogger<JsonFilePluginStateProvider>();
     var notificationSender = Substitute.For<INotificationSender>();
-    var options = GetOptions(tempFile.Path);
+    var options = GetOptions(stateAccessDetails: tempFile.Path);
     var provider = new JsonFilePluginStateProvider(logger, notificationSender, options);
 
     // Act
-    await provider.SetString(PluginName, PluginDescription, Key, Value, CancellationToken.None).ConfigureAwait(false);
-    var result = await provider.GetString(PluginName, PluginDescription, Key, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(PluginName, PluginDescription), Key, Value, CancellationToken.None).ConfigureAwait(false);
+    var result = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
     result.ShouldBe(Value);
@@ -76,13 +78,13 @@ public class JsonFilePluginStateProviderTests {
     using var tempFile = new TempFile();
     var logger = new FakeLogger<JsonFilePluginStateProvider>();
     var notificationSender = Substitute.For<INotificationSender>();
-    var options = GetOptions(tempFile.Path);
+    var options = GetOptions(stateFilePath: tempFile.Path);
     var provider = new JsonFilePluginStateProvider(logger, notificationSender, options);
-    await provider.SetString(PluginName, PluginDescription, Key, Value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(PluginName, PluginDescription), Key, Value, CancellationToken.None).ConfigureAwait(false);
 
     // Act
-    await provider.Remove(PluginName, PluginDescription, Key, CancellationToken.None).ConfigureAwait(false);
-    var result = await provider.GetString(PluginName, PluginDescription, Key, CancellationToken.None).ConfigureAwait(false);
+    await provider.Remove(new P(PluginName, PluginDescription), Key, CancellationToken.None).ConfigureAwait(false);
+    var result = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
     result.ShouldBeNull();
@@ -101,7 +103,7 @@ public class JsonFilePluginStateProviderTests {
     var provider = new JsonFilePluginStateProvider(logger, notificationSender, options);
 
     // Act
-    var result = await provider.GetString(PluginName, PluginDescription, Key, CancellationToken.None).ConfigureAwait(false);
+    var result = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
     result.ShouldBe(Value);
@@ -118,7 +120,7 @@ public class JsonFilePluginStateProviderTests {
     var provider = new JsonFilePluginStateProvider(logger, notificationSender, options);
 
     // Act
-    var result = await provider.GetString(PluginName, PluginDescription, Key, CancellationToken.None).ConfigureAwait(false);
+    var result = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
     result.ShouldBeNull();
@@ -138,7 +140,7 @@ public class JsonFilePluginStateProviderTests {
     var provider = new JsonFilePluginStateProvider(logger, notificationSender, options);
 
     // Act
-    var result = await provider.GetString(PluginName, PluginDescription, Key, CancellationToken.None).ConfigureAwait(false);
+    var result = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
     result.ShouldBeNull();
@@ -156,7 +158,7 @@ public class JsonFilePluginStateProviderTests {
     var notificationSender = Substitute.For<INotificationSender>();
     var options = GetOptions(tempFile.Path);
     var provider = new JsonFilePluginStateProvider(logger, notificationSender, options);
-    await provider.SetString(PluginName, PluginDescription, Key, Value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(PluginName, PluginDescription), Key, Value, CancellationToken.None).ConfigureAwait(false);
 
     // Act
     provider.Dispose();
@@ -174,7 +176,7 @@ public class JsonFilePluginStateProviderTests {
     var notificationSender = Substitute.For<INotificationSender>();
     var options = GetOptions(tempFile.Path);
     var provider = new JsonFilePluginStateProvider(logger, notificationSender, options);
-    await provider.SetString(PluginName, PluginDescription, Key, Value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(PluginName, PluginDescription), Key, Value, CancellationToken.None).ConfigureAwait(false);
 
     // Act
     await provider.OnRunFinished(false, CancellationToken.None).ConfigureAwait(false);
@@ -210,7 +212,7 @@ public class JsonFilePluginStateProviderTests {
     var provider = new JsonFilePluginStateProvider(logger, notificationSender, options);
 
     // Act
-    await provider.SetString(PluginName, PluginDescription, Key, Value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(PluginName, PluginDescription), Key, Value, CancellationToken.None).ConfigureAwait(false);
     await provider.OnRunFinished(true, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
@@ -226,7 +228,7 @@ public class JsonFilePluginStateProviderTests {
     var provider = new JsonFilePluginStateProvider(logger, notificationSender, options);
 
     // Act
-    await provider.SetString(PluginName, PluginDescription, Key, Value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(PluginName, PluginDescription), Key, Value, CancellationToken.None).ConfigureAwait(false);
     Func<Task> act = async () => await provider.OnRunFinished(false, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
@@ -239,4 +241,6 @@ public class JsonFilePluginStateProviderTests {
       if (File.Exists(Path)) File.Delete(Path);
     }
   }
+
+  private record P(string Name, string Description, string? Id = null) : IPluginIdentifiers;
 }

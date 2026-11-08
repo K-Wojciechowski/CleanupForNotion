@@ -1,9 +1,11 @@
+using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Execution;
 using CleanupForNotion.Core.Infrastructure.Notifications;
 using CleanupForNotion.Core.Infrastructure.NotionIntegration;
 using CleanupForNotion.Core.Infrastructure.PluginManagement;
 using CleanupForNotion.Core.Infrastructure.Plugins;
 using CleanupForNotion.Core.Infrastructure.State;
+using CleanupForNotion.Core.Infrastructure.State.Factories;
 using CleanupForNotion.Core.Plugins.Providers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,13 +20,19 @@ public static class CfnServiceCollectionExtensions {
       .AddScoped<IRunner, Runner>()
       .AddSingleton<IGlobalOptionsProvider, GlobalOptionsProvider>()
       .AddSingleton<INotificationSender, NotificationSender>()
-      .AddSingleton<IPluginStateProvider, JsonFilePluginStateProvider>()
+      .AddSingleton<IPluginStateProviderFactory, InMemoryPluginStateProviderFactory>()
+      .AddSingleton<IPluginStateProviderFactory, JsonFilePluginStateProviderFactory>()
+      .AddSingleton<IPluginStateProviderFactory, PostgresPluginStateProviderFactory>()
       .AddSingleton<IPluginProvider, DeleteByCheckboxProvider>()
       .AddSingleton<IPluginProvider, DeleteOnNewMonthlyCycleProvider>()
       .AddSingleton<IPluginProvider, DeleteWithoutRelationshipsProvider>()
       .AddSingleton<IPluginProvider, DeleteZeroSumProvider>()
       .AddSingleton<IPluginProvider, EnsureStaticRelatedPageProvider>()
       .AddSingleton<IPluginProvider, EstimateExpensesWithSubscriptionsProvider>()
-      .AddSingleton<IRunnerSemaphore, RunnerSemaphore>();
+      .AddSingleton<IRunnerSemaphore, RunnerSemaphore>()
+      .AddSingleton<IPluginStateProvider>(s => {
+        var factory = s.GetServices<IPluginStateProviderFactory>().SingleOrDefault(f => f.CanCreate());
+        return factory?.Create() ?? throw new InvalidConfigurationException("Unrecognised StateEngine configured");
+      });
   }
 }
