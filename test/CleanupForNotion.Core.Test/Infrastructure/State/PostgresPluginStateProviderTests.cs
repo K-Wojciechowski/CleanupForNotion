@@ -1,4 +1,4 @@
-﻿using CleanupForNotion.Core.Infrastructure.ConfigModels;
+using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Notifications;
 using CleanupForNotion.Core.Infrastructure.Plugins;
 using CleanupForNotion.Core.Infrastructure.State;
@@ -35,6 +35,23 @@ public class PostgresPluginStateProviderTests {
   public static void Cleanup(TestContext context) {
     if (_container == null) return;
     Task.Run(async () => await _container.DisposeAsync().ConfigureAwait(false), context.CancellationToken).Wait(context.CancellationToken);
+  }
+
+  [TestMethod]
+  public async Task Constructor_NullConnectionString_Throws() {
+    // Arrange
+    var notificationSender = Substitute.For<INotificationSender>();
+
+    var cfnOptions = new CfnOptions {
+        StateAccessDetails = null, AuthToken = "", Plugins = []
+    };
+    var options = new OptionsWrapper<CfnOptions>(cfnOptions);
+
+    // Act
+    Action act = () => { new PostgresPluginStateProvider(notificationSender, options); };
+
+    // Assert
+    act.ShouldThrow<InvalidConfigurationException>();
   }
 
   [TestMethod]
@@ -212,6 +229,16 @@ public class PostgresPluginStateProviderTests {
   }
 
   [TestMethod]
+  public async Task OnRunFinished_NoConnection_DoesNothing() {
+    // Arrange
+    var notificationSender = Substitute.For<INotificationSender>();
+    using var provider = new PostgresPluginStateProvider(notificationSender, _options);
+
+    // Act
+    await provider.OnRunFinished(dryRun: false, TestContext.CancellationToken).ConfigureAwait(false);
+  }
+
+  [TestMethod]
   public async Task Dispose_AfterCommit_DataStaysInDatabase() {
     // Arrange
     var notificationSender = Substitute.For<INotificationSender>();
@@ -256,6 +283,16 @@ public class PostgresPluginStateProviderTests {
 
     // Assert
     (await GetFromDb(verificationDataSource, id, key).ConfigureAwait(false)).ShouldBeNull();
+  }
+
+  [TestMethod]
+  public async Task Dispose_NoConnection_DoesNothing() {
+    // Arrange
+    var notificationSender = Substitute.For<INotificationSender>();
+    using var provider = new PostgresPluginStateProvider(notificationSender, _options);
+
+    // Act
+    provider.Dispose();
   }
 
   private async Task<string?> GetFromDb(NpgsqlDataSource verificationDataSource, IPluginIdentifiers pluginIdentifiers,

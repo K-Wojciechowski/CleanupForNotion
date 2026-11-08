@@ -1,4 +1,4 @@
-﻿using CleanupForNotion.Core.Infrastructure.ConfigModels;
+using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Notifications;
 using CleanupForNotion.Core.Infrastructure.Plugins;
 using Microsoft.Extensions.Logging;
@@ -124,7 +124,7 @@ public class PostgresPluginStateProvider : IPluginStateProvider, INotificationLi
   }
 
   public async Task OnRunFinished(bool dryRun, CancellationToken cancellationToken) {
-    if (_transaction is null || _connection is null) {
+    if (_transaction is null) {
       return;
     }
 
@@ -139,7 +139,7 @@ public class PostgresPluginStateProvider : IPluginStateProvider, INotificationLi
       await _transaction.DisposeAsync().ConfigureAwait(false);
       _transaction = null;
 
-      await _connection.DisposeAsync().ConfigureAwait(false);
+      await _connection!.DisposeAsync().ConfigureAwait(false);
       _connection = null;
     } finally {
       _semaphore.Release();
