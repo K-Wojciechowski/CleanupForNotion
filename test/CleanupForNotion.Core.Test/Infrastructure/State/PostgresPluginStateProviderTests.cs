@@ -18,8 +18,12 @@ public class PostgresPluginStateProviderTests {
 
   [ClassInitialize]
   public static void Initialize(TestContext context) {
+    if (OperatingSystem.IsWindows() && Environment.GetEnvironmentVariable("CI") == "true") {
+      Assert.Inconclusive("Postgres tests cannot run in CI on Windows");
+    }
+
     _container = new PostgreSqlBuilder("postgres:18-alpine").Build();
-    _container.StartAsync(context.CancellationToken).Wait();
+    _container.StartAsync(context.CancellationToken).Wait(context.CancellationToken);
 
     var cfnOptions = new CfnOptions {
         StateAccessDetails = _container.GetConnectionString(), AuthToken = "", Plugins = []
@@ -30,7 +34,7 @@ public class PostgresPluginStateProviderTests {
   [ClassCleanup]
   public static void Cleanup(TestContext context) {
     if (_container == null) return;
-    Task.Run(async () => await _container.DisposeAsync().ConfigureAwait(false), context.CancellationToken).Wait();
+    Task.Run(async () => await _container.DisposeAsync().ConfigureAwait(false), context.CancellationToken).Wait(context.CancellationToken);
   }
 
   [TestMethod]
