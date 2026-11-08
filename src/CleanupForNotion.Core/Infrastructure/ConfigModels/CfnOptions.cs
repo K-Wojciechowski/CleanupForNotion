@@ -7,6 +7,10 @@ public class CfnOptions {
 
   public string? RunFrequency { get; init; }
 
+  public string? StateEngine { get; init; }
+
+  public string? StateAccessDetails { get; init; }
+
   public string? StateFilePath { get; init; }
 
   public required List<Dictionary<string, object>> Plugins { get; init; }

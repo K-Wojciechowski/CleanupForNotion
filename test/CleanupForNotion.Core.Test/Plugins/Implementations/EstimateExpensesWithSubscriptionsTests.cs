@@ -47,9 +47,9 @@ public class EstimateExpensesWithSubscriptionsTests {
     };
     var client = CreateClient(subscriptionPages, expensePages);
     var stateProvider = Substitute.For<IPluginStateProvider>();
-    stateProvider.GetString(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), CancellationToken.None)
-        .Returns((string?)null);
     var plugin = CreatePlugin(stateProvider);
+    stateProvider.GetString(plugin, Arg.Any<string>(), CancellationToken.None)
+        .Returns((string?)null);
 
     await plugin.Run(client, new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
 
@@ -58,10 +58,10 @@ public class EstimateExpensesWithSubscriptionsTests {
     GetUpdatedTotal(client, "unassigned").ShouldBe(1.37);
 
     await stateProvider.Received().SetString(
-            plugin.Name, PluginDescription, "LastEdit", _lastEditedString, CancellationToken.None)
+            plugin, "LastEdit", _lastEditedString, CancellationToken.None)
         .ConfigureAwait(false);
     await stateProvider.Received().SetString(
-            plugin.Name, PluginDescription, "PageCount", expensePages.Count.ToString(CultureInfo.InvariantCulture),
+            plugin, "PageCount", expensePages.Count.ToString(CultureInfo.InvariantCulture),
             CancellationToken.None)
         .ConfigureAwait(false);
   }
@@ -70,11 +70,11 @@ public class EstimateExpensesWithSubscriptionsTests {
   public async Task Run_QueryStateUnchanged_DoesNotUpdateOutputOrState() {
     var client = CreateClient([], [CreatePage("expense", "sub1", 8.15)]);
     var stateProvider = Substitute.For<IPluginStateProvider>();
-    stateProvider.GetString(Arg.Any<string>(), Arg.Any<string>(), "PageCount", CancellationToken.None)
-        .Returns("1");
-    stateProvider.GetString(Arg.Any<string>(), Arg.Any<string>(), "LastEdit", CancellationToken.None)
-        .Returns("2025-01-02T03:04:05.0000000+00:00");
     var plugin = CreatePlugin(stateProvider);
+    stateProvider.GetString(plugin, "PageCount", CancellationToken.None)
+        .Returns("1");
+    stateProvider.GetString(plugin, "LastEdit", CancellationToken.None)
+        .Returns("2025-01-02T03:04:05.0000000+00:00");
 
     await plugin.Run(client, new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
 
@@ -82,8 +82,7 @@ public class EstimateExpensesWithSubscriptionsTests {
         .UpdatePageAsync(Arg.Any<string>(), Arg.Any<PagesUpdateParameters>(), Arg.Any<CancellationToken>())
         .ConfigureAwait(false);
     await stateProvider.DidNotReceiveWithAnyArgs()
-        .SetString(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
-            Arg.Any<CancellationToken>())
+        .SetString(plugin, Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
         .ConfigureAwait(false);
   }
 
@@ -98,8 +97,7 @@ public class EstimateExpensesWithSubscriptionsTests {
     await plugin.Run(client, new GlobalOptions(), CancellationToken.None).ConfigureAwait(false);
 
     GetUpdatedTotal(client, "subscription").ShouldBe(18);
-    await stateProvider.Received().SetString(
-        plugin.Name, PluginDescription, "PageCount", "1", CancellationToken.None).ConfigureAwait(false);
+    await stateProvider.Received().SetString(plugin, "PageCount", "1", CancellationToken.None).ConfigureAwait(false);
   }
 
   [TestMethod]
@@ -130,8 +128,7 @@ public class EstimateExpensesWithSubscriptionsTests {
 
     GetUpdatedTotal(client, "subscription").ShouldBe(8.15);
     GetUpdatedTotal(client, "blank").ShouldBe(0);
-    await stateProvider.Received().SetString(
-        plugin.Name, PluginDescription, "LastEdit", _lastEditedString, CancellationToken.None).ConfigureAwait(false);
+    await stateProvider.Received().SetString(plugin, "LastEdit", _lastEditedString, CancellationToken.None).ConfigureAwait(false);
   }
 
   [TestMethod]
@@ -146,11 +143,9 @@ public class EstimateExpensesWithSubscriptionsTests {
 
     GetUpdatedTotal(client, "subscription1").ShouldBe(3);
     GetUpdatedTotal(client, "subscription2").ShouldBe(15);
-    await stateProvider.Received().SetString(
-            plugin.Name, PluginDescription, "LastEdit", "2000-01-01T00:00:00.0000000+00:00", CancellationToken.None)
+    await stateProvider.Received().SetString(plugin, "LastEdit", "2000-01-01T00:00:00.0000000+00:00", CancellationToken.None)
         .ConfigureAwait(false);
-    await stateProvider.Received().SetString(
-        plugin.Name, PluginDescription, "PageCount", "0", CancellationToken.None).ConfigureAwait(false);
+    await stateProvider.Received().SetString(plugin, "PageCount", "0", CancellationToken.None).ConfigureAwait(false);
   }
 
   [TestMethod]
@@ -240,9 +235,9 @@ public class EstimateExpensesWithSubscriptionsTests {
 
   private static IPluginStateProvider SubstituteState(string? pageCount, string? lastEdit) {
     var stateProvider = Substitute.For<IPluginStateProvider>();
-    stateProvider.GetString(Arg.Any<string>(), Arg.Any<string>(), "PageCount", CancellationToken.None)
+    stateProvider.GetString(Arg.Any<EstimateExpensesWithSubscriptions>(), "PageCount", CancellationToken.None)
         .Returns(pageCount);
-    stateProvider.GetString(Arg.Any<string>(), Arg.Any<string>(), "LastEdit", CancellationToken.None)
+    stateProvider.GetString(Arg.Any<EstimateExpensesWithSubscriptions>(), "LastEdit", CancellationToken.None)
         .Returns(lastEdit);
     return stateProvider;
   }

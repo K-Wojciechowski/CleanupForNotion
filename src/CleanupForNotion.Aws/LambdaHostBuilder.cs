@@ -44,7 +44,6 @@ internal static class LambdaHostBuilder {
         .Configure<CfnOptions>(builder.Configuration.GetSection("CleanupForNotion"))
         .Configure<DynamoDbOptions>(o => o.TableName = dynamoDbTableName);
 
-
     var existingPluginStateProvider = builder.Services.First(s => s.ServiceType == typeof(IPluginStateProvider));
     builder.Services.Remove(existingPluginStateProvider);
 

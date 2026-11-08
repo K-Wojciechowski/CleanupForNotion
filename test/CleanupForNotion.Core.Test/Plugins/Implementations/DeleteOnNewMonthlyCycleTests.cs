@@ -156,7 +156,7 @@ public class DeleteOnNewMonthlyCycleTests : DeletePluginTestsBase {
 
     // Assert
     await AssertPagesDeleted(logger, client, expectedCompoundFilter, dryRun).ConfigureAwait(false);
-    await pluginStateProvider.Received().SetDateTime(PluginName, PluginDescription, LastRunSettingsKey, nowLocal, CancellationToken.None).ConfigureAwait(false);
+    await pluginStateProvider.Received().SetDateTime(plugin, LastRunSettingsKey, nowLocal, CancellationToken.None).ConfigureAwait(false);
     logger.Collector.GetSnapshot().ShouldContain(l => l.Message == logMessage);
   }
 
@@ -182,7 +182,7 @@ public class DeleteOnNewMonthlyCycleTests : DeletePluginTestsBase {
 
   private static IPluginStateProvider CreateMockStateProvider(DateTimeOffset? lastRun) {
     var provider = Substitute.For<IPluginStateProvider>();
-    provider.GetString(PluginName, PluginDescription, LastRunSettingsKey, CancellationToken.None)
+    provider.GetString(Arg.Any<DeleteOnNewMonthlyCycle>(), LastRunSettingsKey, CancellationToken.None)
         .Returns(lastRun?.ToString("o", CultureInfo.InvariantCulture));
     return provider;
   }
