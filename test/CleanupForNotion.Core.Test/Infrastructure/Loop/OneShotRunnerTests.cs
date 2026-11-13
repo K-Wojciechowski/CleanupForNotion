@@ -13,7 +13,9 @@ namespace CleanupForNotion.Core.Test.Infrastructure.Loop;
 [TestClass]
 public class OneShotLoopTests {
   [TestMethod]
-  public async Task ExecuteAsync_Called_RunsOneCleanupAndStopsApplication() {
+  [DataRow(null)]
+  [DataRow("test")]
+  public async Task ExecuteAsync_Called_RunsOneCleanupAndStopsApplication(string? pluginId) {
     // Arrange
     var globalOptionsProvider = Substitute.For<IGlobalOptionsProvider>();
     globalOptionsProvider.GlobalOptions.Returns(new GlobalOptions(RunFrequency: TimeSpan.FromMilliseconds(100)));
@@ -34,23 +36,25 @@ public class OneShotLoopTests {
 
     // Act
     using var cancellationTokenSource = new CancellationTokenSource();
-    await loop.ExecuteAsync(cancellationTokenSource.Token).ConfigureAwait(false);
+    await loop.ExecuteAsync(pluginId, cancellationTokenSource.Token).ConfigureAwait(false);
     await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
 
     // Assert
-    await runner.ReceivedWithAnyArgs(1).RunCleanup(Arg.Any<GlobalOptions>(), null, Arg.Any<CancellationToken>())
+    await runner.ReceivedWithAnyArgs(1).RunCleanup(Arg.Any<GlobalOptions>(), pluginId, Arg.Any<CancellationToken>())
         .ConfigureAwait(false);
   }
 
   [TestMethod]
-  public async Task ExecuteAsync_RunnerThrows_LogsAndStopsApplication() {
+  [DataRow(null)]
+  [DataRow("test")]
+  public async Task ExecuteAsync_RunnerThrows_LogsAndStopsApplication(string? pluginId) {
     // Arrange
     var globalOptionsProvider = Substitute.For<IGlobalOptionsProvider>();
     globalOptionsProvider.GlobalOptions.Returns(new GlobalOptions(RunFrequency: TimeSpan.FromMilliseconds(100)));
     var logger = new FakeLogger<OneShotLoop>();
     var runner = Substitute.For<IRunner>();
 
-    runner.RunCleanup(Arg.Any<GlobalOptions>(), null, Arg.Any<CancellationToken>())
+    runner.RunCleanup(Arg.Any<GlobalOptions>(), pluginId, Arg.Any<CancellationToken>())
         .Returns(async _ => {
           await Task.Delay(100).ConfigureAwait(false);
           throw new Exception("kaboom");
@@ -67,14 +71,14 @@ public class OneShotLoopTests {
 
     // Act
     using var cancellationTokenSource = new CancellationTokenSource();
-    var runTask = lambdaHostedServiceWrapper.ExecuteAsync(cancellationTokenSource.Token);
+    var runTask = lambdaHostedServiceWrapper.ExecuteAsync(pluginId, cancellationTokenSource.Token);
     await Task.Delay(TimeSpan.FromSeconds(2), CancellationToken.None).ConfigureAwait(false);
     await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
     Func<Task> act = async () => await runTask.ConfigureAwait(false);
 
     // Assert
     (await act.ShouldThrowAsync<Exception>().ConfigureAwait(false)).Message.ShouldBe("kaboom");
-    await runner.ReceivedWithAnyArgs(1).RunCleanup(Arg.Any<GlobalOptions>(), null, Arg.Any<CancellationToken>())
+    await runner.ReceivedWithAnyArgs(1).RunCleanup(Arg.Any<GlobalOptions>(), pluginId, Arg.Any<CancellationToken>())
         .ConfigureAwait(false);
     logger.LatestRecord.Message.ShouldContain("kaboom");
   }

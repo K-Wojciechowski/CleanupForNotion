@@ -18,7 +18,8 @@ public class CfnWebApplicationFactory(
       var hostedServices = services.Where(s => s.ServiceType == typeof(IHostedService)).ToList();
       foreach (var s in hostedServices) services.Remove(s);
       services.AddFakeLogging(o => {
-          o.FilteredLevels = Enum.GetValues<LogLevel>().Where(l => traceLoggingEnabled || l != LogLevel.Trace).ToHashSet();
+        o.FilteredLevels = Enum.GetValues<LogLevel>().Where(l => traceLoggingEnabled || l != LogLevel.Trace)
+            .ToHashSet();
       });
       services.AddSingleton(Options.Create(options));
     });

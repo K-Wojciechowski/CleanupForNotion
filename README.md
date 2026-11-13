@@ -193,13 +193,22 @@ There are four state storage engines available:
 
 ### Webhooks
 
-1. Expose the `webhooks` endpoint publicly. You probably don’t want to expose the entire server, as it allows running cleanup without any authentication.
-2. [Set up the webhook in your Notion integration](https://developers.notion.com/reference/webhooks#getting-started-with-webhooks). CleanupForNotion currently supports page and data source change events.
-3. The request with `verification_token` will be logged when it reaches the server.
-4. In `appsettings.json`, set **WebhookSecret** to the value of the `verification_token`.
-5. Configure a webhook actions under the **Webhooks** key. It is a list of objects with **DataSourceId** (string) and **PluginIds** (array of string) keys. See below for an example.
+Webhooks are currently supported in the *Web application* and *AWS* deployment models. The webhook endpoint needs to be publicly accessible over HTTPS.
 
-Webhooks are currently supported only in the *Web application* model.
+#### Exposing the webhook
+
+If using the *Web application* deployment model, expose the `webhooks` endpoint publicly. You probably don’t want to expose the entire server, as it allows running cleanup without any authentication.
+
+If using the *AWS* deployment model, set the `enable_webhooks` variable to `true`. After deploying, you can then read the function URL by using `terraform output lambda_function_url`.
+
+#### Setup
+
+Webhook actions can be configured under the **Webhooks** key in `appsettings.json`. It is a list of objects with **DataSourceId** (string) and **PluginIds** (array of string) keys. See below for an example.
+
+1. To start receiving events from Notion, [set up the webhook in your Notion integration](https://developers.notion.com/reference/webhooks#getting-started-with-webhooks). CleanupForNotion currently supports page and data source change events; Notion appears to send all updates to a database as page creation, deletion, and property update events.
+2. Notion will make a request to your webhook endpoint with a `verification_token`. The token will appear in CleanupForNotion logs (you can search for `Received new webhook request with body`).
+3. In Notion, click **Verify**, paste your `verification_token`, and click **Verify subscription**.
+4. In `appsettings.json`, set **WebhookSecret** to the value of the `verification_token`. Don't forget to restart the web application / upload the updated configuration to S3.
 
 ### Putting it all together
 
@@ -326,6 +335,7 @@ In this model, CleanupForNotion uses various services offered by [AWS](https://a
 * Code runs in **Lambda**
 * Logs are stored in **CloudWatch**
 * Periodic execution is handled by **EventBridge Scheduler**
+* Optional webhook support using **Lambda Function URLs**
 
 All of the above services have very generous free tiers. As long as you keep the execution frequency reasonable (15 minutes should be fine), the AWS costs related to using this should be $0/month (or close enough that AWS won’t charge your card).
 

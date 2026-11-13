@@ -28,6 +28,12 @@ variable "schedule_expression" {
   type        = string
 }
 
+variable "enable_webhooks" {
+  description = "Whether webhooks lambda and function URL should be deployed"
+  default     = false
+  type        = bool
+}
+
 variable "tags" {
   description = "A map of tags to assign to AWS resources"
   type        = map(string)

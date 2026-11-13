@@ -41,6 +41,7 @@ internal static class LambdaHostBuilder {
         .AddDefaultAWSOptions(new AWSOptions())
         .AddAWSService<IAmazonDynamoDB>()
         .AddSingleton<OneShotLoop>()
+        .AddSingleton<DynamoDbLockManager>()
         .Configure<CfnOptions>(builder.Configuration.GetSection("CleanupForNotion"))
         .Configure<DynamoDbOptions>(o => o.TableName = dynamoDbTableName);
 

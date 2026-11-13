@@ -43,7 +43,10 @@ public class DynamoDbPluginStateProvider : IPluginStateProvider, INotificationLi
     _options = options;
   }
 
-  public async Task<string?> GetString(IPluginIdentifiers pluginIdentifiers, string key, CancellationToken cancellationToken) {
+  public async Task<string?> GetString(
+      IPluginIdentifiers pluginIdentifiers,
+      string key,
+      CancellationToken cancellationToken) {
     var stateKey = new DynamoDbStateKey(pluginIdentifiers, key);
 
     using var _ = await _semaphore.AcquireAsync(cancellationToken).ConfigureAwait(false);
@@ -72,13 +75,18 @@ public class DynamoDbPluginStateProvider : IPluginStateProvider, INotificationLi
     }
 
     var value = item.Item[DynamoDbConstants.ValueKeyName].S;
-    _logger.LogTrace("Retrieved state item with partition key '{PartitionKey}' and sort key '{SortKey}' with value '{Value}'",
+    _logger.LogTrace(
+        "Retrieved state item with partition key '{PartitionKey}' and sort key '{SortKey}' with value '{Value}'",
         stateKey.PartitionKey, stateKey.SortKey, value);
 
     return value;
   }
 
-  public async Task SetString(IPluginIdentifiers pluginIdentifiers, string key, string value, CancellationToken cancellationToken) {
+  public async Task SetString(
+      IPluginIdentifiers pluginIdentifiers,
+      string key,
+      string value,
+      CancellationToken cancellationToken) {
     var stateKey = new DynamoDbStateKey(pluginIdentifiers, key);
 
     using var _ = await _semaphore.AcquireAsync(cancellationToken).ConfigureAwait(false);

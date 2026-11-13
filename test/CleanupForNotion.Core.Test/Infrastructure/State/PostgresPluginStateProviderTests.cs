@@ -2,6 +2,7 @@ using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Notifications;
 using CleanupForNotion.Core.Infrastructure.Plugins;
 using CleanupForNotion.Core.Infrastructure.State;
+using DotNet.Testcontainers.Builders;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using NSubstitute;
@@ -22,8 +23,13 @@ public class PostgresPluginStateProviderTests {
       Assert.Inconclusive("Postgres tests cannot run in CI on Windows");
     }
 
-    _container = new PostgreSqlBuilder("postgres:18-alpine").Build();
-    _container.StartAsync(context.CancellationToken).Wait(context.CancellationToken);
+    try {
+      _container = new PostgreSqlBuilder("postgres:18-alpine").Build();
+      _container.StartAsync(context.CancellationToken).Wait(context.CancellationToken);
+    } catch (DockerUnavailableException exc) {
+      Assert.Inconclusive($"Docker is unavailable, cannot run Postgres tests. {exc}");
+
+    }
 
     var cfnOptions = new CfnOptions {
         StateAccessDetails = _container.GetConnectionString(), AuthToken = "", Plugins = []

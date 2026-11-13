@@ -33,7 +33,7 @@ public class S3ConfigurationUnitTests {
 
     await S3TestBase.TestS3Configuration(s3Client).ConfigureAwait(false);
 
-    await s3Client.ReceivedWithAnyArgs().GetObjectAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).ConfigureAwait(false);
+    await s3Client.ReceivedWithAnyArgs()
+        .GetObjectAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).ConfigureAwait(false);
   }
-
 }

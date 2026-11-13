@@ -1,11 +1,12 @@
 .idea/*
 appsettings.json
 cfnstate.json
-aws-terraform/publish
-aws-terraform/lambda.zip
-aws-terraform/invoke.sh
-aws-terraform/invoke.cmd
 aws-terraform/.terraform.lock.hcl
+aws-terraform/invoke.cmd
+aws-terraform/invoke.json
+aws-terraform/invoke.sh
+aws-terraform/lambda.zip
+aws-terraform/publish
 
 # Created by https://www.toptal.com/developers/gitignore/api/csharp,terraform
 # Edit at https://www.toptal.com/developers/gitignore?templates=csharp,terraform

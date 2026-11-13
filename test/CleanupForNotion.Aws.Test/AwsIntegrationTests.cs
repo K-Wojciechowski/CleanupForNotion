@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.S3;
@@ -8,6 +9,7 @@ using CleanupForNotion.Core.Infrastructure.Notifications;
 using CleanupForNotion.Core.Infrastructure.Plugins;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Time.Testing;
 using Shouldly;
 
 namespace CleanupForNotion.Aws.Test;
@@ -111,7 +113,97 @@ public class AwsIntegrationTests {
       (await stateProvider2.GetString(new P("N3", "D3"), "K3", CancellationToken.None).ConfigureAwait(false)).ShouldBeNull();
       (await stateProvider2.GetString(new P("N1", "D1"), "K4", CancellationToken.None).ConfigureAwait(false)).ShouldBe("V4");
     } finally {
-      await dynamoDbClient.DeleteTableAsync(tableName).ConfigureAwait(false);
+      await dynamoDbClient.DeleteTableAsync(tableName, CancellationToken.None).ConfigureAwait(false);
+    }
+  }
+
+  [TestMethod]
+  public async Task TestDynamoDbLockManager() {
+    var dynamoDbClient = new AmazonDynamoDBClient();
+    var tableName = $"cfntest{Guid.NewGuid()}";
+
+    // Create table
+    try {
+      await dynamoDbClient.CreateTableAsync(new CreateTableRequest {
+              TableName = tableName,
+              KeySchema = [
+                  new KeySchemaElement(DynamoDbConstants.PartitionKeyName, KeyType.HASH),
+                  new KeySchemaElement(DynamoDbConstants.SortKeyName, KeyType.RANGE)
+              ],
+              AttributeDefinitions = [
+                  new AttributeDefinition(DynamoDbConstants.PartitionKeyName, ScalarAttributeType.S),
+                  new AttributeDefinition(DynamoDbConstants.SortKeyName, ScalarAttributeType.S)
+              ],
+              BillingMode = BillingMode.PAY_PER_REQUEST
+          }
+      ).ConfigureAwait(false);
+
+      // Wait for table to be created
+      do {
+        try {
+          var table = await dynamoDbClient.DescribeTableAsync(tableName).ConfigureAwait(false);
+          if (table.Table.TableStatus == TableStatus.ACTIVE) break;
+        } catch (ResourceNotFoundException) { }
+
+        await Task.Delay(1000).ConfigureAwait(false);
+      } while (true);
+
+      // Create lock manager
+      var logger = new NullLogger<DynamoDbLockManager>();
+      var options = new OptionsWrapper<DynamoDbOptions>(new DynamoDbOptions { TableName = tableName });
+      var timeProvider = new FakeTimeProvider();
+      var lockManager = new DynamoDbLockManager(dynamoDbClient, logger, options, timeProvider);
+
+      var stopwatch = Stopwatch.StartNew();
+
+      // Lock
+      var firstLockToken = await lockManager.AcquireLock(CancellationToken.None).ConfigureAwait(false);
+      stopwatch.ElapsedMilliseconds.ShouldBeLessThan(1000);
+
+      // Unlock
+      (await lockManager.ReleaseLock(firstLockToken).ConfigureAwait(false)).ShouldBeTrue();
+
+      // Cannot unlock again
+      (await lockManager.ReleaseLock(firstLockToken).ConfigureAwait(false)).ShouldBeFalse();
+
+      // Second lock
+      var secondLockToken = await lockManager.AcquireLock(CancellationToken.None).ConfigureAwait(false);
+
+      stopwatch.Restart();
+
+      // Cannot unlock old lock
+      (await lockManager.ReleaseLock(firstLockToken).ConfigureAwait(false)).ShouldBeFalse();
+
+      // Try another lock
+      Func<Task> act = async () => await lockManager.AcquireLock(CancellationToken.None).ConfigureAwait(false);
+      var exc = await act.ShouldThrowAsync<Exception>().ConfigureAwait(false);
+      exc.Message.ShouldBe("Failed to acquire lock");
+      stopwatch.Elapsed.ShouldBeGreaterThan(DynamoDbConstants.LockWaitTime - TimeSpan.FromSeconds(1));
+
+      // Try again
+      var thirdLockTask = lockManager.AcquireLock(CancellationToken.None);
+
+      // But unlock this time
+      await Task.Delay(5000, CancellationToken.None).ConfigureAwait(false);
+      thirdLockTask.IsCompleted.ShouldBeFalse();
+      thirdLockTask.IsFaulted.ShouldBeFalse();
+      await lockManager.ReleaseLock(secondLockToken).ConfigureAwait(false);
+      var thirdLockToken = await thirdLockTask.ConfigureAwait(false);
+
+      // Advance time
+      timeProvider.Advance(TimeSpan.FromSeconds(1));
+      timeProvider.Advance(DynamoDbConstants.LockAbandonTime);
+
+      // Should steal the lock
+      stopwatch.Restart();
+      var fourthLockToken = await lockManager.AcquireLock(CancellationToken.None).ConfigureAwait(false);
+      stopwatch.ElapsedMilliseconds.ShouldBeLessThan(2000);
+
+
+      (await lockManager.ReleaseLock(thirdLockToken).ConfigureAwait(false)).ShouldBeFalse();
+      (await lockManager.ReleaseLock(fourthLockToken).ConfigureAwait(false)).ShouldBeTrue();
+    } finally {
+      await dynamoDbClient.DeleteTableAsync(tableName, CancellationToken.None).ConfigureAwait(false);
     }
   }
 
