@@ -1,5 +1,10 @@
 # CleanupForNotion Changelog
 
+## 2.4.0
+
+* Support webhooks in AWS Lambda deployment model
+* Support writing actual total in `EstimateExpensesWithSubscriptions`
+
 ## 2.3.0
 
 * Allow storing state in a PostgreSQL database
