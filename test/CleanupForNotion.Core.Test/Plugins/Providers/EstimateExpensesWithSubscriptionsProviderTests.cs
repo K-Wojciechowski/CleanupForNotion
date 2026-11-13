@@ -38,7 +38,8 @@ public class EstimateExpensesWithSubscriptionsProviderTests {
         ["OutputPageId"] = "outputPageId",
         ["VendorPropertyName"] = "vendor",
         ["AmountPropertyName"] = "amount",
-        ["AlternateVendorPropertyName"] = "altvendor"
+        ["AlternateVendorPropertyName"] = "altvendor",
+        ["ActualTotalPropertyName"] = "actualTotal"
     };
 
     if (currencyDecimalPlaces is not null) {
@@ -65,17 +66,17 @@ public class EstimateExpensesWithSubscriptionsProviderTests {
     options.VendorPropertyName.ShouldBe("vendor");
     options.AmountPropertyName.ShouldBe("amount");
     options.AlternateVendorPropertyName.ShouldBe("altvendor");
+    options.ActualTotalPropertyName.ShouldBe("actualTotal");
     options.CurrencyDecimalPlaces.ShouldBe(currencyDecimalPlaces ?? 2);
   }
 
   [TestMethod]
-  public void GetPlugin_MissingAlternateVendorPropertyName_ThrowsException() {
+  public void GetPlugin_MissingVendorPropertyName_ThrowsException() {
     var rawOptions = new Dictionary<string, object> {
         ["DataSourceId"] = "dataSourceId",
         ["PropertyName"] = "propertyName",
         ["ExpensesDataSourceId"] = "expensesDataSourceId",
         ["OutputPageId"] = "outputPageId",
-        ["VendorPropertyName"] = "vendor",
         ["AmountPropertyName"] = "amount"
     };
 
@@ -91,7 +92,7 @@ public class EstimateExpensesWithSubscriptionsProviderTests {
 
     // Assert
     act.ShouldThrow<InvalidConfigurationException>()
-        .Message.ShouldBe("Missing required option 'AlternateVendorPropertyName'");
+        .Message.ShouldBe("Missing required option 'VendorPropertyName'");
   }
 
   [TestMethod]

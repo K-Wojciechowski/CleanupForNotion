@@ -116,11 +116,12 @@ This is another part of the “secondary bank’s credit card” database (as de
 #### Plugin-specific configuration for EstimateExpensesWithoutSubscriptions
 
 * **DataSourceId** (string, mandatory) — ID of the data source with subscriptions.
-* **PropertyName** (string, mandatory) — The name of the subscription property to which the total will be written.
+* **PropertyName** (string, mandatory) — The name of the subscription property to which the estimated total will be written.
 * **ExpensesDataSourceId** (string, mandatory) — ID of the data source with expenses.
 * **VendorPropertyName** (string, mandatory) — name of the vendor property in both data sources.
 * **AmountPropertyName** (string, mandatory) — name of the amount property in both data sources.
-* **AlternateVendorPropertyName** (string, mandatory) — name of the alternate vendor property in the subscriptions data source.
+* **AlternateVendorPropertyName** (string, optional) — name of the alternate vendor property in the subscriptions data source.
+* **ActualTotalPropertyName** (string, optional) — The name of the subscription property to which the actual total will be written.
 * **CurrencyDecimalPlaces** (integer, defaults to 2) — the number of decimal places used by the currency.
 
 *Note: the **GracePeriod** property is ignored by this plugin.*
@@ -267,6 +268,7 @@ Here is an example CleanupForNotion configuration:
       "VendorPropertyName": "Vendor",
       "AmountPropertyName": "Amount",
       "AlternateVendorPropertyName": "Alternate Names",
+      "ActualTotalPropertyName": "Actual Total",
       "CurrencyDecimalPlaces": 2
     }
   ],

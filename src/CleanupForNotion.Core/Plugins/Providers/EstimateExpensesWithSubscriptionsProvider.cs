@@ -30,7 +30,8 @@ public class EstimateExpensesWithSubscriptionsProvider(
         ExpensesDataSourceId: options.GetString("ExpensesDataSourceId"),
         VendorPropertyName: options.GetString("VendorPropertyName"),
         AmountPropertyName: options.GetString("AmountPropertyName"),
-        AlternateVendorPropertyName: options.GetString("AlternateVendorPropertyName"),
+        AlternateVendorPropertyName: options.GetOptionalString("AlternateVendorPropertyName"),
+        ActualTotalPropertyName: options.GetOptionalString("ActualTotalPropertyName"),
         CurrencyDecimalPlaces: options.GetOptionalInteger("CurrencyDecimalPlaces") ?? 2,
         GracePeriod: gracePeriod);
   }

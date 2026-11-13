@@ -79,13 +79,17 @@ public class EstimateExpensesWithSubscriptions(
     LogBuckets(buckets);
 
     foreach (var bucket in buckets) {
+      var properties = new Dictionary<string, PropertyValue> {
+          { options.PropertyName, new NumberPropertyValue { Number = (double)bucket.Value } }
+      };
+
+      if (options.ActualTotalPropertyName != null) {
+        properties[options.ActualTotalPropertyName] = new NumberPropertyValue { Number = (double)bucket.Actual };
+      }
+
       await client.UpdatePageAsync(
           bucket.Id,
-          new PagesUpdateParameters {
-              Properties = new Dictionary<string, PropertyValue> {
-                  { options.PropertyName, new NumberPropertyValue { Number = (double)bucket.Value } }
-              }
-          },
+          new PagesUpdateParameters { Properties = properties },
           cancellationToken).ConfigureAwait(false);
     }
 
@@ -116,12 +120,14 @@ public class EstimateExpensesWithSubscriptions(
         _ => throw new InvalidDataException($"Page {page.Id} does not have a readable vendor")
     };
 
-    return string.Join(null, vendorParts.Select(p => p.PlainText)).Trim().ToLower();
+    return string.Join(null, vendorParts.Select(p => p.PlainText)).Trim().ToLowerInvariant();
   }
 
   private HashSet<string> ExtractSubscriptionNames(Page page) {
     var mainVendor = ExtractVendor(page, options.VendorPropertyName);
-    var alternateVendor = ExtractVendor(page, options.AlternateVendorPropertyName);
+    var alternateVendor = options.AlternateVendorPropertyName != null
+        ? ExtractVendor(page, options.AlternateVendorPropertyName)
+        : null;
 
     return string.IsNullOrEmpty(alternateVendor)
         ? [mainVendor]
