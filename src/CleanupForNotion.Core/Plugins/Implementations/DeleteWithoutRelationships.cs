@@ -8,20 +8,20 @@ using Notion.Client;
 namespace CleanupForNotion.Core.Plugins.Implementations;
 
 public class DeleteWithoutRelationships(
-  ILogger<DeletePluginBase<DeleteWithoutRelationshipsOptions>> logger,
-  IPluginStateProvider pluginStateProvider,
-  TimeProvider timeProvider,
-  DeleteWithoutRelationshipsOptions options,
-  string pluginDescription,
-  string? pluginId)
-  : DeletePluginBase<DeleteWithoutRelationshipsOptions>(logger, pluginStateProvider, timeProvider, options, pluginDescription, pluginId) {
-
+    ILogger<DeletePluginBase<DeleteWithoutRelationshipsOptions>> logger,
+    IPluginStateProvider pluginStateProvider,
+    TimeProvider timeProvider,
+    DeleteWithoutRelationshipsOptions options,
+    string pluginDescription,
+    string? pluginId)
+    : DeletePluginBase<DeleteWithoutRelationshipsOptions>(logger, pluginStateProvider, timeProvider, options,
+        pluginDescription, pluginId) {
   public override string Name => "DeleteWithoutRelationships";
 
   public override async Task Run(
-    ICfnNotionClient client,
-    GlobalOptions globalOptions,
-    CancellationToken cancellationToken) {
+      ICfnNotionClient client,
+      GlobalOptions globalOptions,
+      CancellationToken cancellationToken) {
     await DoDelete(
         client,
         globalOptions,

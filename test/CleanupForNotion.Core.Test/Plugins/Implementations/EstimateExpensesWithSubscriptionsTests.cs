@@ -128,7 +128,8 @@ public class EstimateExpensesWithSubscriptionsTests {
 
     GetUpdatedTotal(client, "subscription").ShouldBe(8.15);
     GetUpdatedTotal(client, "blank").ShouldBe(0);
-    await stateProvider.Received().SetString(plugin, "LastEdit", _lastEditedString, CancellationToken.None).ConfigureAwait(false);
+    await stateProvider.Received().SetString(plugin, "LastEdit", _lastEditedString, CancellationToken.None)
+        .ConfigureAwait(false);
   }
 
   [TestMethod]
@@ -143,7 +144,8 @@ public class EstimateExpensesWithSubscriptionsTests {
 
     GetUpdatedTotal(client, "subscription1").ShouldBe(3);
     GetUpdatedTotal(client, "subscription2").ShouldBe(15);
-    await stateProvider.Received().SetString(plugin, "LastEdit", "2000-01-01T00:00:00.0000000+00:00", CancellationToken.None)
+    await stateProvider.Received()
+        .SetString(plugin, "LastEdit", "2000-01-01T00:00:00.0000000+00:00", CancellationToken.None)
         .ConfigureAwait(false);
     await stateProvider.Received().SetString(plugin, "PageCount", "0", CancellationToken.None).ConfigureAwait(false);
   }

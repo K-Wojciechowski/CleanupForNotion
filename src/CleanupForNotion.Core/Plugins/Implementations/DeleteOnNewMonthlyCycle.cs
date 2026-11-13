@@ -35,7 +35,8 @@ public class DeleteOnNewMonthlyCycle : DeletePluginBase<DeleteOnNewMonthlyCycleO
     var currentCycleStartDate = GetCurrentCycleStartDate(now);
     var currentCycleStartGenericDateTime = currentCycleStartDate.ToDateTime(TimeOnly.MinValue);
     var currentCycleStartUserDateTime = GetMidnightInUserTimeZone(currentCycleStartDate, timeZone);
-    var lastRun = await PluginStateProvider.GetDateTime(this, LastRunSettingsKey, cancellationToken).ConfigureAwait(false);
+    var lastRun = await PluginStateProvider.GetDateTime(this, LastRunSettingsKey, cancellationToken)
+        .ConfigureAwait(false);
 
     if (lastRun == null) {
       Logger.LogDebug("Last run is null, will delete old cycles");

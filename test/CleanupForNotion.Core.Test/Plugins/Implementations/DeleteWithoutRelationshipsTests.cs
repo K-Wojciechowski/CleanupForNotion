@@ -8,10 +8,13 @@ using Shouldly;
 namespace CleanupForNotion.Core.Test.Plugins.Implementations;
 
 [TestClass]
-public class DeleteWithoutRelationshipsTests : BasicDeletePluginTestsBase<DeleteWithoutRelationships, DeleteWithoutRelationshipsOptions> {
+public class
+    DeleteWithoutRelationshipsTests : BasicDeletePluginTestsBase<DeleteWithoutRelationships,
+    DeleteWithoutRelationshipsOptions> {
   [TestMethod]
   public void Name_Get_ReturnsDeleteWithoutRelationships() {
-    new DeleteWithoutRelationships(null!, null!, null!, null!, null!, null!).Name.ShouldBe("DeleteWithoutRelationships");
+    new DeleteWithoutRelationships(null!, null!, null!, null!, null!, null!).Name
+        .ShouldBe("DeleteWithoutRelationships");
   }
 
   [TestMethod]

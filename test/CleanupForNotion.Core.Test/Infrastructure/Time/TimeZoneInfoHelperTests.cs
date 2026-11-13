@@ -31,5 +31,4 @@ public class TimeZoneInfoHelperTests {
     // Assert
     timeZone.Id.ShouldBe(WindowsId);
   }
-
 }

@@ -14,7 +14,9 @@ public static class CfnNotionClientExtensions {
     var pages = new List<IQueryDataSourceResponseObject>(queryResults.Results);
 
     while (queryResults.HasMore) {
-      var nextRequest = new QueryDataSourceRequest { DataSourceId = dataSourceId, Filter = filter, StartCursor = queryResults.NextCursor };
+      var nextRequest = new QueryDataSourceRequest {
+          DataSourceId = dataSourceId, Filter = filter, StartCursor = queryResults.NextCursor
+      };
       queryResults = await cfnNotionClient.QueryDataSourceRawAsync(nextRequest, cancellationToken)
           .ConfigureAwait(false);
       pages.AddRange(queryResults.Results);

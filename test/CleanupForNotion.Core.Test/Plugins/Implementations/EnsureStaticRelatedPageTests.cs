@@ -57,7 +57,9 @@ public class EnsureStaticRelatedPageTests {
 
     var client = Substitute.For<ICfnNotionClient>();
     client.QueryDataSourceRawAsync(Arg.Any<QueryDataSourceRequest>(), CancellationToken.None)
-        .Returns(new QueryDataSourceResponse { Results = pages.Cast<IQueryDataSourceResponseObject>().ToList(), HasMore = false });
+        .Returns(new QueryDataSourceResponse {
+            Results = pages.Cast<IQueryDataSourceResponseObject>().ToList(), HasMore = false
+        });
 
     var relationFilter = new RelationFilter(options.PropertyName, doesNotContain: options.RelatedPageId);
     var expectedFilter = LastEditedFilterHelper.GetCompoundFilterWithLastEdited(
@@ -205,7 +207,9 @@ public class EnsureStaticRelatedPageTests {
 
     var client = Substitute.For<ICfnNotionClient>();
     client.QueryDataSourceRawAsync(Arg.Any<QueryDataSourceRequest>(), CancellationToken.None)
-        .Returns(new QueryDataSourceResponse { Results = pages.Cast<IQueryDataSourceResponseObject>().ToList(), HasMore = false });
+        .Returns(new QueryDataSourceResponse {
+            Results = pages.Cast<IQueryDataSourceResponseObject>().ToList(), HasMore = false
+        });
 
     var expectedFilter = LastEditedFilterHelper.GetLastEditedFilter(timeProvider, TimeSpan.Zero);
     var expectedLogMessages = new[] {

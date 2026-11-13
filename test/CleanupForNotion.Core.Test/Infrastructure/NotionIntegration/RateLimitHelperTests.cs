@@ -101,6 +101,7 @@ public class RateLimitHelperTests {
     stopwatch.ElapsedMilliseconds.ShouldBeGreaterThan((int)(0.9 * (int)defaultRetryAfter.TotalMilliseconds));
     result.ShouldBe(expectedResult);
     logger.Collector.Count.ShouldBe(1);
-    logger.LatestRecord.Message.ShouldBe($"Rate limit exceeded, will retry after {defaultRetryAfter.TotalSeconds} seconds");
+    logger.LatestRecord.Message.ShouldBe(
+        $"Rate limit exceeded, will retry after {defaultRetryAfter.TotalSeconds} seconds");
   }
 }

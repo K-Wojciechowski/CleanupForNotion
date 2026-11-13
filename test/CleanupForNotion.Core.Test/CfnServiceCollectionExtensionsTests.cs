@@ -72,7 +72,8 @@ public class CfnServiceCollectionExtensionsTests {
   [DataRow("InMemory", typeof(InMemoryPluginStateProvider))]
   [DataRow("File", typeof(JsonFilePluginStateProvider))]
   [DataRow("PostgreSQL", typeof(PostgresPluginStateProvider))]
-  public void AddCfnServices_StateProviderConfigured_StateProviderCanBeActivated(string? stateEngine, Type providerType) {
+  public void AddCfnServices_StateProviderConfigured_StateProviderCanBeActivated(string? stateEngine,
+      Type providerType) {
     // Arrange
     var options = new ServiceProviderOptions { ValidateOnBuild = true };
 

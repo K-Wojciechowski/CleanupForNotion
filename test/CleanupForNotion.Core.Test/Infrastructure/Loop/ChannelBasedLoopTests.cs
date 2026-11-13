@@ -41,12 +41,13 @@ public class ChannelBasedLoopTests {
 
     // Assert
     logger.Collector.GetSnapshot().ShouldBeEmpty();
-    await runner.Received(0).RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<string?>(), Arg.Any<CancellationToken>()).ConfigureAwait(false);
+    await runner.Received(0).RunCleanup(Arg.Any<GlobalOptions>(), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        .ConfigureAwait(false);
   }
 
   [TestMethod]
-  [DataRow(null, DisplayName="Triggered once with null plugin ID")]
-  [DataRow("hello", DisplayName="Triggered once with non-null plugin ID")]
+  [DataRow(null, DisplayName = "Triggered once with null plugin ID")]
+  [DataRow("hello", DisplayName = "Triggered once with non-null plugin ID")]
   public async Task ExecuteAsync_TriggeredOnce_RunsCleanup(string? pluginId) {
     // Arrange
     var channel = Channel.CreateUnbounded<RunRequest>();
@@ -86,7 +87,8 @@ public class ChannelBasedLoopTests {
 
     var triggerTime = timeProvider.GetUtcNow().Subtract(TimeSpan.FromMilliseconds(123));
     var startTime = timeProvider.GetUtcNow();
-    await channel.Writer.WriteAsync(new RunRequest(triggerTime, pluginId), CancellationToken.None).ConfigureAwait(false);
+    await channel.Writer.WriteAsync(new RunRequest(triggerTime, pluginId), CancellationToken.None)
+        .ConfigureAwait(false);
     await Task.Delay(200, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
@@ -96,10 +98,11 @@ public class ChannelBasedLoopTests {
     var logRecords = logger.Collector.GetSnapshot();
     logRecords.Count.ShouldBe(2);
     logRecords[0].Message.ShouldBe(
-            $"Received trigger from {triggerTime:O} for plugin {pluginId ?? "(all plugins)"} at {startTime:O} (in {(startTime - triggerTime).TotalMilliseconds} ms)");
+        $"Received trigger from {triggerTime:O} for plugin {pluginId ?? "(all plugins)"} at {startTime:O} (in {(startTime - triggerTime).TotalMilliseconds} ms)");
     logRecords[^1].Message.ShouldBe(
-            $"Finished trigger from {triggerTime:O} at {timeProvider.GetUtcNow():O} (in {(timeProvider.GetUtcNow() - startTime).TotalMilliseconds} ms)");
-    await runner.Received(1).RunCleanup(globalOptionsProvider.GlobalOptions, pluginId, Arg.Any<CancellationToken>()).ConfigureAwait(false);
+        $"Finished trigger from {triggerTime:O} at {timeProvider.GetUtcNow():O} (in {(timeProvider.GetUtcNow() - startTime).TotalMilliseconds} ms)");
+    await runner.Received(1).RunCleanup(globalOptionsProvider.GlobalOptions, pluginId, Arg.Any<CancellationToken>())
+        .ConfigureAwait(false);
   }
 
   [TestMethod]
@@ -119,6 +122,7 @@ public class ChannelBasedLoopTests {
           if (runnerCalls.Count == 2) {
             throw new Exception("kaboom");
           }
+
           return Task.CompletedTask;
         });
 
@@ -152,7 +156,8 @@ public class ChannelBasedLoopTests {
     logRecords[1].Message.ShouldStartWith($"Finished trigger from {trigger1Time:O}");
     logRecords[3].Message.ShouldBe($"Failed trigger from {trigger2Time:O} with exception: kaboom");
     logRecords[5].Message.ShouldStartWith($"Finished trigger from {trigger3Time:O}");
-    await runner.Received(3).RunCleanup(globalOptionsProvider.GlobalOptions, null, Arg.Any<CancellationToken>()).ConfigureAwait(false);
+    await runner.Received(3).RunCleanup(globalOptionsProvider.GlobalOptions, null, Arg.Any<CancellationToken>())
+        .ConfigureAwait(false);
   }
 
   [TestMethod]
@@ -197,7 +202,10 @@ public class ChannelBasedLoopTests {
       logRecords[l].Message.ShouldStartWith("Received trigger from");
       logRecords[l + 1].Message.ShouldStartWith("Finished trigger from");
     }
-    await runner.Received(calls).RunCleanup(globalOptionsProvider.GlobalOptions, Arg.Any<string?>(), Arg.Any<CancellationToken>()).ConfigureAwait(false);
+
+    await runner.Received(calls)
+        .RunCleanup(globalOptionsProvider.GlobalOptions, Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        .ConfigureAwait(false);
   }
 
   private IGlobalOptionsProvider BuildGlobalOptionsProvider() {

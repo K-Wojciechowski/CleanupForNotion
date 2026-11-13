@@ -10,13 +10,13 @@ using Microsoft.Extensions.Options;
 namespace CleanupForNotion.Core.Infrastructure.Execution;
 
 public class Runner(
-  ICfnNotionClient notionClient,
-  ILogger<Runner> logger,
-  INotificationSender notificationSender,
-  IOptions<CfnOptions> options,
-  IPluginActivator pluginActivator,
-  IPluginSpecificationParser pluginSpecificationParser,
-  IRunnerSemaphore runnerSemaphore
+    ICfnNotionClient notionClient,
+    ILogger<Runner> logger,
+    INotificationSender notificationSender,
+    IOptions<CfnOptions> options,
+    IPluginActivator pluginActivator,
+    IPluginSpecificationParser pluginSpecificationParser,
+    IRunnerSemaphore runnerSemaphore
 ) : IRunner {
   private const string EmptyPluginsMessage = "Plugin configuration is missing, check your appsettings.json file";
   private const string AlreadyRunningMessage = "A cleanup is already running.";
@@ -41,14 +41,15 @@ public class Runner(
     using var _ = semaphore;
 
     var plugins = rawPlugins
-      .Select(pluginSpecificationParser.ParseSpecification)
-      .Where(p => pluginId == null || p.PluginId == pluginId)
-      .Select(pluginActivator.ActivatePlugin)
-      .ToArray();
+        .Select(pluginSpecificationParser.ParseSpecification)
+        .Where(p => pluginId == null || p.PluginId == pluginId)
+        .Select(pluginActivator.ActivatePlugin)
+        .ToArray();
 
     foreach (var plugin in plugins) {
       if (plugin.Id != null) {
-        logger.LogInformation("Running plugin {Plugin} ({Description}) [{PluginId}]", plugin, plugin.Description, plugin.Id);
+        logger.LogInformation("Running plugin {Plugin} ({Description}) [{PluginId}]", plugin, plugin.Description,
+            plugin.Id);
       } else {
         logger.LogInformation("Running plugin {Plugin} ({Description})", plugin, plugin.Description);
       }
@@ -56,7 +57,8 @@ public class Runner(
       var stopwatch = Stopwatch.StartNew();
       await plugin.Run(notionClient, globalOptions, cancellationToken).ConfigureAwait(false);
       if (plugin.Id != null) {
-        logger.LogInformation("Finished plugin {Plugin} [{PluginId}] in {Duration} ms", plugin, plugin.Id, stopwatch.ElapsedMilliseconds);
+        logger.LogInformation("Finished plugin {Plugin} [{PluginId}] in {Duration} ms", plugin, plugin.Id,
+            stopwatch.ElapsedMilliseconds);
       } else {
         logger.LogInformation("Finished plugin {Plugin} in {Duration} ms", plugin, stopwatch.ElapsedMilliseconds);
       }

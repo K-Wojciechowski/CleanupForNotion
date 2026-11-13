@@ -34,7 +34,8 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   [DataRow(null, 5, true, "Europe/Warsaw")]
   [DataRow("00:00:01", 5, false, "Europe/Warsaw")]
   [DataRow("00:00:01", "5", false, "Europe/Warsaw")]
-  public void GetPlugin_ValidOptions_ReturnsPlugin(string? gracePeriod, object? cycleResetDay, bool? monthOverflowResets, string? timeZoneName) {
+  public void GetPlugin_ValidOptions_ReturnsPlugin(string? gracePeriod, object? cycleResetDay,
+      bool? monthOverflowResets, string? timeZoneName) {
     // Arrange
     var rawOptions = new Dictionary<string, object> {
         { "DataSourceId", "data source id" },
@@ -72,10 +73,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   [TestMethod]
   public void GetPlugin_MissingPropertyName_ThrowsException() {
     // Arrange
-    var rawOptions = new Dictionary<string, object> {
-        { "DataSourceId", "data source id" },
-        { "CycleResetDay", 1 }
-    };
+    var rawOptions = new Dictionary<string, object> { { "DataSourceId", "data source id" }, { "CycleResetDay", 1 } };
 
     var pluginSpecification = new PluginSpecification(
         PluginIndex: 0,
@@ -96,8 +94,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   public void GetPlugin_MissingCycleResetDay_ThrowsException() {
     // Arrange
     var rawOptions = new Dictionary<string, object> {
-        { "DataSourceId", "data source id" },
-        { "PropertyName", "property name" }
+        { "DataSourceId", "data source id" }, { "PropertyName", "property name" }
     };
 
     var pluginSpecification = new PluginSpecification(
@@ -144,9 +141,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
   public void GetPlugin_InvalidCycleResetDay_ThrowsException() {
     // Arrange
     var rawOptions = new Dictionary<string, object> {
-        { "DataSourceId", "data source id" },
-        { "PropertyName", "property name" },
-        { "CycleResetDay", "one" },
+        { "DataSourceId", "data source id" }, { "PropertyName", "property name" }, { "CycleResetDay", "one" },
     };
 
     var pluginSpecification = new PluginSpecification(
@@ -186,6 +181,7 @@ public class DeleteOnNewMonthlyCycleProviderTests {
 
     // Assert
     act.ShouldThrow<InvalidConfigurationException>()
-        .Message.ShouldBe("Option 'MonthOverflowResetsOnFirstDayOfNextMonth' is of invalid format (expected 'true' or 'false')");
+        .Message.ShouldBe(
+            "Option 'MonthOverflowResetsOnFirstDayOfNextMonth' is of invalid format (expected 'true' or 'false')");
   }
 }

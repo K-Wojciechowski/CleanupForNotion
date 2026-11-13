@@ -11,5 +11,6 @@ public class PluginSpecificationParser : IPluginSpecificationParser {
       RawOptions: new RawPluginOptions(rawSpecification));
 
   private static string Get(Dictionary<string, object> rawSpecification, string key) =>
-    rawSpecification.GetValueOrDefault(key) as string ?? throw new InvalidConfigurationException($"{key} is required");
+      rawSpecification.GetValueOrDefault(key) as string ??
+      throw new InvalidConfigurationException($"{key} is required");
 }

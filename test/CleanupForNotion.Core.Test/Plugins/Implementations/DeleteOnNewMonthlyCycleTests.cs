@@ -138,14 +138,16 @@ public class DeleteOnNewMonthlyCycleTests : DeletePluginTestsBase {
     var logger = new FakeLogger<DeleteOnNewMonthlyCycle>();
     var pluginStateProvider = CreateMockStateProvider(lastRun);
     var timeProvider = new FakeTimeProvider(now);
-    var plugin = new DeleteOnNewMonthlyCycle(logger, pluginStateProvider, timeProvider, options, PluginDescription, null!);
+    var plugin =
+        new DeleteOnNewMonthlyCycle(logger, pluginStateProvider, timeProvider, options, PluginDescription, null!);
 
     var client = CreateMockNotionClient();
 
     var currentCycleStartGenericDateTime = currentCycleStartDate.ToDateTime(TimeOnly.MinValue);
 
     var dateFilter = new DateFilter(options.PropertyName, before: currentCycleStartGenericDateTime);
-    var expectedCompoundFilter = LastEditedFilterHelper.GetCompoundFilterWithLastEdited(timeProvider, options, [dateFilter]);
+    var expectedCompoundFilter =
+        LastEditedFilterHelper.GetCompoundFilterWithLastEdited(timeProvider, options, [dateFilter]);
 
     var nowLocal = options.TimeZoneName != null
         ? TimeZoneInfo.ConvertTime(now, TimeZoneInfoHelper.GetTimeZone(options.TimeZoneName))
@@ -156,7 +158,8 @@ public class DeleteOnNewMonthlyCycleTests : DeletePluginTestsBase {
 
     // Assert
     await AssertPagesDeleted(logger, client, expectedCompoundFilter, dryRun).ConfigureAwait(false);
-    await pluginStateProvider.Received().SetDateTime(plugin, LastRunSettingsKey, nowLocal, CancellationToken.None).ConfigureAwait(false);
+    await pluginStateProvider.Received().SetDateTime(plugin, LastRunSettingsKey, nowLocal, CancellationToken.None)
+        .ConfigureAwait(false);
     logger.Collector.GetSnapshot().ShouldContain(l => l.Message == logMessage);
   }
 
@@ -168,7 +171,8 @@ public class DeleteOnNewMonthlyCycleTests : DeletePluginTestsBase {
     var logger = new FakeLogger<DeleteOnNewMonthlyCycle>();
     var pluginStateProvider = CreateMockStateProvider(lastRun);
     var timeProvider = new FakeTimeProvider(now);
-    var plugin = new DeleteOnNewMonthlyCycle(logger, pluginStateProvider, timeProvider, options, PluginDescription, null!);
+    var plugin =
+        new DeleteOnNewMonthlyCycle(logger, pluginStateProvider, timeProvider, options, PluginDescription, null!);
 
     var client = Substitute.For<ICfnNotionClient>();
 

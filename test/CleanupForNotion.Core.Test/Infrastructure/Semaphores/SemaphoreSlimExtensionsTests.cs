@@ -4,11 +4,9 @@ using Shouldly;
 namespace CleanupForNotion.Core.Test.Infrastructure.Semaphores;
 
 [TestClass]
-public class SemaphoreSlimExtensionsTests
-{
+public class SemaphoreSlimExtensionsTests {
   [TestMethod]
-  public void Acquire_Called_BlocksAndReturnsHolder()
-  {
+  public void Acquire_Called_BlocksAndReturnsHolder() {
     // Arrange
     var semaphore = new SemaphoreSlim(1, 1);
 
@@ -20,8 +18,7 @@ public class SemaphoreSlimExtensionsTests
   }
 
   [TestMethod]
-  public async Task AcquireAsync_Called_BlocksAndReturnsHolder()
-  {
+  public async Task AcquireAsync_Called_BlocksAndReturnsHolder() {
     // Arrange
     var semaphore = new SemaphoreSlim(1, 1);
 
@@ -33,8 +30,7 @@ public class SemaphoreSlimExtensionsTests
   }
 
   [TestMethod]
-  public void Dispose_CalledAfterAcquire_ReleasesSemaphore()
-  {
+  public void Dispose_CalledAfterAcquire_ReleasesSemaphore() {
     // Arrange
     var semaphore = new SemaphoreSlim(1, 1);
 
@@ -47,8 +43,7 @@ public class SemaphoreSlimExtensionsTests
   }
 
   [TestMethod]
-  public async Task Dispose_CalledAfterAcquireAsync_ReleasesSemaphore()
-  {
+  public async Task Dispose_CalledAfterAcquireAsync_ReleasesSemaphore() {
     // Arrange
     var semaphore = new SemaphoreSlim(1, 1);
 
@@ -61,8 +56,7 @@ public class SemaphoreSlimExtensionsTests
   }
 
   [TestMethod]
-  public async Task AcquireAsync_Twice_SecondTaskIsNotCompletedIfSemaphoreTaken()
-  {
+  public async Task AcquireAsync_Twice_SecondTaskIsNotCompletedIfSemaphoreTaken() {
     // Arrange
     var semaphore = new SemaphoreSlim(1, 1);
 
@@ -82,8 +76,7 @@ public class SemaphoreSlimExtensionsTests
   }
 
   [TestMethod]
-  public async Task AcquireAsyncWithCancellationToken_Twice_SecondTaskIsNotCompletedIfSemaphoreTaken()
-  {
+  public async Task AcquireAsyncWithCancellationToken_Twice_SecondTaskIsNotCompletedIfSemaphoreTaken() {
     // Arrange
     var semaphore = new SemaphoreSlim(1, 1);
     using var cancellationTokenSource = new CancellationTokenSource();

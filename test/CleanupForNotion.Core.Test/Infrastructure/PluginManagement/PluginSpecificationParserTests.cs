@@ -44,9 +44,6 @@ public class PluginSpecificationParserTests {
   }
 
   private static Dictionary<string, object> GetBaseRawSpecification() => new() {
-      { "PluginName", PluginName },
-      { "PluginDescription", PluginDescription },
-      { OtherKey, OtherValue },
+      { "PluginName", PluginName }, { "PluginDescription", PluginDescription }, { OtherKey, OtherValue },
   };
-
 }

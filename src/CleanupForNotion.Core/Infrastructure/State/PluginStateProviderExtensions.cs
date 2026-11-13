@@ -9,7 +9,8 @@ public static class PluginStateProviderExtensions {
       IPluginIdentifiers pluginIdentifiers,
       string key,
       CancellationToken cancellationToken) {
-    var stringValue = await pluginStateProvider.GetString(pluginIdentifiers, key, cancellationToken).ConfigureAwait(false);
+    var stringValue = await pluginStateProvider.GetString(pluginIdentifiers, key, cancellationToken)
+        .ConfigureAwait(false);
     if (stringValue == null) return null;
     return DateTimeOffset.ParseExact(stringValue, "o", CultureInfo.InvariantCulture);
   }
@@ -29,7 +30,8 @@ public static class PluginStateProviderExtensions {
       IPluginIdentifiers pluginIdentifiers,
       string key,
       CancellationToken cancellationToken) {
-    var stringValue = await pluginStateProvider.GetString(pluginIdentifiers, key, cancellationToken).ConfigureAwait(false);
+    var stringValue = await pluginStateProvider.GetString(pluginIdentifiers, key, cancellationToken)
+        .ConfigureAwait(false);
     if (stringValue == null) return null;
     return int.Parse(stringValue, CultureInfo.InvariantCulture);
   }

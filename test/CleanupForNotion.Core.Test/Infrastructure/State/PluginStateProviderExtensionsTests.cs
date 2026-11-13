@@ -17,10 +17,12 @@ public class PluginStateProviderExtensionsTests {
     // Arrange
     var pluginStateProvider = Substitute.For<IPluginStateProvider>();
     var pluginIdentifiers = Substitute.For<IPluginIdentifiers>();
-    pluginStateProvider.GetString(pluginIdentifiers, Key, CancellationToken.None).Returns(Task.FromResult((string?)null));
+    pluginStateProvider.GetString(pluginIdentifiers, Key, CancellationToken.None)
+        .Returns(Task.FromResult((string?)null));
 
     // Act
-    var result = await pluginStateProvider.GetDateTime(pluginIdentifiers, Key, CancellationToken.None).ConfigureAwait(false);
+    var result = await pluginStateProvider.GetDateTime(pluginIdentifiers, Key, CancellationToken.None)
+        .ConfigureAwait(false);
 
     // Assert
     result.ShouldBeNull();
@@ -34,7 +36,8 @@ public class PluginStateProviderExtensionsTests {
     pluginStateProvider.GetString(pluginIdentifiers, Key, CancellationToken.None).Returns(DateString);
 
     // Act
-    var result = await pluginStateProvider.GetDateTime(pluginIdentifiers, Key, CancellationToken.None).ConfigureAwait(false);
+    var result = await pluginStateProvider.GetDateTime(pluginIdentifiers, Key, CancellationToken.None)
+        .ConfigureAwait(false);
 
     // Assert
     result.ShouldBe(_dateValue);
@@ -47,10 +50,12 @@ public class PluginStateProviderExtensionsTests {
     var pluginIdentifiers = Substitute.For<IPluginIdentifiers>();
 
     // Act
-    await pluginStateProvider.SetDateTime(pluginIdentifiers, Key, _dateValue, CancellationToken.None).ConfigureAwait(false);
+    await pluginStateProvider.SetDateTime(pluginIdentifiers, Key, _dateValue, CancellationToken.None)
+        .ConfigureAwait(false);
 
     // Assert
-    await pluginStateProvider.Received().SetString(pluginIdentifiers, Key, DateString, CancellationToken.None).ConfigureAwait(false);
+    await pluginStateProvider.Received().SetString(pluginIdentifiers, Key, DateString, CancellationToken.None)
+        .ConfigureAwait(false);
   }
 
 
@@ -59,10 +64,12 @@ public class PluginStateProviderExtensionsTests {
     // Arrange
     var pluginStateProvider = Substitute.For<IPluginStateProvider>();
     var pluginIdentifiers = Substitute.For<IPluginIdentifiers>();
-    pluginStateProvider.GetString(pluginIdentifiers, Key, CancellationToken.None).Returns(Task.FromResult((string?)null));
+    pluginStateProvider.GetString(pluginIdentifiers, Key, CancellationToken.None)
+        .Returns(Task.FromResult((string?)null));
 
     // Act
-    var result = await pluginStateProvider.GetInteger(pluginIdentifiers, Key, CancellationToken.None).ConfigureAwait(false);
+    var result = await pluginStateProvider.GetInteger(pluginIdentifiers, Key, CancellationToken.None)
+        .ConfigureAwait(false);
 
     // Assert
     result.ShouldBeNull();
@@ -76,7 +83,8 @@ public class PluginStateProviderExtensionsTests {
     pluginStateProvider.GetString(pluginIdentifiers, Key, CancellationToken.None).Returns("12345");
 
     // Act
-    var result = await pluginStateProvider.GetInteger(pluginIdentifiers, Key, CancellationToken.None).ConfigureAwait(false);
+    var result = await pluginStateProvider.GetInteger(pluginIdentifiers, Key, CancellationToken.None)
+        .ConfigureAwait(false);
 
     // Assert
     result.ShouldBe(12345);
@@ -92,6 +100,7 @@ public class PluginStateProviderExtensionsTests {
     await pluginStateProvider.SetInteger(pluginIdentifiers, Key, 12345, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
-    await pluginStateProvider.Received().SetString(pluginIdentifiers, Key, "12345", CancellationToken.None).ConfigureAwait(false);
+    await pluginStateProvider.Received().SetString(pluginIdentifiers, Key, "12345", CancellationToken.None)
+        .ConfigureAwait(false);
   }
 }

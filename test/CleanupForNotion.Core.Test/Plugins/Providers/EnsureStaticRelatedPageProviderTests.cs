@@ -62,8 +62,7 @@ public class EnsureStaticRelatedPageProviderTests {
   public void GetPlugin_MissingRelatedPageId_ThrowsException() {
     // Arrange
     var rawOptions = new Dictionary<string, object> {
-        { "DataSourceId", "data source id" },
-        { "PropertyName", "property name" },
+        { "DataSourceId", "data source id" }, { "PropertyName", "property name" },
     };
 
     var pluginSpecification = new PluginSpecification(

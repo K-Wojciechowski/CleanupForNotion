@@ -10,14 +10,14 @@ public abstract class DeletePluginTestsBase {
   private const string DataSourceId = "dataSourceId";
   private static readonly string[] _pageIdsToDelete = ["a", "b", "c"];
 
-  protected static ICfnNotionClient CreateMockNotionClient()
-  {
+  protected static ICfnNotionClient CreateMockNotionClient() {
     var client = Substitute.For<ICfnNotionClient>();
 
     client.QueryDataSourceRawAsync(
         Arg.Any<QueryDataSourceRequest>(), CancellationToken.None).Returns(
         new QueryDataSourceResponse {
-            Results = _pageIdsToDelete.Select(id => new Page { Id = id }).Cast<IQueryDataSourceResponseObject>().ToList()
+            Results = _pageIdsToDelete.Select(id => new Page { Id = id }).Cast<IQueryDataSourceResponseObject>()
+                .ToList()
         });
 
     client.DeletePageAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).ReturnsForAnyArgs(Task.CompletedTask);

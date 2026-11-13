@@ -17,8 +17,10 @@ public class InMemoryPluginStateProviderTests {
     var provider = new InMemoryPluginStateProvider();
 
     // Act
-    await provider.SetString(new P(PluginName, PluginDescription), Key, Value, CancellationToken.None).ConfigureAwait(false);
-    var result = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(PluginName, PluginDescription), Key, Value, CancellationToken.None)
+        .ConfigureAwait(false);
+    var result = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None)
+        .ConfigureAwait(false);
 
     // Assert
     result.ShouldBe(Value);
@@ -28,14 +30,17 @@ public class InMemoryPluginStateProviderTests {
   public async Task Remove_RemovesValue() {
     // Arrange
     var provider = new InMemoryPluginStateProvider();
-    await provider.SetString(new P(PluginName, PluginDescription), Key, Value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(PluginName, PluginDescription), Key, Value, CancellationToken.None)
+        .ConfigureAwait(false);
 
-    var resultBefore = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None).ConfigureAwait(false);
+    var resultBefore = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None)
+        .ConfigureAwait(false);
     resultBefore.ShouldBe(Value);
 
     // Act
     await provider.Remove(new P(PluginName, PluginDescription), Key, CancellationToken.None).ConfigureAwait(false);
-    var result = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None).ConfigureAwait(false);
+    var result = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None)
+        .ConfigureAwait(false);
 
     // Assert
     result.ShouldBeNull();
@@ -47,7 +52,8 @@ public class InMemoryPluginStateProviderTests {
     var provider = new InMemoryPluginStateProvider();
 
     // Act
-    var result = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None).ConfigureAwait(false);
+    var result = await provider.GetString(new P(PluginName, PluginDescription), Key, CancellationToken.None)
+        .ConfigureAwait(false);
 
     // Assert
     result.ShouldBeNull();

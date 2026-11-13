@@ -4,7 +4,8 @@ using Notion.Client;
 namespace CleanupForNotion.Core.Infrastructure.NotionIntegration;
 
 public static class RateLimitHelper {
-  public static async Task<T> CallWithRetryAsync<T>(Func<Task<T>> func, ILogger logger, CancellationToken cancellationToken) {
+  public static async Task<T> CallWithRetryAsync<T>(Func<Task<T>> func, ILogger logger,
+      CancellationToken cancellationToken) {
     while (true) {
       try {
         return await func().ConfigureAwait(false);

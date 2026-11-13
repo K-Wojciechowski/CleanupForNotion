@@ -15,14 +15,16 @@ public class DeleteZeroSum(
     DeleteZeroSumOptions options,
     string pluginDescription,
     string? pluginId)
-    : DeletePluginBase<DeleteZeroSumOptions>(logger, pluginStateProvider, timeProvider, options, pluginDescription, pluginId) {
+    : DeletePluginBase<DeleteZeroSumOptions>(logger, pluginStateProvider, timeProvider, options, pluginDescription,
+        pluginId) {
   public override string Name => "DeleteZeroSum";
 
   public override async Task Run(ICfnNotionClient client, GlobalOptions globalOptions,
       CancellationToken cancellationToken) {
     var filter = LastEditedFilterHelper.GetLastEditedFilter(TimeProvider, Options);
 
-    var pages = await client.QueryDataSourceAsync(Options.DataSourceId, filter, cancellationToken).ConfigureAwait(false);
+    var pages = await client.QueryDataSourceAsync(Options.DataSourceId, filter, cancellationToken)
+        .ConfigureAwait(false);
     var buckets = new Buckets();
 
     foreach (var page in pages) {
@@ -37,7 +39,8 @@ public class DeleteZeroSum(
       if (rawValue is NumberPropertyValue numberValue) {
         var nullableValue = numberValue.Number;
         if (!nullableValue.HasValue) {
-          Logger.LogTrace("Property '{Property}' in page '{Page}' has a null numeric value, skipping", propertyName, pageId);
+          Logger.LogTrace("Property '{Property}' in page '{Page}' has a null numeric value, skipping", propertyName,
+              pageId);
           continue;
         }
 
@@ -45,13 +48,15 @@ public class DeleteZeroSum(
       } else if (rawValue is FormulaPropertyValue formulaValue) {
         var nullableValue = formulaValue.Formula.Number;
         if (!nullableValue.HasValue) {
-          Logger.LogTrace("Property '{Property}' in page '{Page}' has a null formula value, skipping", propertyName, pageId);
+          Logger.LogTrace("Property '{Property}' in page '{Page}' has a null formula value, skipping", propertyName,
+              pageId);
           continue;
         }
 
         buckets.Add(nullableValue.Value, page);
       } else {
-        Logger.LogError("Property '{Property}' in page '{Page}' does not have a numeric or formula value (found '{Type}'), skipping",
+        Logger.LogError(
+            "Property '{Property}' in page '{Page}' does not have a numeric or formula value (found '{Type}'), skipping",
             propertyName, pageId, rawValue.Type);
       }
     }
@@ -60,7 +65,8 @@ public class DeleteZeroSum(
 
     if (buckets.Zero.Count > 0) {
       Logger.LogInformation("Found {Count} pairs with a value of zero, removing", buckets.Zero.Count);
-      await DoDelete(client, globalOptions, buckets.Zero.Select(p => p.Id).ToArray(), cancellationToken).ConfigureAwait(false);
+      await DoDelete(client, globalOptions, buckets.Zero.Select(p => p.Id).ToArray(), cancellationToken)
+          .ConfigureAwait(false);
     }
 
     foreach (var bucket in bucketsWithPairs) {

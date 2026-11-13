@@ -28,7 +28,6 @@ public class PostgresPluginStateProviderTests {
       _container.StartAsync(context.CancellationToken).Wait(context.CancellationToken);
     } catch (DockerUnavailableException exc) {
       Assert.Inconclusive($"Docker is unavailable, cannot run Postgres tests. {exc}");
-
     }
 
     var cfnOptions = new CfnOptions {
@@ -40,7 +39,8 @@ public class PostgresPluginStateProviderTests {
   [ClassCleanup]
   public static void Cleanup(TestContext context) {
     if (_container == null) return;
-    Task.Run(async () => await _container.DisposeAsync().ConfigureAwait(false), context.CancellationToken).Wait(context.CancellationToken);
+    Task.Run(async () => await _container.DisposeAsync().ConfigureAwait(false), context.CancellationToken)
+        .Wait(context.CancellationToken);
   }
 
   [TestMethod]
@@ -48,9 +48,7 @@ public class PostgresPluginStateProviderTests {
     // Arrange
     var notificationSender = Substitute.For<INotificationSender>();
 
-    var cfnOptions = new CfnOptions {
-        StateAccessDetails = null, AuthToken = "", Plugins = []
-    };
+    var cfnOptions = new CfnOptions { StateAccessDetails = null, AuthToken = "", Plugins = [] };
     var options = new OptionsWrapper<CfnOptions>(cfnOptions);
 
     // Act

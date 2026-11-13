@@ -12,7 +12,8 @@ namespace CleanupForNotion.Core.Test.Infrastructure.State.Factories;
 [TestClass]
 public class JsonFilePluginStateProviderFactoryTests {
   [TestMethod]
-  public void Name_ReturnsInMemory() => new JsonFilePluginStateProviderFactory(null!, null!, null!).Name.ShouldBe("File");
+  public void Name_ReturnsInMemory() =>
+      new JsonFilePluginStateProviderFactory(null!, null!, null!).Name.ShouldBe("File");
 
   [TestMethod]
   public void CanCreate_InMemory_ReturnsTrue() =>

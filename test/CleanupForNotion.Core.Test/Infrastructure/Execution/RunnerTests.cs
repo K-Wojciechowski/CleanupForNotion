@@ -57,7 +57,7 @@ public sealed class RunnerTests {
     var notificationSender = Substitute.For<INotificationSender>();
 
     var rawPlugins = new List<Dictionary<string, object>> {
-        new() { { "Name", "Plugin1" } }, new() { { "Name", "Plugin2" }, { "PluginId", "Plugin2Id"} }
+        new() { { "Name", "Plugin1" } }, new() { { "Name", "Plugin2" }, { "PluginId", "Plugin2Id" } }
     };
 
     var runner = new Runner(
@@ -137,7 +137,8 @@ public sealed class RunnerTests {
         runnerSemaphore: semaphore
     );
 
-    var semaphoreHolder = await semaphore.AcquireAsync(TimeSpan.FromSeconds(1), CancellationToken.None).ConfigureAwait(false);
+    var semaphoreHolder =
+        await semaphore.AcquireAsync(TimeSpan.FromSeconds(1), CancellationToken.None).ConfigureAwait(false);
 
     var runTask = runner.RunCleanup(new GlobalOptions(), null, CancellationToken.None);
 
@@ -169,7 +170,8 @@ public sealed class RunnerTests {
 
     using var _ = await semaphore.AcquireAsync(TimeSpan.FromSeconds(1), CancellationToken.None).ConfigureAwait(false);
 
-    Func<Task> act = async () => await runner.RunCleanup(new GlobalOptions(), null, CancellationToken.None).ConfigureAwait(false);
+    Func<Task> act = async () =>
+        await runner.RunCleanup(new GlobalOptions(), null, CancellationToken.None).ConfigureAwait(false);
 
     (await act.ShouldThrowAsync<TimeoutException>().ConfigureAwait(false))
         .Message.ShouldBe("A cleanup is already running.");
@@ -177,7 +179,8 @@ public sealed class RunnerTests {
     await notificationSender.DidNotReceiveWithAnyArgs().NotifyRunFinished(default, default).ConfigureAwait(false);
   }
 
-  private async Task RunCleanup_NoPlugins_ThrowsException(List<Dictionary<string, object>>? plugins, bool nullConfig = false) {
+  private async Task RunCleanup_NoPlugins_ThrowsException(List<Dictionary<string, object>>? plugins,
+      bool nullConfig = false) {
     // Arrange
     var logger = new FakeLogger<Runner>();
     var notificationSender = Substitute.For<INotificationSender>();

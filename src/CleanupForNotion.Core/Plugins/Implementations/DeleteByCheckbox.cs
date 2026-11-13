@@ -8,20 +8,20 @@ using Notion.Client;
 namespace CleanupForNotion.Core.Plugins.Implementations;
 
 public class DeleteByCheckbox(
-  ILogger<DeletePluginBase<DeleteByCheckboxOptions>> logger,
-  IPluginStateProvider pluginStateProvider,
-  TimeProvider timeProvider,
-  DeleteByCheckboxOptions options,
-  string pluginDescription,
-  string? pluginId)
-  : DeletePluginBase<DeleteByCheckboxOptions>(logger, pluginStateProvider, timeProvider, options, pluginDescription, pluginId) {
-
+    ILogger<DeletePluginBase<DeleteByCheckboxOptions>> logger,
+    IPluginStateProvider pluginStateProvider,
+    TimeProvider timeProvider,
+    DeleteByCheckboxOptions options,
+    string pluginDescription,
+    string? pluginId)
+    : DeletePluginBase<DeleteByCheckboxOptions>(logger, pluginStateProvider, timeProvider, options, pluginDescription,
+        pluginId) {
   public override string Name => "DeleteByCheckbox";
 
   public override async Task Run(
-    ICfnNotionClient client,
-    GlobalOptions globalOptions,
-    CancellationToken cancellationToken) {
+      ICfnNotionClient client,
+      GlobalOptions globalOptions,
+      CancellationToken cancellationToken) {
     await DoDelete(
         client,
         globalOptions,

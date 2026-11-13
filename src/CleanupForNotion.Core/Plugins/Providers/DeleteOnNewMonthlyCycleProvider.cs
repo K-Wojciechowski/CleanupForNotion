@@ -26,7 +26,8 @@ public class DeleteOnNewMonthlyCycleProvider(
         DataSourceId: dataSourceId,
         PropertyName: propertyName,
         CycleResetDay: options.GetInteger("CycleResetDay"),
-        MonthOverflowResetsOnFirstDayOfNextMonth: options.GetOptionalBoolean("MonthOverflowResetsOnFirstDayOfNextMonth") ?? true,
+        MonthOverflowResetsOnFirstDayOfNextMonth:
+        options.GetOptionalBoolean("MonthOverflowResetsOnFirstDayOfNextMonth") ?? true,
         TimeZoneName: options.GetOptionalString("TimeZoneName"),
         GracePeriod: gracePeriod);
   }

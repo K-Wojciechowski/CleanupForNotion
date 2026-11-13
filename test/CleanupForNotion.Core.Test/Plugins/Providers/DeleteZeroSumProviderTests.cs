@@ -56,8 +56,7 @@ public class DeleteZeroSumProviderTests {
   public void GetPlugin_MissingPropertyName_ThrowsException() {
     // Arrange
     var rawOptions = new Dictionary<string, object> {
-        { "DataSourceId", "data source id" },
-        { "GracePeriod", "00:00:01" }
+        { "DataSourceId", "data source id" }, { "GracePeriod", "00:00:01" }
     };
 
     var pluginSpecification = new PluginSpecification(

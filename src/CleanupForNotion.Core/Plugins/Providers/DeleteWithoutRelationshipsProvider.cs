@@ -36,6 +36,7 @@ public class DeleteWithoutRelationshipsProvider(
       DeleteWithoutRelationshipsOptions options,
       string pluginDescription,
       string? pluginId) {
-    return new DeleteWithoutRelationships(logger, pluginStateProvider, timeProvider, options, pluginDescription, pluginId);
+    return new DeleteWithoutRelationships(logger, pluginStateProvider, timeProvider, options, pluginDescription,
+        pluginId);
   }
 }

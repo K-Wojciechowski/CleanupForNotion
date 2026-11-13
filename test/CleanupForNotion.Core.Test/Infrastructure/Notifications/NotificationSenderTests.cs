@@ -32,6 +32,5 @@ public class NotificationSenderTests {
     await listener3.Received().OnRunFinished(true, CancellationToken.None).ConfigureAwait(false);
 
     await listener2.DidNotReceive().OnRunFinished(true, CancellationToken.None).ConfigureAwait(false);
-
   }
 }

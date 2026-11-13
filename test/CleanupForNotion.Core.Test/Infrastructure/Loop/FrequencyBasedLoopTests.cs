@@ -23,7 +23,8 @@ public class FrequencyBasedLoopTests {
         .AddScoped<IRunner>(_ => runner)
         .BuildServiceProvider();
 
-    runner.RunCleanup(Arg.Any<GlobalOptions>(), null, Arg.Any<CancellationToken>()).Returns(Task.Delay(200, CancellationToken.None));
+    runner.RunCleanup(Arg.Any<GlobalOptions>(), null, Arg.Any<CancellationToken>())
+        .Returns(Task.Delay(200, CancellationToken.None));
 
     var loop = new FrequencyBasedLoop(
         globalOptionsProvider: globalOptionsProvider,
@@ -69,7 +70,8 @@ public class FrequencyBasedLoopTests {
     await loop.StopAsync(cancellationTokenSource.Token).ConfigureAwait(false);
 
     // Assert
-    await runner.Received().RunCleanup(globalOptionsProvider.GlobalOptions, null, Arg.Any<CancellationToken>()).ConfigureAwait(false);
+    await runner.Received().RunCleanup(globalOptionsProvider.GlobalOptions, null, Arg.Any<CancellationToken>())
+        .ConfigureAwait(false);
     var callCount = runner.ReceivedCalls().Count();
     callCount.ShouldBeInRange(3, 4);
     hostApplicationLifetime.DidNotReceiveWithAnyArgs().StopApplication();
@@ -99,8 +101,9 @@ public class FrequencyBasedLoopTests {
     // Act & Assert
     var cancellationTokenSource = new CancellationTokenSource();
     await loop.StartAsync(cancellationTokenSource.Token).ConfigureAwait(false);
-    var exception = await Should.ThrowAsync<Exception>(
-        async () => await loop.ExecuteTask.ShouldNotBeNull().ConfigureAwait(false)).ConfigureAwait(false);
+    var exception = await Should
+        .ThrowAsync<Exception>(async () => await loop.ExecuteTask.ShouldNotBeNull().ConfigureAwait(false))
+        .ConfigureAwait(false);
     exception.Message.ShouldBe("kaboom");
 
     logger.LatestRecord.Message.ShouldBe("Runner failed with exception: kaboom");

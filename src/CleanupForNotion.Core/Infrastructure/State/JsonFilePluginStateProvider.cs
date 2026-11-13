@@ -33,13 +33,15 @@ public class JsonFilePluginStateProvider : IPluginStateProvider, INotificationLi
 
   #region Data access
 
-  public async Task<string?> GetString(IPluginIdentifiers pluginIdentifiers, string key, CancellationToken cancellationToken) {
+  public async Task<string?> GetString(IPluginIdentifiers pluginIdentifiers, string key,
+      CancellationToken cancellationToken) {
     using var _ = await GetAccess(cancellationToken).ConfigureAwait(false);
     var encodedKey = GetEncodedKey(pluginIdentifiers, key);
     return _data.GetValueOrDefault(encodedKey);
   }
 
-  public async Task SetString(IPluginIdentifiers pluginIdentifiers, string key, string value, CancellationToken cancellationToken) {
+  public async Task SetString(IPluginIdentifiers pluginIdentifiers, string key, string value,
+      CancellationToken cancellationToken) {
     using var _ = await GetAccess(cancellationToken).ConfigureAwait(false);
     var encodedKey = GetEncodedKey(pluginIdentifiers, key);
     _data[encodedKey] = value;
