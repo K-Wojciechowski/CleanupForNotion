@@ -28,6 +28,11 @@ variable "lambda_source" {
   type        = string
 }
 
+variable "lambda_handler" {
+  description = "The assembly, namespace, and name of the Lambda function handler"
+  type        = string
+}
+
 variable "s3_arn" {
   description = "The ARN of the S3 bucket"
   type        = string
@@ -41,4 +46,10 @@ variable "s3_name" {
 variable "s3_key" {
   description = "The S3 key for the appsettings.json file"
   type        = string
+}
+
+variable "function_url" {
+  description = "Whether function URL should be enabled"
+  type        = bool
+  default     = false
 }

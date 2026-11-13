@@ -206,7 +206,8 @@ public class DynamoDbPluginStateProviderUnitTests {
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
     // Act
-    Func<Task> act = async () => await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
+    Func<Task> act = async () => await provider
+        .GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
 
     // Assert
@@ -232,7 +233,8 @@ public class DynamoDbPluginStateProviderUnitTests {
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
     // Act
-    await provider.SetString(new P(pluginName, pluginDescription), key, value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(pluginName, pluginDescription), key, value, CancellationToken.None)
+        .ConfigureAwait(false);
 
     // Assert
     client.ReceivedCalls().ShouldBeEmpty();
@@ -291,7 +293,8 @@ public class DynamoDbPluginStateProviderUnitTests {
     // Act
     var result = await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
-    await provider.SetString(new P(pluginName, pluginDescription), key, value2, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(pluginName, pluginDescription), key, value2, CancellationToken.None)
+        .ConfigureAwait(false);
     var result2 = await provider.GetString(new P(pluginName, pluginDescription), key, CancellationToken.None)
         .ConfigureAwait(false);
 
@@ -374,7 +377,8 @@ public class DynamoDbPluginStateProviderUnitTests {
     var notificationSender = Substitute.For<INotificationSender>();
     var provider = new DynamoDbPluginStateProvider(client, logger, notificationSender, _options);
 
-    await provider.SetString(new P(pluginName, pluginDescription), key, value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(pluginName, pluginDescription), key, value, CancellationToken.None)
+        .ConfigureAwait(false);
 
     // Act
     await provider.OnRunFinished(dryRun: true, CancellationToken.None).ConfigureAwait(false);
@@ -436,7 +440,8 @@ public class DynamoDbPluginStateProviderUnitTests {
     client.BatchWriteItemAsync(Arg.Any<BatchWriteItemRequest>(), Arg.Any<CancellationToken>())
         .Returns(new BatchWriteItemResponse { UnprocessedItems = null });
 
-    await provider.SetString(new P(pluginName, pluginDescription), key, value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(pluginName, pluginDescription), key, value, CancellationToken.None)
+        .ConfigureAwait(false);
 
     // Act
     await provider.OnRunFinished(dryRun: false, CancellationToken.None).ConfigureAwait(false);
@@ -585,7 +590,8 @@ public class DynamoDbPluginStateProviderUnitTests {
             Arg.Any<CancellationToken>())
         .Returns(new BatchWriteItemResponse { UnprocessedItems = null });
 
-    await provider.SetString(new P(pluginName, pluginDescription), key1, value, CancellationToken.None).ConfigureAwait(false);
+    await provider.SetString(new P(pluginName, pluginDescription), key1, value, CancellationToken.None)
+        .ConfigureAwait(false);
     await provider.Remove(new P(pluginName, pluginDescription), key2, CancellationToken.None).ConfigureAwait(false);
 
     // Act
@@ -681,7 +687,8 @@ public class DynamoDbPluginStateProviderUnitTests {
     await provider.Remove(new P(pluginName, pluginDescription), key, CancellationToken.None).ConfigureAwait(false);
 
     // Assert
-    Func<Task> act = async () => await provider.OnRunFinished(dryRun: false, CancellationToken.None).ConfigureAwait(false);
+    Func<Task> act = async () =>
+        await provider.OnRunFinished(dryRun: false, CancellationToken.None).ConfigureAwait(false);
 
     (await act.ShouldThrowAsync<Exception>().ConfigureAwait(false)).ShouldBe(exception);
     await client.Received(5).BatchWriteItemAsync(Arg.Any<BatchWriteItemRequest>(), Arg.Any<CancellationToken>())

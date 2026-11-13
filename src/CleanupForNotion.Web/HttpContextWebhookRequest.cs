@@ -1,4 +1,5 @@
-﻿using CleanupForNotion.Core.Webhooks;
+﻿using CleanupForNotion.Core;
+using CleanupForNotion.Core.Webhooks;
 
 namespace CleanupForNotion.Web;
 
@@ -6,7 +7,7 @@ internal class HttpContextWebhookRequest(HttpContext httpContext) : IWebhookRequ
   public long? ContentLength => httpContext.Request.ContentLength;
 
   public string? SignatureHeader =>
-      httpContext.Request.Headers.TryGetValue("X-Notion-Signature", out var signatureHeaders)
+      httpContext.Request.Headers.TryGetValue(Constants.WebhookSignatureHeaderName, out var signatureHeaders)
           ? signatureHeaders.ToString()
           : null;
 

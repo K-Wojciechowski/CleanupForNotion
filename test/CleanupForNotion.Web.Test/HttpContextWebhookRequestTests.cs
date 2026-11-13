@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Primitives;
+﻿using CleanupForNotion.Core;
+using Microsoft.Extensions.Primitives;
 using NSubstitute;
 using Shouldly;
 
@@ -42,13 +43,13 @@ public class HttpContextWebhookRequestTests {
     var httpContextWebhookRequest = new HttpContextWebhookRequest(httpContext);
 
     // Act & Assert
-    headerDictionary["X-Notion-Signature"] = [];
+    headerDictionary[Constants.WebhookSignatureHeaderName] = [];
     httpContextWebhookRequest.SignatureHeader.ShouldBeNull();
 
-    headerDictionary["X-Notion-Signature"] = new StringValues("one");
+    headerDictionary[Constants.WebhookSignatureHeaderName] = new StringValues("one");
     httpContextWebhookRequest.SignatureHeader.ShouldBe("one");
 
-    headerDictionary["X-Notion-Signature"] = new StringValues(["one", "two"]);
+    headerDictionary[Constants.WebhookSignatureHeaderName] = new StringValues(["one", "two"]);
     httpContextWebhookRequest.SignatureHeader.ShouldBe("one,two");
   }
 
@@ -60,7 +61,8 @@ public class HttpContextWebhookRequestTests {
     var httpContextWebhookRequest = new HttpContextWebhookRequest(httpContext);
 
     // Act
-    Func<Task> act = async () => await httpContextWebhookRequest.ReadBodyAsync(CancellationToken.None).ConfigureAwait(false);
+    Func<Task> act = async () =>
+        await httpContextWebhookRequest.ReadBodyAsync(CancellationToken.None).ConfigureAwait(false);
 
     // Assert
     await act.ShouldThrowAsync<InvalidOperationException>().ConfigureAwait(false);

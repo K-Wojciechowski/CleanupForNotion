@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.Json;
 using System.Threading.Channels;
 using CleanupForNotion.Core;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
@@ -7,8 +6,6 @@ using CleanupForNotion.Core.Infrastructure.Execution;
 using CleanupForNotion.Core.Infrastructure.Loop;
 using CleanupForNotion.Core.Webhooks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Notion.Client;
 
 namespace CleanupForNotion.Web;
 
@@ -19,7 +16,6 @@ public class Program {
     builder.Services
         .AddCfnServices()
         .AddSingleton(TimeProvider.System)
-        .AddSingleton<IWebhookProcessor, WebhookProcessor>()
         .AddHostedService<ChannelTimerBackgroundService>()
         .AddHostedService<ChannelBasedLoop>()
         .AddLogging(loggingBuilder => loggingBuilder.AddSimpleConsole(options => {

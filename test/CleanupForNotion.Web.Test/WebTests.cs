@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
+using CleanupForNotion.Core;
 using CleanupForNotion.Core.Infrastructure.ConfigModels;
 using CleanupForNotion.Core.Infrastructure.Execution;
 using CleanupForNotion.Core.Webhooks.NotionModels;
@@ -193,7 +194,7 @@ public class WebTests {
     channel.Reader.TryPeek(out _).ShouldBeFalse();
     const string body = "invalid json which will not be parsed";
     var content = new StringContent(body, Encoding.UTF8, "application/json");
-    content.Headers.Add("X-Notion-Signature", "sha256-invalid");
+    content.Headers.Add(Constants.WebhookSignatureHeaderName, "sha256-invalid");
 
     // Act
     var response = await client.PostAsync("webhook", content, TestContext.CancellationToken)
@@ -238,7 +239,7 @@ public class WebTests {
     channel.Reader.TryPeek(out _).ShouldBeFalse();
     const string body = "invalid json which will not be parsed";
     var content = new StringContent(body, Encoding.UTF8, "application/json");
-    content.Headers.Add("X-Notion-Signature", "sha256-invalid");
+    content.Headers.Add(Constants.WebhookSignatureHeaderName, "sha256-invalid");
 
     // Act
     var response = await client.PostAsync("webhook", content, TestContext.CancellationToken)
@@ -276,7 +277,7 @@ public class WebTests {
     var body = JsonSerializer.Serialize(webhookBody);
     var content = new StringContent(body, Encoding.UTF8, "application/json");
     var signature = await NotionWebhookSignature.SignPayloadAsync(body, WebhookSecret).ConfigureAwait(false);
-    content.Headers.Add("X-Notion-Signature", signature);
+    content.Headers.Add(Constants.WebhookSignatureHeaderName, signature);
 
     // Act
     var response = await client.PostAsync("webhook", content, TestContext.CancellationToken)
@@ -324,7 +325,7 @@ public class WebTests {
     var body = JsonSerializer.Serialize(webhookBody);
     var content = new StringContent(body, Encoding.UTF8, "application/json");
     var signature = await NotionWebhookSignature.SignPayloadAsync(body, WebhookSecret).ConfigureAwait(false);
-    content.Headers.Add("X-Notion-Signature", signature);
+    content.Headers.Add(Constants.WebhookSignatureHeaderName, signature);
 
     // Act
     var response = await client.PostAsync("webhook", content, TestContext.CancellationToken)
@@ -366,7 +367,7 @@ public class WebTests {
     var body = JsonSerializer.Serialize(webhookBody);
     var content = new StringContent(body, Encoding.UTF8, "application/json");
     var signature = await NotionWebhookSignature.SignPayloadAsync(body, WebhookSecret).ConfigureAwait(false);
-    content.Headers.Add("X-Notion-Signature", signature);
+    content.Headers.Add(Constants.WebhookSignatureHeaderName, signature);
 
     // Act
     var response = await client.PostAsync("webhook", content, TestContext.CancellationToken)
@@ -393,18 +394,16 @@ public class WebTests {
     channel.Reader.TryPeek(out _).ShouldBeFalse();
     var webhookBody = new NotionWebhookBody {
         Type = "page.whatever",
-        Data = new NotionWebhookData() { Parent = new NotionWebhookParent() {
-            Id = "unused",
-            Type = "unused",
-            DataSourceId = null
-        }},
+        Data = new NotionWebhookData() {
+            Parent = new NotionWebhookParent() { Id = "unused", Type = "unused", DataSourceId = null }
+        },
         Entity = new NotionWebhookEntity { Type = "unused", Id = "unused" }
     };
 
     var body = JsonSerializer.Serialize(webhookBody);
     var content = new StringContent(body, Encoding.UTF8, "application/json");
     var signature = await NotionWebhookSignature.SignPayloadAsync(body, WebhookSecret).ConfigureAwait(false);
-    content.Headers.Add("X-Notion-Signature", signature);
+    content.Headers.Add(Constants.WebhookSignatureHeaderName, signature);
 
     // Act
     var response = await client.PostAsync("webhook", content, TestContext.CancellationToken)
@@ -435,7 +434,7 @@ public class WebTests {
     const string body = "null";
     var content = new StringContent(body, Encoding.UTF8, "application/json");
     var signature = await NotionWebhookSignature.SignPayloadAsync(body, WebhookSecret).ConfigureAwait(false);
-    content.Headers.Add("X-Notion-Signature", signature);
+    content.Headers.Add(Constants.WebhookSignatureHeaderName, signature);
 
     // Act
     var response = await client.PostAsync("webhook", content, TestContext.CancellationToken)
@@ -463,7 +462,7 @@ public class WebTests {
     const string body = "invalid json";
     var content = new StringContent(body, Encoding.UTF8, "application/json");
     var signature = await NotionWebhookSignature.SignPayloadAsync(body, WebhookSecret).ConfigureAwait(false);
-    content.Headers.Add("X-Notion-Signature", signature);
+    content.Headers.Add(Constants.WebhookSignatureHeaderName, signature);
 
     // Act
     var response = await client.PostAsync("webhook", content, TestContext.CancellationToken)
@@ -482,7 +481,8 @@ public class WebTests {
   public async Task PostWebhook_TraceLoggingDisabled_DoesNotLogBody() {
     // Arrange
     using var factory =
-        new CfnWebApplicationFactory(webhookSecret: WebhookSecret, webhookConfigurations: [], traceLoggingEnabled: false);
+        new CfnWebApplicationFactory(webhookSecret: WebhookSecret, webhookConfigurations: [],
+            traceLoggingEnabled: false);
     var client = factory.CreateClient();
     var channel = factory.Services.GetRequiredService<Channel<RunRequest>>();
     var logCollector = factory.Services.GetFakeLogCollector();
@@ -491,7 +491,7 @@ public class WebTests {
     const string body = "invalid json";
     var content = new StringContent(body, Encoding.UTF8, "application/json");
     var signature = await NotionWebhookSignature.SignPayloadAsync(body, WebhookSecret).ConfigureAwait(false);
-    content.Headers.Add("X-Notion-Signature", signature);
+    content.Headers.Add(Constants.WebhookSignatureHeaderName, signature);
 
     // Act
     var response = await client.PostAsync("webhook", content, TestContext.CancellationToken)

@@ -17,7 +17,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="$(ProjectName).Test" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Content Include="..\..\Directory.Build.props">
       <Link>Directory.Build.props</Link>

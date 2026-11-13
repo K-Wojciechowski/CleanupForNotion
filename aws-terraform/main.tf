@@ -27,9 +27,11 @@ module "lambda" {
   id_prefix                 = var.id_prefix
   lambda_name               = local.lambda_name
   lambda_source             = var.lambda_source
+  lambda_handler            = "CleanupForNotion.Aws::CleanupForNotion.Aws.LambdaHandler::Handle"
   s3_arn                    = module.s3.arn
   s3_name                   = module.s3.name
   s3_key                    = module.s3.key
+  function_url              = var.enable_webhooks
 }
 
 module "s3" {

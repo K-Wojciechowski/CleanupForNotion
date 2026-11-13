@@ -213,12 +213,14 @@ public class WebhookProcessorTests {
   }
 
   [TestMethod]
-  public async Task ProcessWebhookAsync_UnreadableDataSourceId_ReturnsOkWithoutSendingMessagesToChannel() {
+  [DataRow(true, DisplayName = "data.parent present, data source ID null")]
+  [DataRow(false, DisplayName = "data.parent missing")]
+  public async Task ProcessWebhookAsync_UnreadableDataSourceId_ReturnsOkWithoutSendingMessagesToChannel(bool parentPresent) {
     // Arrange
     var webhookBody = new NotionWebhookBody {
         Type = "page.whatever",
         Data = new NotionWebhookData() {
-            Parent = new NotionWebhookParent() { Id = "unused", Type = "unused", DataSourceId = null }
+            Parent = parentPresent ? new NotionWebhookParent() { Id = "unused", Type = "unused", DataSourceId = null } : null
         },
         Entity = new NotionWebhookEntity { Type = "unused", Id = "unused" }
     };

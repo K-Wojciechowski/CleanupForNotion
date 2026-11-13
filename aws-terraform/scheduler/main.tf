@@ -11,6 +11,7 @@ resource "aws_scheduler_schedule" "schedule" {
   target {
     arn      = var.lambda_arn
     role_arn = aws_iam_role.scheduler_role.arn
+    input = "{\"version\": \"cfn-schedule\"}"
   }
 }
 

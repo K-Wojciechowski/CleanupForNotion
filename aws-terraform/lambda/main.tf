@@ -3,7 +3,7 @@ resource "aws_lambda_function" "lambda" {
   source_code_hash = filemd5(var.lambda_source)
   function_name    = var.lambda_name
   role             = aws_iam_role.lambda_role.arn
-  handler          = "CleanupForNotion.Aws::CleanupForNotion.Aws.LambdaHandler::Handle"
+  handler          = var.lambda_handler
   runtime          = "dotnet10"
   timeout          = 300
 
@@ -14,11 +14,18 @@ resource "aws_lambda_function" "lambda" {
 
   environment {
     variables = {
-      CFN_S3_BUCKET           = var.s3_name
-      CFN_S3_KEY              = var.s3_key
-      CFN_DYNAMODB_TABLE_NAME = var.dynamodb_name
+      CFN_S3_BUCKET                = var.s3_name
+      CFN_S3_KEY                   = var.s3_key
+      CFN_DYNAMODB_TABLE_NAME      = var.dynamodb_name
+      AWS_LAMBDA_HANDLER_LOG_LEVEL = "Debug"
     }
   }
+}
+
+resource "aws_lambda_function_url" "lambda_url" {
+  count = var.function_url ? 1 : 0
+  function_name      = aws_lambda_function.lambda.function_name
+  authorization_type = "NONE"
 }
 
 resource "aws_iam_role" "lambda_role" {
@@ -57,7 +64,9 @@ resource "aws_iam_policy" "lambda_policies" {
         Effect = "Allow"
         Action = [
           "dynamodb:BatchWriteItem",
-          "dynamodb:GetItem"
+          "dynamodb:DeleteItem",
+          "dynamodb:GetItem",
+          "dynamodb:PutItem"
         ]
         Resource = ["${var.dynamodb_arn}", "${var.dynamodb_arn}/*"]
       },
